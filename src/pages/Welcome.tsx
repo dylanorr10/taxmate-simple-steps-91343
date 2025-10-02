@@ -23,18 +23,18 @@ const Welcome = () => {
   };
 
   return (
-    <div className="min-h-screen px-4 py-8 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted px-4 py-8 flex flex-col">
       <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
         <div className="text-center mb-8 space-y-3">
-          <h1 className="text-4xl md:text-5xl font-bold gradient-primary bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground">
             Welcome to TaxMate! 👋
           </h1>
-          <p className="text-xl text-foreground font-medium">
+          <p className="text-xl text-muted-foreground">
             Finally, tax software that speaks your language!
           </p>
         </div>
 
-        <Card className="p-6 shadow-primary flex-1 flex flex-col bg-gradient-to-br from-white to-primary/5 border-primary/20">
+        <Card className="p-6 shadow-card flex-1 flex flex-col border border-border">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-foreground mb-2">
               What kind of work do you do?
@@ -45,32 +45,29 @@ const Welcome = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 flex-1">
-            {professions.map((prof, idx) => {
-              const gradients = ['gradient-success', 'gradient-accent', 'gradient-secondary', 'gradient-primary', 'from-info/80 to-accent/80 bg-gradient-to-br'];
-              return (
-                <button
-                  key={prof.id}
-                  onClick={() => setSelected(prof.id)}
-                  className={`p-6 rounded-xl border-2 transition-all hover:scale-105 active:scale-95 ${
-                    selected === prof.id
-                      ? `${gradients[idx]} text-white border-0 shadow-primary`
-                      : "border-border bg-card hover:border-primary/50 shadow-card"
-                  }`}
-                >
-                  <div className="text-5xl mb-3">{prof.emoji}</div>
-                  <div className={`text-sm font-bold ${selected === prof.id ? 'text-white' : 'text-foreground'}`}>
-                    {prof.label}
-                  </div>
-                </button>
-              );
-            })}
+            {professions.map((prof) => (
+              <button
+                key={prof.id}
+                onClick={() => setSelected(prof.id)}
+                className={`p-6 rounded-lg border-2 transition-all hover:scale-105 active:scale-95 ${
+                  selected === prof.id
+                    ? "border-primary bg-primary/5 shadow-card"
+                    : "border-border bg-card hover:border-primary/50"
+                }`}
+              >
+                <div className="text-5xl mb-3">{prof.emoji}</div>
+                <div className="text-sm font-semibold text-foreground">
+                  {prof.label}
+                </div>
+              </button>
+            ))}
           </div>
 
           <Button
             size="xl"
             onClick={handleContinue}
             disabled={!selected}
-            className="w-full gradient-accent text-white border-0 shadow-accent text-lg h-14 disabled:opacity-50"
+            className="w-full text-lg h-14"
           >
             Continue
           </Button>

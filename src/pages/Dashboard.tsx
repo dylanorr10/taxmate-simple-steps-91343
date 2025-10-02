@@ -79,7 +79,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-20">
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <div className="flex items-start justify-between">
           <div className="space-y-2">
@@ -89,40 +89,40 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Let's see how things are going</p>
           </div>
           <Link to="/onboarding">
-            <Button variant="outline" size="sm" className="gap-2 border-primary/30 hover:bg-primary/10">
-              <Sparkles className="w-4 h-4 text-primary" />
+            <Button variant="outline" size="sm" className="gap-2">
+              <Sparkles className="w-4 h-4" />
               Review Features
             </Button>
           </Link>
         </div>
 
-        <Card className="p-6 shadow-primary gradient-primary text-white border-0">
+        <Card className="p-6 shadow-card bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm text-white/80 mb-1">Dashboard</div>
-              <h2 className="text-xl font-bold">
+              <div className="text-sm text-muted-foreground mb-1">Dashboard</div>
+              <h2 className="text-xl font-bold text-foreground">
                 Business Snapshot
               </h2>
-              <p className="text-sm text-white/80 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Quick view of your business health
               </p>
             </div>
-            <div className="text-center bg-white/20 backdrop-blur-sm rounded-xl p-3">
+            <div className="text-center">
               <MTDGauge score={73} />
-              <div className="text-xs text-white/90 mt-2 font-medium">MTD Ready</div>
+              <div className="text-xs text-muted-foreground mt-2 font-medium">MTD Ready</div>
             </div>
           </div>
 
           <div className="mt-6 grid grid-cols-3 gap-3">
-            <div className="p-4 bg-white/95 rounded-xl shadow-md backdrop-blur-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
               <div className="text-xs text-muted-foreground mb-1">Jobs this week</div>
-              <div className="font-bold text-2xl gradient-success bg-clip-text text-transparent">5</div>
+              <div className="font-bold text-2xl text-success">5</div>
             </div>
-            <div className="p-4 bg-white/95 rounded-xl shadow-md backdrop-blur-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
               <div className="text-xs text-muted-foreground mb-1">Est. invoiced</div>
               <div className="font-bold text-2xl text-primary">£3.2k</div>
             </div>
-            <div className="p-4 bg-white/95 rounded-xl shadow-md backdrop-blur-sm">
+            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
               <div className="text-xs text-muted-foreground mb-1">Outstanding</div>
               <div className="font-bold text-xl text-warning">£740</div>
             </div>
@@ -135,28 +135,25 @@ const Dashboard = () => {
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {quickActions.map((action) => (
-              <Button
+              <Card
                 key={action.id}
-                className={`h-auto py-6 shadow-md hover:shadow-lg transition-all border-0 ${
-                  action.id === 'income' ? 'gradient-success text-white' :
-                  action.id === 'expense' ? 'gradient-secondary text-white' :
-                  action.id === 'receipt' ? 'gradient-accent text-white' :
-                  'gradient-primary text-white'
-                }`}
+                className="p-6 shadow-card hover:shadow-md transition-all cursor-pointer border border-border hover:border-primary/30 bg-card"
               >
-                <div className="text-3xl mb-1">{action.emoji}</div>
-                <span className="text-sm font-semibold">{action.label}</span>
-              </Button>
+                <div className="text-center">
+                  <div className="text-3xl mb-2">{action.emoji}</div>
+                  <span className="text-sm font-semibold text-foreground">{action.label}</span>
+                </div>
+              </Card>
             ))}
           </div>
         </div>
 
-        <Card className="p-6 shadow-card border-success/30 bg-gradient-to-br from-success/5 to-success/10">
+        <Card className="p-6 shadow-card border border-border">
           <h2 className="text-lg font-semibold text-foreground mb-4">
             This Week
           </h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm border border-success/20">
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-4 bg-success/5 rounded-lg border border-success/20">
               <div className="flex-1">
                 <HelpTooltip 
                   term="Revenue"
@@ -165,34 +162,34 @@ const Dashboard = () => {
                 />
                 <div className="text-2xl font-bold text-success mt-1">£542</div>
               </div>
-              <div className="w-12 h-12 rounded-xl gradient-success flex items-center justify-center shadow-primary">
-                <Coins className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+                <Coins className="w-5 h-5 text-success" />
               </div>
             </div>
-            <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm border border-warning/20">
+            <div className="flex justify-between items-center p-4 bg-destructive/5 rounded-lg border border-destructive/20">
               <div className="flex-1">
                 <HelpTooltip 
                   term="Expenses"
                   explanation="Money you spent on business costs this week - fuel, materials, tools, etc. These reduce your tax bill!"
                   icon="💸"
                 />
-                <div className="text-2xl font-bold text-warning mt-1">£78</div>
+                <div className="text-2xl font-bold text-destructive mt-1">£78</div>
               </div>
-              <div className="w-12 h-12 rounded-xl gradient-secondary flex items-center justify-center shadow-accent">
-                <Receipt className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+                <Receipt className="w-5 h-5 text-destructive" />
               </div>
             </div>
-            <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm border-2 border-accent/30">
+            <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg border border-primary/20">
               <div className="flex-1">
                 <HelpTooltip 
                   term="Profit"
                   explanation="What's left after business costs - this is the money you actually keep. This is what you pay tax on, not your total income."
                   icon="💰"
                 />
-                <div className="text-2xl font-bold text-accent mt-1">£464</div>
+                <div className="text-2xl font-bold text-primary mt-1">£464</div>
               </div>
-              <div className="w-12 h-12 rounded-xl gradient-accent flex items-center justify-center shadow-accent">
-                <TrendingUp className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-primary" />
               </div>
             </div>
           </div>
@@ -203,11 +200,11 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold text-foreground">
               Recent Activity
             </h2>
-            <button className="text-xs text-accent font-medium hover:underline">View all</button>
+            <button className="text-xs text-primary font-medium hover:underline">View all</button>
           </div>
           <div className="space-y-2">
             {recentActivity.map((activity, index) => (
-              <Card key={index} className="p-4 shadow-card bg-gradient-to-r from-white to-success/5 border-success/20 hover:shadow-md transition-shadow">
+              <Card key={index} className="p-4 shadow-card hover:shadow-md transition-shadow border border-border">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="font-semibold text-sm">{activity.text}</div>
@@ -229,7 +226,7 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold text-foreground">
               Outstanding Invoices
             </h2>
-            <div className="text-xs px-3 py-1 rounded-full bg-warning/10 text-warning font-medium">
+            <div className="text-xs text-muted-foreground">
               {outstandingInvoices.length} unpaid
             </div>
           </div>
@@ -237,11 +234,7 @@ const Dashboard = () => {
             {outstandingInvoices.map((invoice) => (
               <Card
                 key={invoice.id}
-                className={`p-4 shadow-card hover:shadow-md transition-all border-l-4 ${
-                  invoice.dueInDays < 0 
-                    ? 'border-l-destructive bg-gradient-to-r from-destructive/5 to-white' 
-                    : 'border-l-accent bg-gradient-to-r from-accent/5 to-white'
-                }`}
+                className="p-4 shadow-card hover:shadow-md transition-shadow border border-border"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -259,7 +252,7 @@ const Dashboard = () => {
                   </div>
                   <div
                     className={`font-bold text-lg ${
-                      invoice.dueInDays < 0 ? "text-destructive" : "text-accent"
+                      invoice.dueInDays < 0 ? "text-destructive" : "text-primary"
                     }`}
                   >
                     £{invoice.amount}
@@ -270,12 +263,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <Card className="p-5 shadow-card gradient-secondary text-white border-0">
+        <Card className="p-5 shadow-card bg-accent/5 border border-accent/20">
           <div className="flex items-start gap-3">
             <div className="text-3xl">💡</div>
             <div>
-              <h3 className="font-bold text-lg mb-1">Quick Tip</h3>
-              <p className="text-sm text-white/90">
+              <h3 className="font-semibold text-foreground mb-1">Quick Tip</h3>
+              <p className="text-sm text-muted-foreground">
                 Remember to log those fuel receipts! They add up quickly and can
                 save you a lot on taxes.
               </p>
