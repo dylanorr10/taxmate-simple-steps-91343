@@ -8,56 +8,61 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    /* Core Palette */
+    --background: 214 32% 96%; /* Light Gray #F1F5F9 */
+    --foreground: 217 33% 17%; /* Dark Gray #1E293B */
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card: 0 0% 100%; /* Pure White */
+    --card-foreground: 217 33% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 217 33% 17%;
 
-    --primary: 215 85% 35%;
+    /* Primary Blue - Trust & Finance */
+    --primary: 217 80% 51%; /* #1A73E8 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 55% 45%;
+    /* Secondary Green - Growth & Compliance (stronger role) */
+    --secondary: 123 46% 34%; /* #2E7D32 */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 15% 95%;
-    --muted-foreground: 215 15% 45%;
-
-    --accent: 205 80% 50%;
+    /* Accent Teal - Modern contrast */
+    --accent: 171 100% 37%; /* #00BFA5 */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    /* Supporting Neutrals */
+    --muted: 214 32% 96%; /* Light Gray */
+    --muted-foreground: 215 16% 65%; /* Mid Gray #94A3B8 */
 
-    --border: 215 15% 90%;
-    --input: 215 15% 95%;
-    --ring: 215 85% 35%;
+    --border: 215 16% 85%;
+    --input: 214 32% 96%;
+    --ring: 217 80% 51%;
 
     --radius: 0.5rem;
     
-    --success: 160 55% 45%;
+    /* Status Colors */
+    --success: 134 74% 37%; /* #16A34A */
     --success-foreground: 0 0% 100%;
     
-    --warning: 35 90% 55%;
+    --warning: 38 92% 50%; /* #F59E0B */
     --warning-foreground: 0 0% 100%;
     
-    --info: 205 80% 50%;
+    --destructive: 0 72% 51%; /* #DC2626 */
+    --destructive-foreground: 0 0% 100%;
+    
+    --info: 199 97% 39%; /* #0284C7 */
     --info-foreground: 0 0% 100%;
 
-    /* Subtle Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(215 85% 35%) 0%, hsl(215 85% 42%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(205 80% 50%) 0%, hsl(205 80% 58%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(160 55% 45%) 0%, hsl(160 55% 52%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(160 55% 45%) 0%, hsl(165 50% 50%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(210 20% 98%) 0%, hsl(210 20% 96%) 100%);
+    /* Modern Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 80% 51%) 0%, hsl(171 100% 37%) 100%); /* Blue → Teal */
+    --gradient-secondary: linear-gradient(135deg, hsl(123 46% 34%) 0%, hsl(217 80% 51%) 100%); /* Green → Blue */
+    --gradient-success: linear-gradient(135deg, hsl(134 74% 37%) 0%, hsl(123 46% 34%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(214 32% 96%) 0%, hsl(215 20% 92%) 100%);
     
     /* Subtle Shadows */
-    --shadow-primary: 0 4px 16px -4px hsl(215 85% 35% / 0.12);
-    --shadow-accent: 0 4px 16px -4px hsl(205 80% 50% / 0.12);
-    --shadow-card: 0 2px 8px -2px hsl(215 25% 15% / 0.06);
+    --shadow-primary: 0 4px 16px -4px hsl(217 80% 51% / 0.15);
+    --shadow-success: 0 4px 16px -4px hsl(134 74% 37% / 0.15);
+    --shadow-card: 0 2px 8px -2px hsl(217 33% 17% / 0.08);
 
     --sidebar-background: 0 0% 98%;
 
@@ -77,53 +82,56 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 215 25% 10%;
-    --foreground: 210 20% 95%;
+    --background: 217 33% 12%;
+    --foreground: 214 32% 96%;
 
-    --card: 215 20% 14%;
-    --card-foreground: 210 20% 95%;
+    --card: 217 30% 16%;
+    --card-foreground: 214 32% 96%;
 
-    --popover: 215 20% 14%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 217 30% 16%;
+    --popover-foreground: 214 32% 96%;
 
-    --primary: 215 85% 50%;
+    /* Primary Blue */
+    --primary: 217 80% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 55% 50%;
+    /* Secondary Green */
+    --secondary: 123 46% 45%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 215 15% 20%;
-    --muted-foreground: 210 15% 65%;
-
-    --accent: 205 80% 55%;
+    /* Accent Teal */
+    --accent: 171 100% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --muted: 217 25% 22%;
+    --muted-foreground: 215 16% 65%;
 
-    --border: 215 15% 25%;
-    --input: 215 15% 20%;
-    --ring: 215 85% 50%;
+    --border: 217 25% 25%;
+    --input: 217 25% 22%;
+    --ring: 217 80% 60%;
     
-    --success: 160 55% 50%;
+    /* Status Colors */
+    --success: 134 74% 45%;
     --success-foreground: 0 0% 100%;
     
-    --warning: 35 90% 55%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     
-    --info: 205 80% 55%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --info: 199 97% 45%;
     --info-foreground: 0 0% 100%;
 
-    /* Subtle Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(215 85% 40%) 0%, hsl(215 85% 52%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(205 80% 45%) 0%, hsl(205 80% 58%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(160 55% 40%) 0%, hsl(160 55% 52%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(160 55% 40%) 0%, hsl(165 50% 48%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(215 25% 10%) 0%, hsl(215 25% 16%) 100%);
+    /* Modern Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217 80% 50%) 0%, hsl(171 100% 37%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(123 46% 40%) 0%, hsl(217 80% 50%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(134 74% 40%) 0%, hsl(123 46% 40%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(217 33% 12%) 0%, hsl(217 30% 18%) 100%);
     
     /* Subtle Shadows */
-    --shadow-primary: 0 4px 16px -4px hsl(215 85% 35% / 0.3);
-    --shadow-accent: 0 4px 16px -4px hsl(205 80% 50% / 0.3);
+    --shadow-primary: 0 4px 16px -4px hsl(217 80% 51% / 0.3);
+    --shadow-success: 0 4px 16px -4px hsl(134 74% 37% / 0.3);
     --shadow-card: 0 2px 8px -2px hsl(0 0% 0% / 0.4);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -151,10 +159,6 @@ All colors MUST be HSL.
     background: var(--gradient-primary);
   }
   
-  .gradient-accent {
-    background: var(--gradient-accent);
-  }
-  
   .gradient-secondary {
     background: var(--gradient-secondary);
   }
@@ -171,7 +175,7 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-primary);
   }
   
-  .shadow-accent {
-    box-shadow: var(--shadow-accent);
+  .shadow-success {
+    box-shadow: var(--shadow-success);
   }
 }
