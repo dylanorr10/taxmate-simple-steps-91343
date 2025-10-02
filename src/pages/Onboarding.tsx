@@ -15,7 +15,7 @@ const Onboarding = () => {
     recordKeeping: "",
   });
 
-  const totalScreens = 4;
+  const totalScreens = 5;
   const progress = ((currentScreen + 1) / totalScreens) * 100;
 
   const handleNext = () => {
@@ -38,6 +38,70 @@ const Onboarding = () => {
     setFormData({ ...formData, [field]: value });
   };
 
+  // Screen 0: Welcome
+  const WelcomeScreen = () => (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 flex flex-col justify-center px-6 pb-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl mx-auto mb-6 flex items-center justify-center">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-foreground mb-3">
+            Welcome to TaxMate
+          </h1>
+          <p className="text-lg text-muted-foreground mb-8">
+            Tax & accounting made simple for sole traders
+          </p>
+        </div>
+
+        <div className="space-y-4 mb-8">
+          <div className="flex items-start space-x-3 bg-primary/5 p-4 rounded-xl border border-primary/10">
+            <CheckCircle className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-foreground">Learn As You Go</p>
+              <p className="text-sm text-muted-foreground">
+                We explain every tax term and rule in plain English - no confusing jargon
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start space-x-3 bg-accent/5 p-4 rounded-xl border border-accent/10">
+            <CheckCircle className="w-6 h-6 text-accent flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-foreground">MTD Ready in Minutes</p>
+              <p className="text-sm text-muted-foreground">
+                Get compliant with Making Tax Digital without the hassle
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start space-x-3 bg-secondary/5 p-4 rounded-xl border border-secondary/10">
+            <CheckCircle className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-foreground">Built for Sole Traders</p>
+              <p className="text-sm text-muted-foreground">
+                Designed specifically for sole traders and self-employed professionals
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground mb-6">
+          🔒 Your data is secure and encrypted
+        </p>
+      </div>
+
+      <div className="px-6 pb-6">
+        <button
+          onClick={handleNext}
+          className="w-full bg-gradient-to-r from-primary to-accent text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center space-x-2"
+        >
+          <span>Let's Get Started</span>
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  );
 
   // Screen 1: Basic Info
   const BasicInfoScreen = () => (
@@ -485,6 +549,7 @@ const Onboarding = () => {
   );
 
   const screens = [
+    <WelcomeScreen key="welcome" />,
     <BasicInfoScreen key="basic" />,
     <BusinessTypeScreen key="business" />,
     <IncomeRecordsScreen key="income" />,

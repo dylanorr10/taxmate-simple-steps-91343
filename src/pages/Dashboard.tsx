@@ -9,6 +9,7 @@ import {
   Home,
   FileText,
   Settings,
+  Sparkles,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { HelpTooltip } from "@/components/HelpTooltip";
@@ -56,11 +57,19 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-20">
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-foreground">
-            Morning, Dave! ☀️
-          </h1>
-          <p className="text-muted-foreground">Let's see how things are going</p>
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-foreground">
+              Morning, Dave! ☀️
+            </h1>
+            <p className="text-muted-foreground">Let's see how things are going</p>
+          </div>
+          <Link to="/onboarding">
+            <Button variant="outline" size="sm" className="gap-2">
+              <Sparkles className="w-4 h-4" />
+              Review Features
+            </Button>
+          </Link>
         </div>
 
         <Card className="p-6 shadow-lg">
