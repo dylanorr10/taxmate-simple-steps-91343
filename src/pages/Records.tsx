@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings } from "lucide-react";
+import { Home, FileText, BookOpen, Shield, Lock } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const Records = () => {
@@ -7,20 +7,44 @@ const Records = () => {
 
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/records", label: "Records", icon: FileText },
-    { path: "/settings", label: "Settings", icon: Settings },
+    { path: "/log", label: "Log", icon: FileText },
+    { path: "/learn", label: "Learn", icon: BookOpen },
+    { path: "/records", label: "MTD", icon: Shield },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">Your Records</h1>
-        <Card className="p-6 text-center">
-          <p className="text-muted-foreground">
-            Records page coming soon! This is where you'll see all your income and
-            expenses.
-          </p>
-        </Card>
+        <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-6">
+          <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mb-6">
+            <Shield className="w-12 h-12 text-primary" />
+          </div>
+          
+          <h1 className="text-3xl font-bold text-foreground mb-3">
+            Making Tax Digital
+          </h1>
+          
+          <div className="max-w-md space-y-4">
+            <p className="text-lg text-muted-foreground">
+              Coming Soon
+            </p>
+            
+            <Card className="p-6 bg-primary/5 border-primary/20">
+              <div className="flex items-start gap-3 text-left">
+                <Lock className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                <div>
+                  <p className="text-sm text-foreground">
+                    We're building MTD compliance features to help you submit your tax information directly to HMRC.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <p className="text-sm text-muted-foreground pt-4">
+              We'll notify you when this feature is ready. In the meantime, keep logging your income and expenses!
+            </p>
+          </div>
+        </div>
       </div>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg">

@@ -10,6 +10,8 @@ import {
   FileText,
   Settings,
   Sparkles,
+  BookOpen,
+  Shield,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { HelpTooltip } from "@/components/HelpTooltip";
@@ -51,8 +53,8 @@ const Dashboard = () => {
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
     { path: "/log", label: "Log", icon: FileText },
-    { path: "/learn", label: "Learn", icon: Sparkles },
-    { path: "/records", label: "Records", icon: Settings },
+    { path: "/learn", label: "Learn", icon: BookOpen },
+    { path: "/records", label: "MTD", icon: Shield },
   ];
 
   const outstandingInvoices = [

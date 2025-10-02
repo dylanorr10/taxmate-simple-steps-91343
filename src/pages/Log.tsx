@@ -23,7 +23,7 @@ const Log = () => {
     { path: "/dashboard", label: "Home", icon: Home },
     { path: "/log", label: "Log", icon: FileText },
     { path: "/learn", label: "Learn", icon: BookOpen },
-    { path: "/records", label: "Records", icon: Shield },
+    { path: "/records", label: "MTD", icon: Shield },
   ];
 
   const handleQuickCash = () => {
