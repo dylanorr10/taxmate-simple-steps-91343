@@ -13,27 +13,27 @@ const Records = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
+    <div className="min-h-screen pb-24">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-6">
-          <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mb-6">
-            <Shield className="w-12 h-12 text-primary" />
+          <div className="w-28 h-28 gradient-primary rounded-full flex items-center justify-center mb-6 shadow-primary animate-pulse">
+            <Shield className="w-14 h-14 text-white" />
           </div>
           
-          <h1 className="text-3xl font-bold text-foreground mb-3">
+          <h1 className="text-4xl font-bold text-foreground mb-3 gradient-primary bg-clip-text text-transparent">
             Making Tax Digital
           </h1>
           
           <div className="max-w-md space-y-4">
-            <p className="text-lg text-muted-foreground">
+            <p className="text-xl font-semibold text-accent">
               Coming Soon
             </p>
             
-            <Card className="p-6 bg-primary/5 border-primary/20">
+            <Card className="p-6 shadow-accent gradient-accent text-white border-0">
               <div className="flex items-start gap-3 text-left">
-                <Lock className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                <Lock className="w-6 h-6 flex-shrink-0 mt-1" />
                 <div>
-                  <p className="text-sm text-foreground">
+                  <p className="text-sm text-white/95 leading-relaxed">
                     We're building MTD compliance features to help you submit your tax information directly to HMRC.
                   </p>
                 </div>

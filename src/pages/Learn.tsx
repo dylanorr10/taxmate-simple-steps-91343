@@ -67,7 +67,7 @@ const Learn = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
+    <div className="min-h-screen pb-24">
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
@@ -78,15 +78,15 @@ const Learn = () => {
           </p>
         </div>
 
-        <Card className="p-6 shadow-lg bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+        <Card className="p-6 shadow-primary gradient-accent text-white border-0">
           <div className="flex items-start gap-4">
-            <div className="text-4xl">📚</div>
+            <div className="text-5xl">📚</div>
             <div className="flex-1">
-              <h2 className="font-bold text-lg mb-2">Featured Topic</h2>
-              <p className="text-sm text-muted-foreground mb-3">
+              <h2 className="font-bold text-xl mb-2">Featured Topic</h2>
+              <p className="text-sm text-white/90 mb-4">
                 New to self-employment? Start with our beginner's guide to understand the basics.
               </p>
-              <Button size="sm" className="gap-2">
+              <Button size="sm" className="gap-2 bg-white/20 hover:bg-white/30 border-white/30 text-white shadow-md backdrop-blur-sm">
                 Start Learning
                 <ArrowRight className="w-4 h-4" />
               </Button>
@@ -97,43 +97,51 @@ const Learn = () => {
         <div>
           <h2 className="font-semibold text-lg mb-4">All Lessons</h2>
           <div className="space-y-3">
-            {lessons.map((lesson, index) => (
-              <Card
-                key={index}
-                className="p-5 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl">{lesson.emoji}</div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-foreground">
-                        {lesson.title}
-                      </h3>
-                      <Badge variant="secondary" className="ml-2 text-xs">
-                        {lesson.category}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {lesson.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">
-                        {lesson.duration}
-                      </span>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="default">
-                          Read
-                        </Button>
-                        <Button size="sm" variant="outline" className="gap-1">
-                          <Bookmark className="w-3 h-3" />
-                          Save
-                        </Button>
+            {lessons.map((lesson, index) => {
+              const gradients = ['from-success/10 to-success/5', 'from-accent/10 to-accent/5', 'from-secondary/10 to-secondary/5', 'from-primary/10 to-primary/5'];
+              const badgeColors = ['bg-success/10 text-success', 'bg-accent/10 text-accent', 'bg-secondary/10 text-secondary', 'bg-primary/10 text-primary'];
+              return (
+                <Card
+                  key={index}
+                  className={`p-5 shadow-card hover:shadow-primary transition-all cursor-pointer bg-gradient-to-br ${gradients[index % 4]} border-l-4 ${
+                    index % 4 === 0 ? 'border-l-success' :
+                    index % 4 === 1 ? 'border-l-accent' :
+                    index % 4 === 2 ? 'border-l-secondary' : 'border-l-primary'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="text-4xl">{lesson.emoji}</div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-foreground">
+                          {lesson.title}
+                        </h3>
+                        <Badge className={`ml-2 text-xs ${badgeColors[index % 4]} border-0`}>
+                          {lesson.category}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {lesson.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          {lesson.duration}
+                        </span>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="shadow-sm">
+                            Read
+                          </Button>
+                          <Button size="sm" variant="outline" className="gap-1">
+                            <Bookmark className="w-3 h-3" />
+                            Save
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -42,7 +42,7 @@ const Log = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
+    <div className="min-h-screen pb-24">
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
@@ -53,45 +53,43 @@ const Log = () => {
           </p>
         </div>
 
-        <Card className="p-6 shadow-lg">
+        <Card className="p-6 shadow-card gradient-accent text-white border-0">
           <div className="flex flex-wrap gap-3 mb-4">
             <Button
               onClick={() => alert("Create invoice flow - coming soon")}
-              className="flex-1 min-w-[140px] gap-2"
+              className="flex-1 min-w-[140px] gap-2 bg-white/20 hover:bg-white/30 border-white/30 text-white shadow-md backdrop-blur-sm"
             >
               <FilePlus className="w-4 h-4" />
               Create Invoice
             </Button>
             <Button
-              variant="outline"
               onClick={handleQuickCash}
-              className="flex-1 min-w-[140px] gap-2"
+              className="flex-1 min-w-[140px] gap-2 bg-white/20 hover:bg-white/30 border-white/30 text-white shadow-md backdrop-blur-sm"
             >
               <ShoppingCart className="w-4 h-4" />
               Record Cash
             </Button>
             <Button
-              variant="outline"
               onClick={() => alert("Log expense flow - coming soon")}
-              className="flex-1 min-w-[140px] gap-2"
+              className="flex-1 min-w-[140px] gap-2 bg-white/20 hover:bg-white/30 border-white/30 text-white shadow-md backdrop-blur-sm"
             >
               <Tag className="w-4 h-4" />
               Log Expense
             </Button>
           </div>
-          <div className="p-3 bg-muted/50 rounded-lg">
-            <p className="text-sm text-muted-foreground">{logOutput}</p>
+          <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm">
+            <p className="text-sm text-white/90">{logOutput}</p>
           </div>
         </Card>
 
-        <Card className="p-6 shadow-lg">
+        <Card className="p-6 shadow-card gradient-success text-white border-0">
           <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-success" />
+            <ShoppingCart className="w-5 h-5" />
             Quick Cash Sale
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-muted-foreground mb-2 block">
+              <label className="text-sm font-medium text-white/90 mb-2 block">
                 Amount
               </label>
               <Input
@@ -99,43 +97,49 @@ const Log = () => {
                 placeholder="Enter amount (£)"
                 value={cashAmount}
                 onChange={(e) => setCashAmount(e.target.value)}
-                className="text-lg"
+                className="text-lg bg-white/20 border-white/30 text-white placeholder:text-white/50 backdrop-blur-sm"
               />
             </div>
-            <Button onClick={handleSaveCash} className="w-full gap-2">
+            <Button onClick={handleSaveCash} className="w-full gap-2 bg-white/20 hover:bg-white/30 border-white/30 text-white shadow-md backdrop-blur-sm">
               <CheckCircle className="w-4 h-4" />
               Save Cash Sale
             </Button>
           </div>
         </Card>
 
-        <Card className="p-6 shadow-lg">
-          <h2 className="font-semibold text-lg mb-4">Recent Logs</h2>
+        <Card className="p-6 shadow-card bg-gradient-to-br from-primary/10 to-success/5 border-success/20">
+          <h2 className="font-semibold text-lg mb-4 text-primary">Recent Logs</h2>
           <div className="space-y-3">
-            <div className="flex items-start justify-between p-3 bg-success/5 rounded-lg border border-success/20">
+            <div className="flex items-start justify-between p-4 bg-white rounded-xl shadow-sm border border-success/20">
               <div className="flex-1">
                 <div className="font-semibold text-sm">Invoice INV-209 sent</div>
                 <div className="text-xs text-muted-foreground mt-1">
                   Paul's Garage – £180
                 </div>
               </div>
-              <CheckCircle className="w-5 h-5 text-success" />
+              <div className="w-8 h-8 rounded-lg gradient-success flex items-center justify-center shadow-sm">
+                <CheckCircle className="w-4 h-4 text-white" />
+              </div>
             </div>
-            <div className="flex items-start justify-between p-3 bg-success/5 rounded-lg border border-success/20">
+            <div className="flex items-start justify-between p-4 bg-white rounded-xl shadow-sm border border-success/20">
               <div className="flex-1">
                 <div className="font-semibold text-sm">Materials logged</div>
                 <div className="text-xs text-muted-foreground mt-1">
                   Cables & clips – £45.50
                 </div>
               </div>
-              <CheckCircle className="w-5 h-5 text-success" />
+              <div className="w-8 h-8 rounded-lg gradient-success flex items-center justify-center shadow-sm">
+                <CheckCircle className="w-4 h-4 text-white" />
+              </div>
             </div>
-            <div className="flex items-start justify-between p-3 bg-success/5 rounded-lg border border-success/20">
+            <div className="flex items-start justify-between p-4 bg-white rounded-xl shadow-sm border border-success/20">
               <div className="flex-1">
                 <div className="font-semibold text-sm">Cash sale recorded</div>
                 <div className="text-xs text-muted-foreground mt-1">£85.00</div>
               </div>
-              <CheckCircle className="w-5 h-5 text-success" />
+              <div className="w-8 h-8 rounded-lg gradient-success flex items-center justify-center shadow-sm">
+                <CheckCircle className="w-4 h-4 text-white" />
+              </div>
             </div>
           </div>
         </Card>
