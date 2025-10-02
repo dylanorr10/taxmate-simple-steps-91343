@@ -18,266 +18,285 @@ import { HelpTooltip } from "@/components/HelpTooltip";
 
 const Dashboard = () => {
   const location = useLocation();
+  const mtdReadiness = 78;
 
   const quickActions = [
     {
+      id: "receipt",
+      label: "Photo Receipt",
+      subtitle: "Snap & Save",
+      emoji: "📸",
+      icon: Camera,
+    },
+    {
       id: "income",
       label: "Money In",
+      subtitle: "Got Paid",
       emoji: "💰",
       icon: Coins,
-      color: "text-success",
     },
     {
       id: "expense",
       label: "Money Out",
+      subtitle: "Spent Cash",
       emoji: "💸",
       icon: Receipt,
-      color: "text-destructive",
-    },
-    {
-      id: "receipt",
-      label: "Photo Receipt",
-      emoji: "📸",
-      icon: Camera,
-      color: "text-info",
     },
     {
       id: "reports",
-      label: "How Am I Doing?",
+      label: "Check Progress",
+      subtitle: "How Am I?",
       emoji: "📊",
       icon: TrendingUp,
-      color: "text-warning",
     },
   ];
 
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/log", label: "Log", icon: FileText },
-    { path: "/learn", label: "Learn", icon: BookOpen },
+    { path: "/log", label: "Money", icon: FileText },
+    { path: "/learn", label: "Reports", icon: BookOpen },
     { path: "/records", label: "MTD", icon: Shield },
   ];
 
-  const outstandingInvoices = [
-    {
-      id: "INV-210",
-      client: "Acme Repairs",
-      amount: 320,
-      dueInDays: -3,
-    },
-    {
-      id: "INV-211",
-      client: "HomeFix Ltd",
-      amount: 420,
-      dueInDays: 6,
-    },
+  const achievements = [
+    { id: 1, title: "Receipt Master", emoji: "📸", status: "unlocked" },
+    { id: 2, title: "Banking Expert", emoji: "🏦", status: "progress" },
+    { id: 3, title: "Reports Wizard", emoji: "📊", status: "locked" },
   ];
 
   const recentActivity = [
-    { text: "Added materials – £45.50 (cables & clips)", when: "Yesterday" },
-    { text: "Invoice INV-209 sent to Paul's Garage – £180", when: "3 days ago" },
-    { text: "Recorded cash sale – £85.00", when: "Last week" },
+    { text: "£45 fuel at Shell", when: "Today", checked: true },
+    { text: "£127 tools at Screwfix", when: "Yesterday", checked: true },
+    { text: "£340 job payment received", when: "Monday", checked: true },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-20">
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-foreground">
-              Morning, Dave! ☀️
-            </h1>
-            <p className="text-muted-foreground">Let's see how things are going</p>
-          </div>
-          <Link to="/onboarding">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Sparkles className="w-4 h-4" />
-              Review Features
-            </Button>
-          </Link>
-        </div>
-
-        <Card className="p-6 shadow-card bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-background pb-20">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+        {/* HERO SECTION */}
+        <Card className="p-6 shadow-primary bg-gradient-to-br from-primary/10 via-background to-accent/5 border-primary/30">
+          <div className="space-y-4">
             <div>
-              <div className="text-sm text-muted-foreground mb-1">Dashboard</div>
-              <h2 className="text-xl font-bold text-foreground">
-                Business Snapshot
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Quick view of your business health
+              <h1 className="text-xl font-bold text-foreground mb-1">
+                🏠 Hi Dave! Here's how your business is doing
+              </h1>
+            </div>
+
+            {/* MTD Progress */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-primary">{mtdReadiness}% MTD Ready</span>
+                  <HelpTooltip 
+                    term="MTD Ready"
+                    explanation="This shows how ready you are for your next Making Tax Digital submission to HMRC"
+                    icon="ℹ️"
+                  />
+                </div>
+              </div>
+              <div className="relative w-full h-3 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-success rounded-full transition-all duration-500"
+                  style={{ width: `${mtdReadiness}%` }}
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Next submission: <span className="font-semibold text-foreground">6 weeks away</span>
               </p>
             </div>
-            <div className="text-center">
-              <MTDGauge score={73} />
-              <div className="text-xs text-muted-foreground mt-2 font-medium">MTD Ready</div>
-            </div>
-          </div>
 
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
-              <div className="text-xs text-muted-foreground mb-1">Jobs this week</div>
-              <div className="font-bold text-2xl text-success">5</div>
-            </div>
-            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
-              <div className="text-xs text-muted-foreground mb-1">Est. invoiced</div>
-              <div className="font-bold text-2xl text-primary">£3.2k</div>
-            </div>
-            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
-              <div className="text-xs text-muted-foreground mb-1">Outstanding</div>
-              <div className="font-bold text-xl text-warning">£740</div>
+            {/* This Month Summary */}
+            <div className="flex items-center gap-2 text-sm pt-2 border-t border-border/50">
+              <span className="text-muted-foreground">This Month:</span>
+              <span className="font-semibold text-success">£2,340 in</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="font-semibold text-destructive">£680 out</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="font-semibold text-primary">£1,660 profit ✨</span>
             </div>
           </div>
         </Card>
 
+        {/* QUICK ACTIONS */}
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-3">
-            Quick Actions
+            Get Stuff Done Fast
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {quickActions.map((action) => (
               <Card
                 key={action.id}
-                className="p-6 shadow-card hover:shadow-md transition-all cursor-pointer border border-border hover:border-primary/30 bg-card"
+                className="p-5 shadow-card hover:shadow-primary transition-all cursor-pointer bg-primary text-primary-foreground hover:scale-105 active:scale-95"
               >
-                <div className="text-center">
-                  <div className="text-3xl mb-2">{action.emoji}</div>
-                  <span className="text-sm font-semibold text-foreground">{action.label}</span>
+                <div className="text-center space-y-2">
+                  <div className="text-3xl">{action.emoji}</div>
+                  <div>
+                    <div className="font-bold text-sm">{action.label}</div>
+                    <div className="text-xs opacity-90">"{action.subtitle}"</div>
+                  </div>
                 </div>
               </Card>
             ))}
           </div>
         </div>
 
-        <Card className="p-6 shadow-card border border-border">
+        {/* FINANCIAL OVERVIEW */}
+        <Card className="p-6 shadow-card">
           <h2 className="text-lg font-semibold text-foreground mb-4">
-            This Week
+            Your Numbers Made Simple
           </h2>
           <div className="space-y-3">
-            <div className="flex justify-between items-center p-4 bg-success/5 rounded-lg border border-success/20">
-              <div className="flex-1">
-                <HelpTooltip 
-                  term="Revenue"
-                  explanation="The total money customers paid you this week, before taking off any business costs"
-                  icon="💵"
-                />
-                <div className="text-2xl font-bold text-success mt-1">£542</div>
+            {/* Money In */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium text-foreground">📈 Money In</span>
+                <span className="font-bold text-success">£8,450</span>
               </div>
-              <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
-                <Coins className="w-5 h-5 text-success" />
+              <div className="relative w-full h-6 bg-muted rounded-lg overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-accent to-success rounded-lg"
+                  style={{ width: "85%" }}
+                />
               </div>
             </div>
-            <div className="flex justify-between items-center p-4 bg-destructive/5 rounded-lg border border-destructive/20">
-              <div className="flex-1">
-                <HelpTooltip 
-                  term="Expenses"
-                  explanation="Money you spent on business costs this week - fuel, materials, tools, etc. These reduce your tax bill!"
-                  icon="💸"
-                />
-                <div className="text-2xl font-bold text-destructive mt-1">£78</div>
+
+            {/* Money Out */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium text-foreground">📉 Money Out</span>
+                <span className="font-bold text-warning">£3,200</span>
               </div>
-              <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-                <Receipt className="w-5 h-5 text-destructive" />
+              <div className="relative w-full h-6 bg-muted rounded-lg overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-warning to-destructive/70 rounded-lg"
+                  style={{ width: "48%" }}
+                />
               </div>
             </div>
-            <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg border border-primary/20">
-              <div className="flex-1">
-                <HelpTooltip 
-                  term="Profit"
-                  explanation="What's left after business costs - this is the money you actually keep. This is what you pay tax on, not your total income."
-                  icon="💰"
+
+            {/* You Made */}
+            <div className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium text-foreground">💰 You Made</span>
+                <span className="font-bold text-primary">£5,250 ✨</span>
+              </div>
+              <div className="relative w-full h-6 bg-muted rounded-lg overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-success rounded-lg"
+                  style={{ width: "70%" }}
                 />
-                <div className="text-2xl font-bold text-primary mt-1">£464</div>
               </div>
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-primary" />
-              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2 text-sm">
+              <span className="text-success">↗️</span>
+              <span className="text-muted-foreground">
+                Up <span className="font-semibold text-success">12%</span> from last quarter - nice work! 🎉
+              </span>
             </div>
           </div>
         </Card>
 
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-foreground">
-              Recent Activity
-            </h2>
-            <button className="text-xs text-primary font-medium hover:underline">View all</button>
-          </div>
-          <div className="space-y-2">
-            {recentActivity.map((activity, index) => (
-              <Card key={index} className="p-4 shadow-card hover:shadow-md transition-shadow border border-border">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="font-semibold text-sm">{activity.text}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {activity.when}
-                    </div>
-                  </div>
-                  <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
-                    <Receipt className="w-4 h-4 text-success" />
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-foreground">
-              Outstanding Invoices
-            </h2>
-            <div className="text-xs text-muted-foreground">
-              {outstandingInvoices.length} unpaid
+        {/* UPCOMING & RECENT ACTIVITY */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* What's Coming Up */}
+          <Card className="p-5 shadow-card">
+            <h3 className="font-semibold text-foreground mb-3">What's Coming Up</h3>
+            <div className="space-y-3">
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <div className="text-sm font-medium text-muted-foreground mb-1">⏰ Next MTD Update</div>
+                <div className="text-lg font-bold text-foreground">Jan 31, 2026</div>
+                <div className="text-sm text-muted-foreground mb-3">6 weeks away</div>
+                <Button size="sm" className="w-full bg-primary hover:bg-primary-hover text-primary-foreground">
+                  Set Reminder
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="space-y-2">
-            {outstandingInvoices.map((invoice) => (
-              <Card
-                key={invoice.id}
-                className="p-4 shadow-card hover:shadow-md transition-shadow border border-border"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold">
-                      {invoice.client}{" "}
-                      <span className="text-xs text-muted-foreground">
-                        • {invoice.id}
-                      </span>
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {invoice.dueInDays < 0
-                        ? `Overdue by ${Math.abs(invoice.dueInDays)} days`
-                        : `Due in ${invoice.dueInDays} days`}
-                    </div>
+          </Card>
+
+          {/* Recent Activity */}
+          <Card className="p-5 shadow-card">
+            <h3 className="font-semibold text-foreground mb-3">📝 Recent Activity</h3>
+            <div className="space-y-2">
+              {recentActivity.map((activity, idx) => (
+                <div key={idx} className="flex items-center justify-between text-sm">
+                  <div className="flex-1">
+                    <div className="font-medium text-foreground">{activity.text}</div>
+                    <div className="text-xs text-muted-foreground">{activity.when}</div>
                   </div>
-                  <div
-                    className={`font-bold text-lg ${
-                      invoice.dueInDays < 0 ? "text-destructive" : "text-primary"
-                    }`}
-                  >
-                    £{invoice.amount}
-                  </div>
+                  <div className="text-success text-lg">✅</div>
                 </div>
-              </Card>
-            ))}
-          </div>
+              ))}
+              <Button variant="outline" size="sm" className="w-full mt-3">
+                See All Activity →
+              </Button>
+            </div>
+          </Card>
         </div>
 
-        <Card className="p-5 shadow-card bg-accent/5 border border-accent/20">
+        {/* ACHIEVEMENTS */}
+        <Card className="p-6 shadow-card bg-gradient-to-br from-warning/5 to-success/5 border-warning/30">
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            🚀 Your Tax Hero Journey
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            {achievements.map((achievement) => (
+              <div
+                key={achievement.id}
+                className={`p-4 rounded-lg text-center ${
+                  achievement.status === "unlocked"
+                    ? "bg-warning/20 border-2 border-warning"
+                    : achievement.status === "progress"
+                    ? "bg-accent/10 border-2 border-accent"
+                    : "bg-muted border-2 border-border opacity-50"
+                }`}
+              >
+                <div className="text-3xl mb-2">{achievement.emoji}</div>
+                <div className="text-xs font-semibold text-foreground mb-1">
+                  {achievement.title}
+                </div>
+                <div className="text-xs">
+                  {achievement.status === "unlocked" && "✨"}
+                  {achievement.status === "progress" && "🔄"}
+                  {achievement.status === "locked" && "🔒"}
+                </div>
+                <div className="text-xs font-medium mt-1 text-muted-foreground">
+                  {achievement.status === "unlocked" && "Unlocked!"}
+                  {achievement.status === "progress" && "In Progress"}
+                  {achievement.status === "locked" && "Locked"}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-sm text-muted-foreground mt-4 text-center">
+            Next: <span className="font-semibold text-foreground">Link your bank to unlock Banking Expert!</span> →
+          </p>
+        </Card>
+
+        {/* PRO TIP */}
+        <Card className="p-5 shadow-card bg-warning/10 border-warning/40">
           <div className="flex items-start gap-3">
             <div className="text-3xl">💡</div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-1">Quick Tip</h3>
-              <p className="text-sm text-muted-foreground">
-                Remember to log those fuel receipts! They add up quickly and can
-                save you a lot on taxes.
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">Pro Tip: You're spending more on fuel lately</h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Your fuel costs are up 23% this month. Want to track business vs personal trips better?
               </p>
+              <div className="flex gap-2">
+                <Button size="sm" className="bg-primary hover:bg-primary-hover text-primary-foreground">
+                  Set up mileage tracking
+                </Button>
+                <Button size="sm" variant="outline">
+                  Not now
+                </Button>
+              </div>
             </div>
           </div>
         </Card>
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg">
+      {/* BOTTOM NAVIGATION */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
         <div className="max-w-2xl mx-auto flex justify-around py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -294,6 +313,7 @@ const Dashboard = () => {
               >
                 <Icon className="w-6 h-6" />
                 <span className="text-xs font-medium">{item.label}</span>
+                {isActive && <div className="w-1 h-1 rounded-full bg-primary" />}
               </Link>
             );
           })}
