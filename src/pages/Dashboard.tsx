@@ -50,8 +50,30 @@ const Dashboard = () => {
 
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/records", label: "Records", icon: FileText },
-    { path: "/settings", label: "Settings", icon: Settings },
+    { path: "/log", label: "Log", icon: FileText },
+    { path: "/learn", label: "Learn", icon: Sparkles },
+    { path: "/records", label: "Records", icon: Settings },
+  ];
+
+  const outstandingInvoices = [
+    {
+      id: "INV-210",
+      client: "Acme Repairs",
+      amount: 320,
+      dueInDays: -3,
+    },
+    {
+      id: "INV-211",
+      client: "HomeFix Ltd",
+      amount: 420,
+      dueInDays: 6,
+    },
+  ];
+
+  const recentActivity = [
+    { text: "Added materials – £45.50 (cables & clips)", when: "Yesterday" },
+    { text: "Invoice INV-209 sent to Paul's Garage – £180", when: "3 days ago" },
+    { text: "Recorded cash sale – £85.00", when: "Last week" },
   ];
 
   return (
@@ -72,17 +94,36 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        <Card className="p-6 shadow-lg">
-          <div className="text-center mb-4">
-            <h2 className="text-lg font-semibold text-foreground mb-6">
-              Your MTD Readiness
-            </h2>
-            <MTDGauge score={73} />
+        <Card className="p-6 shadow-lg bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Dashboard</div>
+              <h2 className="text-xl font-bold text-foreground">
+                Business Snapshot
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Quick view of your business health
+              </p>
+            </div>
+            <div className="text-center">
+              <MTDGauge score={73} />
+              <div className="text-xs text-muted-foreground mt-2">MTD Ready</div>
+            </div>
           </div>
-          <div className="mt-6 p-4 bg-success/10 rounded-lg border border-success/20">
-            <p className="text-sm text-center text-success font-medium">
-              You're 73% ready for MTD - well done! 🎉
-            </p>
+
+          <div className="mt-6 grid grid-cols-3 gap-3">
+            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
+              <div className="text-xs text-muted-foreground mb-1">Jobs this week</div>
+              <div className="font-bold text-2xl text-primary">5</div>
+            </div>
+            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
+              <div className="text-xs text-muted-foreground mb-1">Est. invoiced</div>
+              <div className="font-bold text-2xl">£3.2k</div>
+            </div>
+            <div className="p-4 bg-card rounded-lg shadow-sm border border-border">
+              <div className="text-xs text-muted-foreground mb-1">Outstanding</div>
+              <div className="font-bold text-xl">£740</div>
+            </div>
           </div>
         </Card>
 
@@ -144,6 +185,72 @@ const Dashboard = () => {
             </div>
           </div>
         </Card>
+
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-foreground">
+              Recent Activity
+            </h2>
+            <button className="text-xs text-primary font-medium">View all</button>
+          </div>
+          <div className="space-y-2">
+            {recentActivity.map((activity, index) => (
+              <Card key={index} className="p-4 shadow-sm">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="font-semibold text-sm">{activity.text}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {activity.when}
+                    </div>
+                  </div>
+                  <Receipt className="w-5 h-5 text-success" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-foreground">
+              Outstanding Invoices
+            </h2>
+            <div className="text-xs text-muted-foreground">
+              {outstandingInvoices.length} unpaid
+            </div>
+          </div>
+          <div className="space-y-2">
+            {outstandingInvoices.map((invoice) => (
+              <Card
+                key={invoice.id}
+                className="p-4 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold">
+                      {invoice.client}{" "}
+                      <span className="text-xs text-muted-foreground">
+                        • {invoice.id}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {invoice.dueInDays < 0
+                        ? `Overdue by ${Math.abs(invoice.dueInDays)} days`
+                        : `Due in ${invoice.dueInDays} days`}
+                    </div>
+                  </div>
+                  <div
+                    className={`font-bold text-lg ${
+                      invoice.dueInDays < 0 ? "text-destructive" : "text-primary"
+                    }`}
+                  >
+                    £{invoice.amount}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
 
         <Card className="p-4 bg-warning/10 border-warning/20">
           <div className="flex items-start gap-3">

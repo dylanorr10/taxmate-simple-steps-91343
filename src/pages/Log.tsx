@@ -1,0 +1,170 @@
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Home,
+  FileText,
+  BookOpen,
+  Shield,
+  FilePlus,
+  ShoppingCart,
+  Tag,
+  CheckCircle,
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+
+const Log = () => {
+  const location = useLocation();
+  const [cashAmount, setCashAmount] = useState("");
+  const [logOutput, setLogOutput] = useState("No recent logs in this view.");
+
+  const navItems = [
+    { path: "/dashboard", label: "Home", icon: Home },
+    { path: "/log", label: "Log", icon: FileText },
+    { path: "/learn", label: "Learn", icon: BookOpen },
+    { path: "/records", label: "Records", icon: Shield },
+  ];
+
+  const handleQuickCash = () => {
+    setLogOutput("Tap Save to record a cash sale.");
+  };
+
+  const handleSaveCash = () => {
+    if (!cashAmount || parseFloat(cashAmount) <= 0) {
+      setLogOutput("Please enter a valid amount");
+      return;
+    }
+    setLogOutput(
+      `Saved cash sale £${parseFloat(cashAmount).toFixed(2)} — added to Recent Activity.`
+    );
+    setCashAmount("");
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">
+            Log Income & Expenses
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Quickly record sales, expenses or create invoices
+          </p>
+        </div>
+
+        <Card className="p-6 shadow-lg">
+          <div className="flex flex-wrap gap-3 mb-4">
+            <Button
+              onClick={() => alert("Create invoice flow - coming soon")}
+              className="flex-1 min-w-[140px] gap-2"
+            >
+              <FilePlus className="w-4 h-4" />
+              Create Invoice
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleQuickCash}
+              className="flex-1 min-w-[140px] gap-2"
+            >
+              <ShoppingCart className="w-4 h-4" />
+              Record Cash
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => alert("Log expense flow - coming soon")}
+              className="flex-1 min-w-[140px] gap-2"
+            >
+              <Tag className="w-4 h-4" />
+              Log Expense
+            </Button>
+          </div>
+          <div className="p-3 bg-muted/50 rounded-lg">
+            <p className="text-sm text-muted-foreground">{logOutput}</p>
+          </div>
+        </Card>
+
+        <Card className="p-6 shadow-lg">
+          <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
+            <ShoppingCart className="w-5 h-5 text-success" />
+            Quick Cash Sale
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">
+                Amount
+              </label>
+              <Input
+                type="number"
+                placeholder="Enter amount (£)"
+                value={cashAmount}
+                onChange={(e) => setCashAmount(e.target.value)}
+                className="text-lg"
+              />
+            </div>
+            <Button onClick={handleSaveCash} className="w-full gap-2">
+              <CheckCircle className="w-4 h-4" />
+              Save Cash Sale
+            </Button>
+          </div>
+        </Card>
+
+        <Card className="p-6 shadow-lg">
+          <h2 className="font-semibold text-lg mb-4">Recent Logs</h2>
+          <div className="space-y-3">
+            <div className="flex items-start justify-between p-3 bg-success/5 rounded-lg border border-success/20">
+              <div className="flex-1">
+                <div className="font-semibold text-sm">Invoice INV-209 sent</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Paul's Garage – £180
+                </div>
+              </div>
+              <CheckCircle className="w-5 h-5 text-success" />
+            </div>
+            <div className="flex items-start justify-between p-3 bg-success/5 rounded-lg border border-success/20">
+              <div className="flex-1">
+                <div className="font-semibold text-sm">Materials logged</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Cables & clips – £45.50
+                </div>
+              </div>
+              <CheckCircle className="w-5 h-5 text-success" />
+            </div>
+            <div className="flex items-start justify-between p-3 bg-success/5 rounded-lg border border-success/20">
+              <div className="flex-1">
+                <div className="font-semibold text-sm">Cash sale recorded</div>
+                <div className="text-xs text-muted-foreground mt-1">£85.00</div>
+              </div>
+              <CheckCircle className="w-5 h-5 text-success" />
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg">
+        <div className="max-w-2xl mx-auto flex justify-around py-2">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-all ${
+                  isActive
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                <Icon className="w-6 h-6" />
+                <span className="text-xs font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+export default Log;

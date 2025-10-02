@@ -10,6 +10,8 @@ import Records from "./pages/Records";
 import SettingsPage from "./pages/SettingsPage";
 import LearningHub from "./pages/LearningHub";
 import Glossary from "./pages/Glossary";
+import Log from "./pages/Log";
+import Learn from "./pages/Learn";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/log" element={<Log />} />
+          <Route path="/learn" element={<Learn />} />
           <Route path="/records" element={<Records />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/learning" element={<LearningHub />} />
