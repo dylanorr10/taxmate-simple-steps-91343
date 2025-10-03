@@ -13,12 +13,44 @@ import {
   BookOpen,
   Shield,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HelpTooltip } from "@/components/HelpTooltip";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const mtdReadiness = 78;
+
+  const handleQuickAction = (actionId: string, label: string) => {
+    if (actionId === "receipt") {
+      toast({
+        title: "📸 Photo Receipt",
+        description: "Open your camera to snap a receipt",
+      });
+    } else if (actionId === "income") {
+      navigate("/log");
+    } else if (actionId === "expense") {
+      navigate("/log");
+    } else if (actionId === "reports") {
+      navigate("/learn");
+    }
+  };
+
+  const handleSetReminder = () => {
+    toast({
+      title: "⏰ Reminder Set!",
+      description: "We'll notify you 1 week before your MTD submission",
+    });
+  };
+
+  const handleMileageTracking = () => {
+    toast({
+      title: "🚗 Mileage Tracking",
+      description: "Feature coming soon! We'll help you track business vs personal trips",
+    });
+  };
 
   const quickActions = [
     {
@@ -126,6 +158,7 @@ const Dashboard = () => {
             {quickActions.map((action) => (
               <Card
                 key={action.id}
+                onClick={() => handleQuickAction(action.id, action.label)}
                 className="p-5 shadow-card hover:shadow-primary transition-all cursor-pointer bg-primary text-primary-foreground hover:scale-105 active:scale-95"
               >
                 <div className="text-center space-y-2">
@@ -207,7 +240,11 @@ const Dashboard = () => {
                 <div className="text-sm font-medium text-muted-foreground mb-1">⏰ Next MTD Update</div>
                 <div className="text-lg font-bold text-foreground">Jan 31, 2026</div>
                 <div className="text-sm text-muted-foreground mb-3">6 weeks away</div>
-                <Button size="sm" className="w-full bg-primary hover:bg-primary-hover text-primary-foreground">
+                <Button 
+                  size="sm" 
+                  onClick={handleSetReminder}
+                  className="w-full bg-primary hover:bg-primary-hover text-primary-foreground"
+                >
                   Set Reminder
                 </Button>
               </div>
@@ -227,7 +264,12 @@ const Dashboard = () => {
                   <div className="text-success text-lg">✅</div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" className="w-full mt-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate("/log")}
+                className="w-full mt-3"
+              >
                 See All Activity →
               </Button>
             </div>
@@ -283,10 +325,18 @@ const Dashboard = () => {
                 Your fuel costs are up 23% this month. Want to track business vs personal trips better?
               </p>
               <div className="flex gap-2">
-                <Button size="sm" className="bg-primary hover:bg-primary-hover text-primary-foreground">
+                <Button 
+                  size="sm" 
+                  onClick={handleMileageTracking}
+                  className="bg-primary hover:bg-primary-hover text-primary-foreground"
+                >
                   Set up mileage tracking
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => toast({ title: "No problem!", description: "We'll remind you later" })}
+                >
                   Not now
                 </Button>
               </div>
