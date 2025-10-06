@@ -151,6 +151,30 @@ const Dashboard = () => {
           </div>
         </Card>
 
+        {/* Quick Actions */}
+        <Card className="p-3 shadow-lg">
+          <div className="flex gap-3 justify-between">
+            <button onClick={() => handleQuickAction("invoice")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
+              <div className="flex flex-col items-center gap-1">
+                <FilePlus className="w-5 h-5" />
+                <div className="text-xs font-semibold">Produce Invoice</div>
+              </div>
+            </button>
+            <button onClick={() => handleQuickAction("expense")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
+              <div className="flex flex-col items-center gap-1">
+                <PlusCircle className="w-5 h-5" />
+                <div className="text-xs font-semibold">Log Expense</div>
+              </div>
+            </button>
+            <button onClick={() => handleQuickAction("receipt")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
+              <div className="flex flex-col items-center gap-1">
+                <Camera className="w-5 h-5" />
+                <div className="text-xs font-semibold">Snap Receipt</div>
+              </div>
+            </button>
+          </div>
+        </Card>
+
         {/* MTD Compliance */}
         <Card className="p-4 shadow-lg">
           <div className="flex items-center justify-between mb-3">
@@ -224,30 +248,6 @@ const Dashboard = () => {
             </div>
           </Card>
         </div>
-
-        {/* Quick Actions */}
-        <Card className="p-3 shadow-lg">
-          <div className="flex gap-3 justify-between">
-            <button onClick={() => handleQuickAction("invoice")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
-              <div className="flex flex-col items-center gap-1">
-                <FilePlus className="w-5 h-5" />
-                <div className="text-xs font-semibold">Produce Invoice</div>
-              </div>
-            </button>
-            <button onClick={() => handleQuickAction("expense")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
-              <div className="flex flex-col items-center gap-1">
-                <PlusCircle className="w-5 h-5" />
-                <div className="text-xs font-semibold">Log Expense</div>
-              </div>
-            </button>
-            <button onClick={() => handleQuickAction("receipt")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
-              <div className="flex flex-col items-center gap-1">
-                <Camera className="w-5 h-5" />
-                <div className="text-xs font-semibold">Snap Receipt</div>
-              </div>
-            </button>
-          </div>
-        </Card>
 
         {/* Recent Activity */}
         <Card className="p-4 shadow-lg">
