@@ -21,15 +21,10 @@ const Dashboard = () => {
   const [expenseExpanded, setExpenseExpanded] = useState(false);
   const [modalContent, setModalContent] = useState<string | null>(null);
   const [mtdReadyPct, setMtdReadyPct] = useState(78);
-
-  const navItems = [
-    { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/log", label: "Money", icon: FileText },
-    { path: "/learn", label: "Reports", icon: BookOpen },
-    { path: "/records", label: "MTD", icon: Shield },
-  ];
-
-  const userData = {
+  const [mtdIssuesCount, setMtdIssuesCount] = useState(3);
+  
+  // Make userData stateful so we can update it
+  const [userData, setUserData] = useState({
     name: "Alex",
     role: "Electrician",
     incomeThisMonth: 2340,
@@ -47,7 +42,14 @@ const Dashboard = () => {
       { text: "Invoice INV-209 sent – £180", when: "3 days ago" },
       { text: "Recorded cash sale – £85.00", when: "Last week" },
     ],
-  };
+  });
+
+  const navItems = [
+    { path: "/dashboard", label: "Home", icon: Home },
+    { path: "/log", label: "Money", icon: FileText },
+    { path: "/learn", label: "Reports", icon: BookOpen },
+    { path: "/records", label: "MTD", icon: Shield },
+  ];
 
   const profit = userData.incomeThisMonth - userData.expensesThisMonth;
   const taxSavings = Math.round(userData.expensesThisMonth * 0.66);
@@ -75,11 +77,23 @@ const Dashboard = () => {
   };
 
   const handleAutoFix = () => {
-    setMtdReadyPct(Math.min(100, mtdReadyPct + 15));
+    const improvement = Math.min(22, 100 - mtdReadyPct);
+    setMtdReadyPct(Math.min(100, mtdReadyPct + improvement));
+    setMtdIssuesCount(0);
     setModalContent(null);
+    
+    // Add to recent activity
+    setUserData(prev => ({
+      ...prev,
+      recentActivity: [
+        { text: `Fixed ${mtdIssuesCount} MTD issues (VAT categories, invoice dates)`, when: "Just now" },
+        ...prev.recentActivity,
+      ].slice(0, 5),
+    }));
+    
     toast({
-      title: "✅ Issues Fixed!",
-      description: "Your MTD readiness has improved",
+      title: "✅ All Issues Fixed!",
+      description: `Fixed ${mtdIssuesCount} issues - MTD readiness now at ${Math.min(100, mtdReadyPct + improvement)}%`,
     });
   };
 
@@ -190,9 +204,16 @@ const Dashboard = () => {
             <div className="h-3 rounded-full bg-gradient-to-r from-accent to-success transition-all duration-300" style={{ width: `${mtdReadyPct}%` }}></div>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <Button onClick={handleFixMtd} className="bg-warning hover:bg-warning/90 text-warning-foreground">
-              Fix 3 issues
-            </Button>
+            {mtdIssuesCount > 0 ? (
+              <Button onClick={handleFixMtd} className="bg-warning hover:bg-warning/90 text-warning-foreground">
+                Fix {mtdIssuesCount} issues
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2 text-success">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-sm font-semibold">All issues resolved!</span>
+              </div>
+            )}
             <div className="text-sm text-muted-foreground">or <button onClick={() => toast({ title: "Coming soon", description: "MTD guide will help you understand the requirements" })} className="text-primary underline">learn more</button></div>
           </div>
         </Card>
@@ -318,10 +339,19 @@ const Dashboard = () => {
             {modalContent === "mtd-fix" && (
               <>
                 <h3 className="font-bold text-lg mb-2">Fix MTD Issues</h3>
-                <p className="text-sm text-muted-foreground mb-4">We found 3 issues: missing VAT category (2), missing invoice date (1).</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  We found {mtdIssuesCount} issues that need attention:
+                </p>
+                <ul className="list-disc list-inside text-sm text-muted-foreground mb-4 space-y-1">
+                  <li>Missing VAT category (2 invoices)</li>
+                  <li>Missing invoice date (1 invoice)</li>
+                </ul>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Auto-fix will update your records to be MTD compliant.
+                </p>
                 <div className="flex gap-2">
                   <Button onClick={handleAutoFix} className="bg-success hover:bg-success/90">
-                    Auto-fix
+                    Auto-fix all issues
                   </Button>
                   <Button onClick={closeModal} variant="outline">
                     Close
@@ -334,10 +364,43 @@ const Dashboard = () => {
                 <h3 className="font-bold text-lg mb-2">Generate Invoice</h3>
                 <p className="text-sm text-muted-foreground mb-4">Quick create an invoice for a client.</p>
                 <div className="space-y-2">
-                  <input className="w-full border border-border p-2 rounded bg-background" placeholder="Amount (e.g. 180)" />
-                  <input className="w-full border border-border p-2 rounded bg-background" placeholder="Client name" />
+                  <input 
+                    id="invoiceAmount" 
+                    type="number" 
+                    className="w-full border border-border p-2 rounded bg-background" 
+                    placeholder="Amount (e.g. 180)" 
+                  />
+                  <input 
+                    id="invoiceClient" 
+                    className="w-full border border-border p-2 rounded bg-background" 
+                    placeholder="Client name" 
+                  />
                   <div className="flex gap-2 mt-4">
-                    <Button onClick={() => { closeModal(); toast({ title: "Invoice created!", description: "Demo mode" }); }}>
+                    <Button onClick={() => {
+                      const amountInput = document.getElementById("invoiceAmount") as HTMLInputElement;
+                      const clientInput = document.getElementById("invoiceClient") as HTMLInputElement;
+                      const amount = parseFloat(amountInput?.value || "0");
+                      const client = clientInput?.value || "Client";
+                      
+                      if (amount <= 0) {
+                        toast({ title: "Invalid amount", description: "Please enter a valid amount", variant: "destructive" });
+                        return;
+                      }
+                      
+                      // Update income
+                      setUserData(prev => ({
+                        ...prev,
+                        incomeThisMonth: prev.incomeThisMonth + amount,
+                        incomeHistory: [...prev.incomeHistory.slice(1), prev.incomeThisMonth + amount],
+                        recentActivity: [
+                          { text: `Invoice sent to ${client} – £${amount.toFixed(2)}`, when: "Just now" },
+                          ...prev.recentActivity,
+                        ].slice(0, 5),
+                      }));
+                      
+                      closeModal();
+                      toast({ title: "Invoice created!", description: `£${amount.toFixed(2)} invoice for ${client}` });
+                    }}>
                       Create
                     </Button>
                     <Button onClick={closeModal} variant="outline">
@@ -352,10 +415,52 @@ const Dashboard = () => {
                 <h3 className="font-bold text-lg mb-2">Log Expense</h3>
                 <p className="text-sm text-muted-foreground mb-4">Quick record an expense.</p>
                 <div className="space-y-2">
-                  <input className="w-full border border-border p-2 rounded bg-background" placeholder="Amount (e.g. 45.5)" />
-                  <input className="w-full border border-border p-2 rounded bg-background" placeholder="Category (e.g. Fuel)" />
+                  <input 
+                    id="expenseAmount" 
+                    type="number" 
+                    className="w-full border border-border p-2 rounded bg-background" 
+                    placeholder="Amount (e.g. 45.5)" 
+                  />
+                  <input 
+                    id="expenseCategory" 
+                    className="w-full border border-border p-2 rounded bg-background" 
+                    placeholder="Category (e.g. Fuel)" 
+                  />
                   <div className="flex gap-2 mt-4">
-                    <Button onClick={() => { closeModal(); toast({ title: "Expense logged!", description: "Demo mode" }); }} className="bg-success hover:bg-success/90">
+                    <Button onClick={() => {
+                      const amountInput = document.getElementById("expenseAmount") as HTMLInputElement;
+                      const categoryInput = document.getElementById("expenseCategory") as HTMLInputElement;
+                      const amount = parseFloat(amountInput?.value || "0");
+                      const category = categoryInput?.value || "Other";
+                      
+                      if (amount <= 0) {
+                        toast({ title: "Invalid amount", description: "Please enter a valid amount", variant: "destructive" });
+                        return;
+                      }
+                      
+                      // Update expenses
+                      setUserData(prev => {
+                        const existingCategory = prev.expenseBreakdown.find(e => e.cat === category);
+                        const newBreakdown = existingCategory
+                          ? prev.expenseBreakdown.map(e => 
+                              e.cat === category ? { ...e, amount: e.amount + amount } : e
+                            )
+                          : [...prev.expenseBreakdown, { cat: category, amount, color: "bg-purple-100" }];
+                        
+                        return {
+                          ...prev,
+                          expensesThisMonth: prev.expensesThisMonth + amount,
+                          expenseBreakdown: newBreakdown,
+                          recentActivity: [
+                            { text: `Added ${category} expense – £${amount.toFixed(2)}`, when: "Just now" },
+                            ...prev.recentActivity,
+                          ].slice(0, 5),
+                        };
+                      });
+                      
+                      closeModal();
+                      toast({ title: "Expense logged!", description: `£${amount.toFixed(2)} in ${category}` });
+                    }} className="bg-success hover:bg-success/90">
                       Save
                     </Button>
                     <Button onClick={closeModal} variant="outline">
@@ -368,11 +473,41 @@ const Dashboard = () => {
             {modalContent === "receipt" && (
               <>
                 <h3 className="font-bold text-lg mb-2">Snap Receipt</h3>
-                <p className="text-sm text-muted-foreground mb-4">Upload or snap a receipt (demo).</p>
+                <p className="text-sm text-muted-foreground mb-4">Upload or snap a receipt to automatically extract expense details.</p>
                 <div className="space-y-2">
-                  <input type="file" accept="image/*" className="w-full border border-border p-2 rounded bg-background" />
+                  <input 
+                    id="receiptFile" 
+                    type="file" 
+                    accept="image/*" 
+                    className="w-full border border-border p-2 rounded bg-background" 
+                  />
                   <div className="flex gap-2 mt-4">
-                    <Button onClick={() => { closeModal(); toast({ title: "Receipt uploaded!", description: "Demo mode" }); }} className="bg-accent hover:bg-accent/90">
+                    <Button onClick={() => {
+                      const fileInput = document.getElementById("receiptFile") as HTMLInputElement;
+                      const file = fileInput?.files?.[0];
+                      
+                      if (!file) {
+                        toast({ title: "No file selected", description: "Please select a receipt image", variant: "destructive" });
+                        return;
+                      }
+                      
+                      // Simulate receipt processing
+                      const randomAmount = Math.floor(Math.random() * 100) + 20;
+                      
+                      setUserData(prev => ({
+                        ...prev,
+                        recentActivity: [
+                          { text: `Receipt uploaded – ${file.name} (processing...)`, when: "Just now" },
+                          ...prev.recentActivity,
+                        ].slice(0, 5),
+                      }));
+                      
+                      closeModal();
+                      toast({ 
+                        title: "Receipt uploaded!", 
+                        description: "Processing receipt... This feature will extract expense details automatically." 
+                      });
+                    }} className="bg-accent hover:bg-accent/90">
                       Upload
                     </Button>
                     <Button onClick={closeModal} variant="outline">
