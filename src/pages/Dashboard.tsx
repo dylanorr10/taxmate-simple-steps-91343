@@ -47,7 +47,7 @@ const Dashboard = () => {
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
     { path: "/log", label: "Money", icon: FileText },
-    { path: "/learn", label: "Reports", icon: BookOpen },
+    { path: "/learn", label: "Learning", icon: BookOpen },
     { path: "/records", label: "MTD", icon: Shield },
   ];
 
