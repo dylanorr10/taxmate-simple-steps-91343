@@ -45,9 +45,9 @@ All colors MUST be HSL.
     --info: 211 100% 50%;
     --info-foreground: 0 0% 100%;
     
-    /* BACKGROUNDS: White for clarity */
-    --background: 0 0% 100%; /* #FFFFFF - Pure white */
-    --card: 0 0% 100%; /* White cards */
+    /* BACKGROUNDS: Colorful gradients */
+    --background: 210 100% 98%; /* Very light blue tint */
+    --card: 0 0% 100%; /* White cards for contrast */
     --popover: 0 0% 100%;
     
     /* TEXT: Dark gray for readability */
@@ -75,11 +75,12 @@ All colors MUST be HSL.
     --disabled: 210 10% 90%;
     --disabled-foreground: 210 10% 65%;
     
-    /* GRADIENTS: Blue spectrum depth effects */
+    /* GRADIENTS: Colorful vibrant backgrounds */
     --gradient-primary: linear-gradient(135deg, hsl(227 95% 22%) 0%, hsl(210 100% 26%) 50%, hsl(196 91% 34%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(134 61% 41%) 0%, hsl(134 61% 36%) 100%);
     --gradient-highlight: linear-gradient(135deg, hsl(196 91% 34%) 0%, hsl(192 96% 44%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 10% 98%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(210 100% 98%) 0%, hsl(192 80% 95%) 50%, hsl(134 40% 96%) 100%);
+    --gradient-background: linear-gradient(135deg, hsl(210 100% 98%) 0%, hsl(192 60% 97%) 40%, hsl(24 80% 98%) 70%, hsl(134 50% 97%) 100%);
     
     /* SHADOWS: Professional depth (7.8:1, 6.2:1, 4.9:1 contrast ratios met) */
     --shadow-sm: 0 1px 2px 0 hsl(210 11% 46% / 0.05);
@@ -179,7 +180,9 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: var(--gradient-background);
+    min-height: 100vh;
   }
   
   /* Accessibility: Ensure high contrast for disabled elements */
@@ -206,6 +209,10 @@ All colors MUST be HSL.
   
   .gradient-highlight {
     background: var(--gradient-highlight);
+  }
+  
+  .gradient-background {
+    background: var(--gradient-background);
   }
   
   /* ============================================
