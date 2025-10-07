@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import IncomeChart from "@/components/IncomeChart";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -107,6 +108,13 @@ const Dashboard = () => {
 
   const trendPct = calcTrendPct(userData.incomeHistory);
 
+  // Transform income history data for the chart
+  const incomeChartData = [
+    { month: "Oct", income: userData.incomeHistory[0] },
+    { month: "Nov", income: userData.incomeHistory[1] },
+    { month: "Dec", income: userData.incomeHistory[2] },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -149,19 +157,11 @@ const Dashboard = () => {
           <div className="mt-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">Income trend (3 months)</div>
             <div className={`text-sm font-semibold ${trendPct >= 0 ? "text-success" : "text-destructive"}`}>
-              {trendPct >= 0 ? "Up" : "Down"} {Math.abs(trendPct)}%
+              {trendPct >= 0 ? "↗" : "↘"} {Math.abs(trendPct)}%
             </div>
           </div>
           <div className="mt-3">
-            <svg width="100%" height="48" viewBox="0 0 300 48" preserveAspectRatio="none" className="rounded-md">
-              <polyline 
-                points={generateSparklinePoints(userData.incomeHistory)} 
-                className="fill-none stroke-primary"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <IncomeChart data={incomeChartData} trendPct={trendPct} />
           </div>
         </Card>
 
