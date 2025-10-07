@@ -44,173 +44,173 @@ export type ColorPalette = {
 
 export const colorPalettes: ColorPalette[] = [
   {
-    id: 'sage-navy',
-    name: 'Deep Navy & Sage Green',
-    description: 'Calm, nature-inspired with green accents',
+    id: 'modern-trust',
+    name: 'Modern Trust',
+    description: 'Calm fintech with a heart',
     colors: {
-      background: '135 25% 92%', // #E8F3E8 - Light sage
-      foreground: '215 45% 20%', // #1A365D - Deep navy
-      card: '135 35% 88%', // #C8E6C9 - Sage green
-      cardForeground: '215 45% 20%',
-      popover: '135 35% 88%',
-      popoverForeground: '215 45% 20%',
+      background: '180 11% 97%',
+      foreground: '186 12% 21%',
+      card: '180 11% 95%',
+      cardForeground: '186 12% 21%',
+      popover: '180 11% 97%',
+      popoverForeground: '186 12% 21%',
       
-      primary: '215 45% 20%', // #1A365D - Deep navy
+      primary: '187 47% 31%',
       primaryForeground: '0 0% 100%',
       
-      secondary: '135 35% 45%', // Sage green
-      secondaryForeground: '0 0% 100%',
+      secondary: '30 27% 87%',
+      secondaryForeground: '186 12% 21%',
       
-      muted: '135 20% 85%',
-      mutedForeground: '215 25% 35%',
+      muted: '180 11% 92%',
+      mutedForeground: '186 12% 45%',
       
-      accent: '135 40% 55%',
-      accentForeground: '0 0% 100%',
+      accent: '177 47% 59%',
+      accentForeground: '186 12% 21%',
       
-      border: '135 25% 75%',
-      input: '135 25% 75%',
-      ring: '215 45% 20%',
+      border: '180 11% 88%',
+      input: '180 11% 88%',
+      ring: '187 47% 31%',
       
       success: '142 71% 45%',
-      warning: '45 93% 47%',
+      warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '199 89% 48%',
+      info: '187 47% 59%',
     },
   },
   {
-    id: 'slate-cream',
-    name: 'Slate Blue & Warm Cream',
-    description: 'Professional, warm, balanced',
+    id: 'fresh-focus',
+    name: 'Fresh Focus',
+    description: 'A wellness app for your money',
     colors: {
-      background: '35 30% 95%', // #F7F4ED - Warm cream
-      foreground: '215 20% 35%', // #475569 - Slate blue
-      card: '215 25% 92%', // #E2E8F0 - Light slate
-      cardForeground: '215 20% 35%',
-      popover: '215 25% 92%',
-      popoverForeground: '215 20% 35%',
+      background: '60 20% 98%',
+      foreground: '225 10% 19%',
+      card: '60 20% 96%',
+      cardForeground: '225 10% 19%',
+      popover: '60 20% 98%',
+      popoverForeground: '225 10% 19%',
       
-      primary: '215 20% 35%', // #475569 - Slate blue
+      primary: '130 24% 57%',
       primaryForeground: '0 0% 100%',
       
-      secondary: '35 45% 75%', // Warm beige
-      secondaryForeground: '215 20% 35%',
+      secondary: '28 43% 73%',
+      secondaryForeground: '225 10% 19%',
       
-      muted: '215 15% 88%',
-      mutedForeground: '215 15% 45%',
+      muted: '60 20% 93%',
+      mutedForeground: '225 10% 45%',
       
-      accent: '215 30% 55%',
-      accentForeground: '0 0% 100%',
+      accent: '197 41% 66%',
+      accentForeground: '225 10% 19%',
       
-      border: '215 20% 80%',
-      input: '215 20% 80%',
-      ring: '215 20% 35%',
+      border: '60 20% 89%',
+      input: '60 20% 89%',
+      ring: '130 24% 57%',
       
       success: '142 71% 45%',
-      warning: '45 93% 47%',
+      warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '199 89% 48%',
+      info: '197 41% 66%',
     },
   },
   {
-    id: 'forest-sand',
-    name: 'Forest Green & Sand',
-    description: 'Earthy, trustworthy, stable',
+    id: 'calm-energy',
+    name: 'Calm Energy',
+    description: 'Serious about finance but easy to love',
     colors: {
-      background: '40 28% 93%', // #F5F1E8 - Sand
-      foreground: '145 35% 20%', // #2F5233 - Forest green
-      card: '80 25% 88%', // #DFE7D6 - Light green
-      cardForeground: '145 35% 20%',
-      popover: '80 25% 88%',
-      popoverForeground: '145 35% 20%',
+      background: '210 20% 98%',
+      foreground: '225 8% 22%',
+      card: '210 20% 96%',
+      cardForeground: '225 8% 22%',
+      popover: '210 20% 98%',
+      popoverForeground: '225 8% 22%',
       
-      primary: '145 35% 20%', // #2F5233 - Forest green
+      primary: '208 31% 28%',
       primaryForeground: '0 0% 100%',
       
-      secondary: '40 35% 70%', // Warm sand
-      secondaryForeground: '145 35% 20%',
+      secondary: '125 11% 69%',
+      secondaryForeground: '225 8% 22%',
       
-      muted: '80 20% 85%',
-      mutedForeground: '145 25% 35%',
+      muted: '210 20% 93%',
+      mutedForeground: '225 8% 45%',
       
-      accent: '145 45% 40%',
-      accentForeground: '0 0% 100%',
+      accent: '5 82% 73%',
+      accentForeground: '225 8% 22%',
       
-      border: '80 20% 75%',
-      input: '80 20% 75%',
-      ring: '145 35% 20%',
+      border: '210 20% 89%',
+      input: '210 20% 89%',
+      ring: '208 31% 28%',
       
       success: '142 71% 45%',
-      warning: '45 93% 47%',
+      warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '199 89% 48%',
+      info: '208 31% 60%',
     },
   },
   {
-    id: 'charcoal-seafoam',
-    name: 'Charcoal & Seafoam',
-    description: 'Modern, fresh, clean',
+    id: 'ocean-breeze',
+    name: 'Ocean Breeze',
+    description: 'Refreshing and trustworthy',
     colors: {
-      background: '175 35% 92%', // #E0F2F1 - Seafoam
-      foreground: '200 15% 25%', // #37474F - Charcoal
-      card: '175 40% 85%', // #B2DFDB - Seafoam green
-      cardForeground: '200 15% 25%',
-      popover: '175 40% 85%',
-      popoverForeground: '200 15% 25%',
+      background: '195 20% 95%',
+      foreground: '190 20% 15%',
+      card: '195 20% 93%',
+      cardForeground: '190 20% 15%',
+      popover: '195 20% 95%',
+      popoverForeground: '190 20% 15%',
       
-      primary: '200 15% 25%', // #37474F - Charcoal
+      primary: '190 58% 27%',
       primaryForeground: '0 0% 100%',
       
-      secondary: '175 45% 65%', // Seafoam
-      secondaryForeground: '200 15% 25%',
+      secondary: '36 33% 76%',
+      secondaryForeground: '190 20% 15%',
       
-      muted: '175 25% 88%',
-      mutedForeground: '200 15% 40%',
+      muted: '195 20% 90%',
+      mutedForeground: '190 20% 45%',
       
-      accent: '175 50% 50%',
-      accentForeground: '0 0% 100%',
+      accent: '165 57% 67%',
+      accentForeground: '190 20% 15%',
       
-      border: '175 30% 78%',
-      input: '175 30% 78%',
-      ring: '200 15% 25%',
+      border: '195 20% 86%',
+      input: '195 20% 86%',
+      ring: '190 58% 27%',
       
       success: '142 71% 45%',
-      warning: '45 93% 47%',
+      warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '199 89% 48%',
+      info: '190 58% 60%',
     },
   },
   {
-    id: 'indigo-lavender',
-    name: 'Indigo & Lavender Mist',
-    description: 'Sophisticated, calm, approachable',
+    id: 'earth-sky',
+    name: 'Earth & Sky',
+    description: 'Grounded and harmonious',
     colors: {
-      background: '230 25% 96%', // #F3F4F9 - Lavender mist
-      foreground: '231 48% 48%', // #3F51B5 - Indigo
-      card: '235 30% 92%', // #E0E3F0 - Light lavender
-      cardForeground: '231 48% 48%',
-      popover: '235 30% 92%',
-      popoverForeground: '231 48% 48%',
+      background: '40 29% 96%',
+      foreground: '30 7% 16%',
+      card: '40 29% 94%',
+      cardForeground: '30 7% 16%',
+      popover: '40 29% 96%',
+      popoverForeground: '30 7% 16%',
       
-      primary: '231 48% 48%', // #3F51B5 - Indigo
+      primary: '168 33% 26%',
       primaryForeground: '0 0% 100%',
       
-      secondary: '235 35% 75%', // Lavender
-      secondaryForeground: '231 48% 48%',
+      secondary: '145 28% 77%',
+      secondaryForeground: '30 7% 16%',
       
-      muted: '235 25% 90%',
-      mutedForeground: '231 30% 45%',
+      muted: '40 29% 91%',
+      mutedForeground: '30 7% 45%',
       
-      accent: '231 55% 60%',
-      accentForeground: '0 0% 100%',
+      accent: '6 26% 70%',
+      accentForeground: '30 7% 16%',
       
-      border: '235 25% 82%',
-      input: '235 25% 82%',
-      ring: '231 48% 48%',
+      border: '40 29% 87%',
+      input: '40 29% 87%',
+      ring: '168 33% 26%',
       
       success: '142 71% 45%',
-      warning: '45 93% 47%',
+      warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '199 89% 48%',
+      info: '168 33% 60%',
     },
   },
 ];
