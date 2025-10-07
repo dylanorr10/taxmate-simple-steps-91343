@@ -50,7 +50,7 @@ export const colorPalettes: ColorPalette[] = [
     colors: {
       background: '180 11% 97%',
       foreground: '186 12% 21%',
-      card: '180 11% 95%',
+      card: '180 20% 100%',
       cardForeground: '186 12% 21%',
       popover: '180 11% 97%',
       popoverForeground: '186 12% 21%',
@@ -84,7 +84,7 @@ export const colorPalettes: ColorPalette[] = [
     colors: {
       background: '60 20% 98%',
       foreground: '225 10% 19%',
-      card: '60 20% 96%',
+      card: '60 30% 100%',
       cardForeground: '225 10% 19%',
       popover: '60 20% 98%',
       popoverForeground: '225 10% 19%',
@@ -118,7 +118,7 @@ export const colorPalettes: ColorPalette[] = [
     colors: {
       background: '210 20% 98%',
       foreground: '225 8% 22%',
-      card: '210 20% 96%',
+      card: '210 30% 100%',
       cardForeground: '225 8% 22%',
       popover: '210 20% 98%',
       popoverForeground: '225 8% 22%',
@@ -152,7 +152,7 @@ export const colorPalettes: ColorPalette[] = [
     colors: {
       background: '195 20% 95%',
       foreground: '190 20% 15%',
-      card: '195 20% 93%',
+      card: '195 35% 100%',
       cardForeground: '190 20% 15%',
       popover: '195 20% 95%',
       popoverForeground: '190 20% 15%',
@@ -186,7 +186,7 @@ export const colorPalettes: ColorPalette[] = [
     colors: {
       background: '40 29% 96%',
       foreground: '30 7% 16%',
-      card: '40 29% 94%',
+      card: '40 40% 100%',
       cardForeground: '30 7% 16%',
       popover: '40 29% 96%',
       popoverForeground: '30 7% 16%',
