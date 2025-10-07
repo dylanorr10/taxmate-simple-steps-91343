@@ -45,8 +45,8 @@ All colors MUST be HSL.
     --info: 211 100% 50%;
     --info-foreground: 0 0% 100%;
     
-    /* BACKGROUNDS: Colorful gradients */
-    --background: 210 100% 98%; /* Very light blue tint */
+    /* BACKGROUNDS: Solid light teal/cyan */
+    --background: 192 60% 96%; /* Light teal/cyan background */
     --card: 0 0% 100%; /* White cards for contrast */
     --popover: 0 0% 100%;
     
@@ -180,8 +180,7 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply text-foreground;
-    background: var(--gradient-background);
+    @apply bg-background text-foreground;
     min-height: 100vh;
   }
   
