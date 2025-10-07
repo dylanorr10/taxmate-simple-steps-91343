@@ -50,10 +50,10 @@ All colors MUST be HSL.
     --card: 202 61% 54%; /* Celestial Blue #449dd1 */
     --popover: 202 61% 54%;
     
-    /* TEXT: Dark gray for readability */
-    --foreground: 210 11% 46%; /* #6C757D - Body text */
-    --card-foreground: 210 11% 46%;
-    --popover-foreground: 210 11% 46%;
+    /* TEXT: Dark for readability on blue backgrounds */
+    --foreground: 240 71% 19%; /* Federal Blue #0e0e52 - Dark text */
+    --card-foreground: 240 71% 19%; /* Dark text on cards */
+    --popover-foreground: 240 71% 19%; /* Dark text on popovers */
     
     /* NEUTRALS: Light grays for hierarchy */
     --muted: 210 10% 96%; /* Very light gray backgrounds */
