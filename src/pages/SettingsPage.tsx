@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone } from "lucide-react";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 const SettingsPage = () => {
   const location = useLocation();
@@ -17,6 +18,17 @@ const SettingsPage = () => {
       <div className="max-w-2xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-foreground mb-6">Settings</h1>
         
+        {/* Appearance Section */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Palette className="w-5 h-5" />
+            Appearance
+          </h2>
+          <Card className="p-6">
+            <ThemeSwitcher />
+          </Card>
+        </div>
+
         {/* Learning & Help Section */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
