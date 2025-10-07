@@ -11,6 +11,7 @@ import {
   Home,
   BookOpen,
   Shield,
+  Car,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -48,6 +49,7 @@ const Dashboard = () => {
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
     { path: "/log", label: "Money", icon: FileText },
+    { path: "/mileage", label: "Mileage", icon: Car },
     { path: "/learn", label: "Learning", icon: BookOpen },
     { path: "/records", label: "MTD", icon: Shield },
   ];
@@ -167,25 +169,31 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <Card className="p-3 shadow-lg">
-          <div className="flex gap-3 justify-between">
+          <div className="grid grid-cols-4 gap-3">
             <button onClick={() => handleQuickAction("invoice")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
               <div className="flex flex-col items-center gap-1">
                 <FilePlus className="w-5 h-5" />
-                <div className="text-xs font-semibold">Produce Invoice</div>
+                <div className="text-xs font-semibold">Invoice</div>
               </div>
             </button>
             <button onClick={() => handleQuickAction("expense")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
               <div className="flex flex-col items-center gap-1">
                 <PlusCircle className="w-5 h-5" />
-                <div className="text-xs font-semibold">Log Expense</div>
+                <div className="text-xs font-semibold">Expense</div>
               </div>
             </button>
             <button onClick={() => handleQuickAction("receipt")} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
               <div className="flex flex-col items-center gap-1">
                 <Camera className="w-5 h-5" />
-                <div className="text-xs font-semibold">Snap Receipt</div>
+                <div className="text-xs font-semibold">Receipt</div>
               </div>
             </button>
+            <Link to="/mileage" className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
+              <div className="flex flex-col items-center gap-1">
+                <Car className="w-5 h-5" />
+                <div className="text-xs font-semibold">Mileage</div>
+              </div>
+            </Link>
           </div>
         </Card>
 
