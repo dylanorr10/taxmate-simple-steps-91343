@@ -3,31 +3,19 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Home,
-  FileText,
-  BookOpen,
-  Shield,
   Bookmark,
   BookmarkCheck,
   ArrowRight,
   CheckCircle,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import BottomNav from "@/components/BottomNav";
 
 const Learn = () => {
-  const location = useLocation();
   const { toast } = useToast();
   const [savedLessons, setSavedLessons] = useState<number[]>([]);
   const [completedLessons, setCompletedLessons] = useState<number[]>([]);
   const [showLesson, setShowLesson] = useState<number | null>(null);
-
-  const navItems = [
-    { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/log", label: "Money", icon: FileText },
-    { path: "/learn", label: "Learning", icon: BookOpen },
-    { path: "/records", label: "MTD", icon: Shield },
-  ];
 
   const toggleSave = (index: number) => {
     setSavedLessons(prev => 
@@ -247,28 +235,7 @@ const Learn = () => {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-40">
-        <div className="max-w-2xl mx-auto flex justify-around py-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-all ${
-                  isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 };

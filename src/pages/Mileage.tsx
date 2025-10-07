@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import BottomNav from '@/components/BottomNav';
 
 interface Trip {
   id: string;
@@ -316,6 +317,8 @@ const Mileage = () => {
           </CardContent>
         </Card>
       </div>
+
+      <BottomNav />
 
       {/* Add Trip Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>

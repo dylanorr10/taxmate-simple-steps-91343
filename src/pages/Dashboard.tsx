@@ -8,18 +8,15 @@ import {
   Zap,
   CheckCircle,
   FilePlus,
-  Home,
-  BookOpen,
-  Shield,
   Car,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import IncomeChart from "@/components/IncomeChart";
+import BottomNav from "@/components/BottomNav";
 
 const Dashboard = () => {
   const { toast } = useToast();
-  const location = useLocation();
   const [expenseExpanded, setExpenseExpanded] = useState(false);
   const [modalContent, setModalContent] = useState<string | null>(null);
   const [mtdReadyPct, setMtdReadyPct] = useState(78);
@@ -46,13 +43,6 @@ const Dashboard = () => {
     ],
   });
 
-  const navItems = [
-    { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/log", label: "Money", icon: FileText },
-    { path: "/mileage", label: "Mileage", icon: Car },
-    { path: "/learn", label: "Learning", icon: BookOpen },
-    { path: "/records", label: "MTD", icon: Shield },
-  ];
 
   const profit = userData.incomeThisMonth - userData.expensesThisMonth;
   const taxSavings = Math.round(userData.expensesThisMonth * 0.66);
@@ -315,30 +305,7 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
-        <div className="max-w-md mx-auto flex justify-around py-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-all ${
-                  isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-xs font-medium">{item.label}</span>
-                {isActive && <div className="w-1 h-1 rounded-full bg-primary" />}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      <BottomNav />
 
       {/* Modal */}
       {modalContent && (
