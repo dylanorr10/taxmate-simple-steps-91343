@@ -47,8 +47,8 @@ All colors MUST be HSL.
     
     /* BACKGROUNDS: Solid teal/cyan */
     --background: 192 50% 88%; /* Medium-light teal/cyan background */
-    --card: 210 60% 94%; /* Light blue cards for contrast */
-    --popover: 210 60% 94%;
+    --card: 220 70% 82%; /* Darker blue cards */
+    --popover: 220 70% 82%;
     
     /* TEXT: Dark gray for readability */
     --foreground: 210 11% 46%; /* #6C757D - Body text */
