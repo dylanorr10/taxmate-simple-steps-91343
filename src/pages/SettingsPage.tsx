@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,13 +9,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useProfile } from "@/hooks/useProfile";
 import { useHMRCConnection } from "@/hooks/useHMRCConnection";
+import { useTrueLayerConnection } from "@/hooks/useTrueLayerConnection";
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
 
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, isLoading: profileLoading, updateProfile, isUpdating } = useProfile();
   const { isConnected, isLoading: hmrcLoading, initiateConnection, refetch } = useHMRCConnection();
+  const { 
+    connections, 
+    isLoading: trueLayerLoading, 
+    initiateConnection: connectBank, 
+    isInitiating,
+    syncTransactions,
+    isSyncing,
+    disconnectBank,
+    isDisconnecting
+  } = useTrueLayerConnection();
   
   const [businessName, setBusinessName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
@@ -38,6 +50,13 @@ const SettingsPage = () => {
     } else if (params.get('error')) {
       const error = params.get('error');
       toast.error(`Failed to connect to HMRC: ${error}`);
+      navigate('/settings', { replace: true });
+    } else if (params.get('truelayer_connected') === 'true') {
+      toast.success("Bank connected successfully!");
+      navigate('/settings', { replace: true });
+    } else if (params.get('truelayer_error')) {
+      const error = params.get('truelayer_error');
+      toast.error(`Failed to connect bank: ${error}`);
       navigate('/settings', { replace: true });
     }
   }, [location.search, navigate, refetch]);
@@ -154,6 +173,83 @@ const SettingsPage = () => {
                   <Button onClick={initiateConnection} className="w-full">
                     Connect to HMRC
                   </Button>
+                )}
+              </div>
+            )}
+          </Card>
+        </div>
+
+        {/* Bank Connections Section */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Landmark className="w-5 h-5" />
+            Bank Connections
+          </h2>
+          <Card className="p-6">
+            {trueLayerLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {connections.length === 0 ? (
+                  <div className="text-center py-6">
+                    <Landmark className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                    <p className="font-semibold text-foreground mb-1">No banks connected</p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Connect your bank to automatically import transactions
+                    </p>
+                    <Button onClick={() => connectBank()} disabled={isInitiating}>
+                      {isInitiating ? "Connecting..." : "Connect Bank Account"}
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    {connections.map((connection) => (
+                      <div key={connection.id} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <Landmark className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground">{connection.account_name}</p>
+                              <p className="text-sm text-muted-foreground">{connection.provider}</p>
+                            </div>
+                          </div>
+                          <CheckCircle2 className="w-5 h-5 text-success" />
+                        </div>
+                        {connection.last_sync_at && (
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Last synced: {format(new Date(connection.last_sync_at), 'PPp')}
+                          </p>
+                        )}
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => syncTransactions(connection.id)}
+                            disabled={isSyncing}
+                            className="flex-1"
+                          >
+                            <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+                            {isSyncing ? "Syncing..." : "Sync Now"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => disconnectBank(connection.id)}
+                            disabled={isDisconnecting}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <Button onClick={() => connectBank()} disabled={isInitiating} variant="outline" className="w-full">
+                      {isInitiating ? "Connecting..." : "Connect Another Bank"}
+                    </Button>
+                  </>
                 )}
               </div>
             )}

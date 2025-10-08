@@ -1,1 +1,13 @@
 project_id = "lwcfnoajclekuzqoxdhv"
+
+[functions.truelayer-oauth-init]
+verify_jwt = true
+
+[functions.truelayer-oauth-callback]
+verify_jwt = false
+
+[functions.truelayer-sync-transactions]
+verify_jwt = true
+
+[functions.truelayer-categorize-transaction]
+verify_jwt = true

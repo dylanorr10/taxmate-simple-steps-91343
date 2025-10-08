@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      bank_transactions: {
+        Row: {
+          amount: number
+          category: string | null
+          connection_id: string
+          created_at: string
+          description: string | null
+          id: string
+          merchant_name: string | null
+          status: string
+          synced_at: string
+          timestamp: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category?: string | null
+          connection_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          merchant_name?: string | null
+          status?: string
+          synced_at?: string
+          timestamp: string
+          transaction_id: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string | null
+          connection_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          merchant_name?: string | null
+          status?: string
+          synced_at?: string
+          timestamp?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_transactions_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "truelayer_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expense_transactions: {
         Row: {
           amount: number
@@ -155,6 +208,103 @@ export type Database = {
           id?: string
           updated_at?: string
           vat_number?: string | null
+        }
+        Relationships: []
+      }
+      transaction_mappings: {
+        Row: {
+          bank_transaction_id: string
+          confidence_score: number | null
+          created_at: string
+          expense_transaction_id: string | null
+          id: string
+          income_transaction_id: string | null
+          mapping_type: string
+          user_confirmed: boolean
+        }
+        Insert: {
+          bank_transaction_id: string
+          confidence_score?: number | null
+          created_at?: string
+          expense_transaction_id?: string | null
+          id?: string
+          income_transaction_id?: string | null
+          mapping_type: string
+          user_confirmed?: boolean
+        }
+        Update: {
+          bank_transaction_id?: string
+          confidence_score?: number | null
+          created_at?: string
+          expense_transaction_id?: string | null
+          id?: string
+          income_transaction_id?: string | null
+          mapping_type?: string
+          user_confirmed?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_mappings_bank_transaction_id_fkey"
+            columns: ["bank_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "bank_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_mappings_expense_transaction_id_fkey"
+            columns: ["expense_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "expense_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_mappings_income_transaction_id_fkey"
+            columns: ["income_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "income_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      truelayer_connections: {
+        Row: {
+          access_token: string
+          account_id: string
+          account_name: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          last_sync_at: string | null
+          provider: string
+          refresh_token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          account_id: string
+          account_name?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          last_sync_at?: string | null
+          provider: string
+          refresh_token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          account_id?: string
+          account_name?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          last_sync_at?: string | null
+          provider?: string
+          refresh_token?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
