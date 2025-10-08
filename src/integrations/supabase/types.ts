@@ -14,7 +14,180 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      expense_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          transaction_date: string
+          updated_at: string
+          user_id: string
+          vat_rate: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          transaction_date: string
+          updated_at?: string
+          user_id: string
+          vat_rate?: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          transaction_date?: string
+          updated_at?: string
+          user_id?: string
+          vat_rate?: number
+        }
+        Relationships: []
+      }
+      hmrc_tokens: {
+        Row: {
+          access_token: string
+          created_at: string
+          expires_at: string
+          id: string
+          refresh_token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          refresh_token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      income_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          transaction_date: string
+          updated_at: string
+          user_id: string
+          vat_rate: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          transaction_date: string
+          updated_at?: string
+          user_id: string
+          vat_rate?: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          transaction_date?: string
+          updated_at?: string
+          user_id?: string
+          vat_rate?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          vat_number: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          vat_number?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          vat_number?: string | null
+        }
+        Relationships: []
+      }
+      vat_submissions: {
+        Row: {
+          created_at: string
+          id: string
+          net_vat_due: number
+          period_key: string
+          submitted_at: string | null
+          total_acquisitions_ex_vat: number
+          total_value_goods_supplied_ex_vat: number
+          total_value_purchases_ex_vat: number
+          total_value_sales_ex_vat: number
+          total_vat_due: number
+          updated_at: string
+          user_id: string
+          vat_due_acquisitions: number
+          vat_due_sales: number
+          vat_reclaimed_curr_period: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          net_vat_due: number
+          period_key: string
+          submitted_at?: string | null
+          total_acquisitions_ex_vat?: number
+          total_value_goods_supplied_ex_vat?: number
+          total_value_purchases_ex_vat: number
+          total_value_sales_ex_vat: number
+          total_vat_due: number
+          updated_at?: string
+          user_id: string
+          vat_due_acquisitions?: number
+          vat_due_sales: number
+          vat_reclaimed_curr_period: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          net_vat_due?: number
+          period_key?: string
+          submitted_at?: string | null
+          total_acquisitions_ex_vat?: number
+          total_value_goods_supplied_ex_vat?: number
+          total_value_purchases_ex_vat?: number
+          total_value_sales_ex_vat?: number
+          total_vat_due?: number
+          updated_at?: string
+          user_id?: string
+          vat_due_acquisitions?: number
+          vat_due_sales?: number
+          vat_reclaimed_curr_period?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
