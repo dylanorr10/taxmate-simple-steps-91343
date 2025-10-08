@@ -24,8 +24,10 @@ import { useVATCalculations } from "@/hooks/useVATCalculations";
 import { useVATSubmissions } from "@/hooks/useVATSubmissions";
 import { useProfile } from "@/hooks/useProfile";
 import { useHMRCConnection } from "@/hooks/useHMRCConnection";
+import { useHMRCSubmission } from "@/hooks/useHMRCSubmission";
 import { formatCurrency } from "@/utils/transactionHelpers";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Records = () => {
   const navigate = useNavigate();
@@ -36,8 +38,9 @@ const Records = () => {
   const { transactions: incomeTransactions, isLoading: isLoadingIncome } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: isLoadingExpenses } = useExpenseTransactions();
   const { profile, isLoading: isLoadingProfile } = useProfile();
-  const { isConnected, isLoading: isLoadingConnection } = useHMRCConnection();
-  const { submissions } = useVATSubmissions();
+  const { isConnected, isLoading: isLoadingConnection, refetch: refetchConnection } = useHMRCConnection();
+  const { submissions, saveSubmission, isSaving } = useVATSubmissions();
+  const { submitToHMRC, isSubmitting } = useHMRCSubmission();
 
   // Calculate VAT
   const { boxes, tasks, hasErrors, mtdReadiness } = useVATCalculations(
@@ -72,6 +75,27 @@ const Records = () => {
 
   const totalSalesWithVAT = boxes.box6 + boxes.box1;
   const totalExpensesWithVAT = boxes.box7 + boxes.box4;
+
+  const handleSubmit = async () => {
+    if (!isConnected) {
+      toast.error("Please connect to HMRC first");
+      return;
+    }
+
+    if (hasErrors) {
+      toast.error("Please fix all errors before submitting");
+      return;
+    }
+
+    // Submit to HMRC
+    submitToHMRC(boxes, {
+      onSuccess: async () => {
+        // Save to local database
+        await saveSubmission(boxes);
+        await refetchConnection();
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-24">
@@ -305,11 +329,12 @@ const Records = () => {
             
             <Button
               size="lg"
-              disabled={hasErrors}
+              disabled={hasErrors || isSubmitting || isSaving}
+              onClick={handleSubmit}
               className="w-full mb-3 h-12 text-base font-semibold"
             >
               <Shield className="w-5 h-5 mr-2" />
-              Submit VAT Return to HMRC
+              {isSubmitting || isSaving ? "Submitting..." : "Submit VAT Return to HMRC"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
