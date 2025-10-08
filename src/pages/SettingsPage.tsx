@@ -1,14 +1,31 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut } from "lucide-react";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useProfile } from "@/hooks/useProfile";
+import { useHMRCConnection } from "@/hooks/useHMRCConnection";
+import { useState, useEffect } from "react";
 
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { profile, isLoading: profileLoading, updateProfile, isUpdating } = useProfile();
+  const { isConnected, isLoading: hmrcLoading, initiateConnection } = useHMRCConnection();
+  
+  const [businessName, setBusinessName] = useState("");
+  const [vatNumber, setVatNumber] = useState("");
+
+  useEffect(() => {
+    if (profile) {
+      setBusinessName(profile.business_name || "");
+      setVatNumber(profile.vat_number || "");
+    }
+  }, [profile]);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -18,6 +35,14 @@ const SettingsPage = () => {
       toast.success("Signed out successfully");
       navigate("/auth");
     }
+  };
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfile({
+      business_name: businessName,
+      vat_number: vatNumber,
+    });
   };
 
   const navItems = [
@@ -31,6 +56,95 @@ const SettingsPage = () => {
       <div className="max-w-2xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold text-foreground mb-6">Settings</h1>
         
+        {/* Business Profile Section */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Building2 className="w-5 h-5" />
+            Business Profile
+          </h2>
+          <Card className="p-6">
+            {profileLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <form onSubmit={handleSaveProfile} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="businessName">Business Name</Label>
+                  <Input
+                    id="businessName"
+                    type="text"
+                    placeholder="Your Business Ltd"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vatNumber">VAT Number</Label>
+                  <Input
+                    id="vatNumber"
+                    type="text"
+                    placeholder="GB123456789"
+                    value={vatNumber}
+                    onChange={(e) => setVatNumber(e.target.value)}
+                  />
+                </div>
+                <Button type="submit" disabled={isUpdating} className="w-full">
+                  {isUpdating ? "Saving..." : "Save Profile"}
+                </Button>
+              </form>
+            )}
+          </Card>
+        </div>
+
+        {/* HMRC Connection Section */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            HMRC Connection
+          </h2>
+          <Card className="p-6">
+            {hmrcLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {isConnected ? (
+                      <>
+                        <CheckCircle2 className="w-6 h-6 text-success" />
+                        <div>
+                          <p className="font-semibold text-foreground">Connected to HMRC</p>
+                          <p className="text-sm text-muted-foreground">
+                            You can submit VAT returns to HMRC
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-6 h-6 text-muted-foreground" />
+                        <div>
+                          <p className="font-semibold text-foreground">Not Connected</p>
+                          <p className="text-sm text-muted-foreground">
+                            Connect to HMRC to submit VAT returns
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {!isConnected && (
+                  <Button onClick={initiateConnection} className="w-full">
+                    Connect to HMRC
+                  </Button>
+                )}
+              </div>
+            )}
+          </Card>
+        </div>
+
         {/* Appearance Section */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
