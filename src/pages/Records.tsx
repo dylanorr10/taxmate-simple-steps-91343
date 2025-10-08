@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Download,
   Shield,
+  ArrowRight,
 } from "lucide-react";
 import {
   Tooltip,
@@ -18,53 +19,59 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import BottomNav from "@/components/BottomNav";
+import { useIncomeTransactions, useExpenseTransactions } from "@/hooks/useTransactions";
+import { useVATCalculations } from "@/hooks/useVATCalculations";
+import { useVATSubmissions } from "@/hooks/useVATSubmissions";
+import { useProfile } from "@/hooks/useProfile";
+import { useHMRCConnection } from "@/hooks/useHMRCConnection";
+import { formatCurrency } from "@/utils/transactionHelpers";
+import { useNavigate } from "react-router-dom";
 
 const Records = () => {
+  const navigate = useNavigate();
   const [showCalculation, setShowCalculation] = useState(false);
   const [expandedBox, setExpandedBox] = useState<number | null>(null);
 
+  // Fetch data
+  const { transactions: incomeTransactions, isLoading: isLoadingIncome } = useIncomeTransactions();
+  const { transactions: expenseTransactions, isLoading: isLoadingExpenses } = useExpenseTransactions();
+  const { profile, isLoading: isLoadingProfile } = useProfile();
+  const { isConnected, isLoading: isLoadingConnection } = useHMRCConnection();
+  const { submissions } = useVATSubmissions();
+
+  // Calculate VAT
+  const { boxes, tasks, hasErrors, mtdReadiness } = useVATCalculations(
+    incomeTransactions,
+    expenseTransactions,
+    isConnected,
+    !!profile?.vat_number,
+    !!profile?.business_name
+  );
+
+  const isLoading = isLoadingIncome || isLoadingExpenses || isLoadingProfile || isLoadingConnection;
+
   const steps = [
-    { id: 1, label: "Record Income", completed: true },
-    { id: 2, label: "Record Expenses", completed: true },
-    { id: 3, label: "Reconcile Bank", completed: true },
-    { id: 4, label: "Review Return", completed: false, current: true },
+    { id: 1, label: "Record Income", completed: incomeTransactions.length > 0 },
+    { id: 2, label: "Record Expenses", completed: expenseTransactions.length > 0 },
+    { id: 3, label: "Connect HMRC", completed: isConnected },
+    { id: 4, label: "Review Return", completed: false, current: !hasErrors },
     { id: 5, label: "Submit", completed: false },
   ];
 
-  const tasks = [
-    {
-      id: 1,
-      message: "3 expenses missing VAT category",
-      type: "warning",
-      action: "Fix Now",
-    },
-    {
-      id: 2,
-      message: "2 invoices missing issue date",
-      type: "warning",
-      action: "Review",
-    },
-  ];
-
   const vatBoxes = [
-    { box: 1, label: "VAT due on sales", amount: 2450.5, type: "output" },
-    { box: 2, label: "VAT due on acquisitions", amount: 0, type: "output" },
-    { box: 3, label: "Total VAT due", amount: 2450.5, type: "total" },
-    { box: 4, label: "VAT reclaimed", amount: 820.25, type: "input" },
-    { box: 5, label: "Net VAT to pay", amount: 1630.25, type: "net" },
-    { box: 6, label: "Total sales (excl. VAT)", amount: 14703.0, type: "turnover" },
-    { box: 7, label: "Total purchases (excl. VAT)", amount: 4921.5, type: "turnover" },
-    { box: 8, label: "Total supplies (incl. VAT)", amount: 17153.5, type: "turnover" },
-    { box: 9, label: "Total acquisitions (incl. VAT)", amount: 5741.75, type: "turnover" },
+    { box: 1, label: "VAT due on sales", amount: boxes.box1, type: "output" },
+    { box: 2, label: "VAT due on acquisitions", amount: boxes.box2, type: "output" },
+    { box: 3, label: "Total VAT due", amount: boxes.box3, type: "total" },
+    { box: 4, label: "VAT reclaimed", amount: boxes.box4, type: "input" },
+    { box: 5, label: "Net VAT to pay", amount: boxes.box5, type: "net" },
+    { box: 6, label: "Total sales (excl. VAT)", amount: boxes.box6, type: "turnover" },
+    { box: 7, label: "Total purchases (excl. VAT)", amount: boxes.box7, type: "turnover" },
+    { box: 8, label: "Total supplies (excl. VAT)", amount: boxes.box8, type: "turnover" },
+    { box: 9, label: "Total acquisitions (excl. VAT)", amount: boxes.box9, type: "turnover" },
   ];
 
-  const pastReturns = [
-    { period: "Apr–Jun 2024", status: "Submitted", ref: "XJ8Y34", amount: 2450, type: "paid" },
-    { period: "Jan–Mar 2024", status: "Submitted", ref: "AJ2K89", amount: 430, type: "refund" },
-    { period: "Oct–Dec 2023", status: "Submitted", ref: "PL9W23", amount: 1820, type: "paid" },
-  ];
-
-  const hasErrors = tasks.length > 0;
+  const totalSalesWithVAT = boxes.box6 + boxes.box1;
+  const totalExpensesWithVAT = boxes.box7 + boxes.box4;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-24">
@@ -138,25 +145,24 @@ const Records = () => {
           </Card>
 
           {/* Tasks/Errors Section */}
-          {hasErrors && (
+          {tasks.length > 0 && (
             <Card className="p-5 shadow-card border-l-4 border-l-warning bg-warning/5">
               <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-warning" />
                 To Do Before You Submit
               </h2>
               <div className="space-y-2">
-                {tasks.map((task) => (
+                {tasks.map((task, index) => (
                   <div
-                    key={task.id}
+                    key={index}
+                    onClick={() => navigate('/settings')}
                     className="flex items-center justify-between p-3 bg-card rounded-lg border border-warning/20 cursor-pointer hover:bg-warning/5 transition-colors"
                   >
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-foreground">{task.message}</span>
+                      <span className="text-sm text-foreground">{task}</span>
                     </div>
-                    <Button size="sm" variant="outline" className="ml-2 text-xs">
-                      {task.action}
-                    </Button>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
                   </div>
                 ))}
               </div>
@@ -171,24 +177,32 @@ const Records = () => {
               <div className="flex justify-between items-center p-3 bg-success/5 rounded-lg">
                 <div>
                   <p className="text-xs text-muted-foreground">Total Sales</p>
-                  <p className="text-sm font-medium text-foreground">£14,703.00 + £2,450.50 VAT</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {formatCurrency(boxes.box6)} + {formatCurrency(boxes.box1)} VAT
+                  </p>
                 </div>
-                <p className="text-lg font-bold text-success">£17,153.50</p>
+                <p className="text-lg font-bold text-success">{formatCurrency(totalSalesWithVAT)}</p>
               </div>
 
               <div className="flex justify-between items-center p-3 bg-destructive/5 rounded-lg">
                 <div>
                   <p className="text-xs text-muted-foreground">Total Expenses</p>
-                  <p className="text-sm font-medium text-foreground">£4,921.50 + £820.25 VAT</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {formatCurrency(boxes.box7)} + {formatCurrency(boxes.box4)} VAT
+                  </p>
                 </div>
-                <p className="text-lg font-bold text-destructive">£5,741.75</p>
+                <p className="text-lg font-bold text-destructive">{formatCurrency(totalExpensesWithVAT)}</p>
               </div>
 
               <div className="flex justify-between items-center p-4 bg-primary/5 rounded-lg border-2 border-primary/30">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">VAT Due to HMRC</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {boxes.box5 >= 0 ? "VAT Due to HMRC" : "VAT Refund from HMRC"}
+                  </p>
                 </div>
-                <p className="text-2xl font-bold text-primary">£1,630.25</p>
+                <p className="text-2xl font-bold text-primary">
+                  {boxes.box5 >= 0 ? formatCurrency(boxes.box5) : formatCurrency(Math.abs(boxes.box5))}
+                </p>
               </div>
             </div>
 
@@ -210,23 +224,23 @@ const Records = () => {
               <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-2 text-sm animate-fade-in">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">VAT on Sales (Box 1)</span>
-                  <span className="font-medium">£2,450.50</span>
+                  <span className="font-medium">{formatCurrency(boxes.box1)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">VAT on Acquisitions (Box 2)</span>
-                  <span className="font-medium">£0.00</span>
+                  <span className="font-medium">{formatCurrency(boxes.box2)}</span>
                 </div>
                 <div className="flex justify-between font-semibold pt-2 border-t border-border">
                   <span>Total VAT Due (Box 3)</span>
-                  <span>£2,450.50</span>
+                  <span>{formatCurrency(boxes.box3)}</span>
                 </div>
                 <div className="flex justify-between text-success">
                   <span>Less: VAT Reclaimed (Box 4)</span>
-                  <span>-£820.25</span>
+                  <span>-{formatCurrency(boxes.box4)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
                   <span>Net VAT Due (Box 5)</span>
-                  <span className="text-primary">£1,630.25</span>
+                  <span className="text-primary">{formatCurrency(boxes.box5)}</span>
                 </div>
               </div>
             )}
@@ -318,51 +332,63 @@ const Records = () => {
             <h2 className="text-sm font-semibold text-muted-foreground mb-4">
               SUBMISSION HISTORY
             </h2>
-            <div className="space-y-3">
-              {pastReturns.map((return_item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
-                      <CheckCircle className="w-4 h-4 text-success" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-foreground">
-                          {return_item.period}
-                        </p>
-                        <Badge variant="outline" className="text-xs">
-                          Ref: {return_item.ref}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {return_item.status} ✅
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p
-                      className={`text-sm font-bold ${
-                        return_item.type === "paid" ? "text-primary" : "text-success"
-                      }`}
+            {submissions.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground">No submissions yet</p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Your submitted VAT returns will appear here
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  {submissions.map((submission) => (
+                    <div
+                      key={submission.id}
+                      className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors cursor-pointer"
                     >
-                      {return_item.type === "paid" ? "£" : "+£"}
-                      {return_item.amount.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {return_item.type === "paid" ? "paid" : "refund"}
-                    </p>
-                  </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="w-4 h-4 text-success" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold text-foreground">
+                              {submission.period_key}
+                            </p>
+                            {submission.submitted_at && (
+                              <Badge variant="outline" className="text-xs">
+                                Submitted
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(submission.created_at).toLocaleDateString('en-GB')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p
+                          className={`text-sm font-bold ${
+                            submission.net_vat_due >= 0 ? "text-primary" : "text-success"
+                          }`}
+                        >
+                          {formatCurrency(Math.abs(submission.net_vat_due))}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {submission.net_vat_due >= 0 ? "due" : "refund"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <Button variant="outline" size="sm" className="w-full mt-4 gap-2">
-              <Download className="w-4 h-4" />
-              Export History
-            </Button>
+                <Button variant="outline" size="sm" className="w-full mt-4 gap-2">
+                  <Download className="w-4 h-4" />
+                  Export History
+                </Button>
+              </>
+            )}
           </Card>
         </div>
       </div>

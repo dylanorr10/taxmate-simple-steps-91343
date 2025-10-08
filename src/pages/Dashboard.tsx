@@ -17,6 +17,9 @@ import IncomeChart from "@/components/IncomeChart";
 import BottomNav from "@/components/BottomNav";
 import { useIncomeTransactions, useExpenseTransactions } from "@/hooks/useTransactions";
 import { getMonthToDateTotal, getLastMonthsData, formatCurrency } from "@/utils/transactionHelpers";
+import { useVATCalculations } from "@/hooks/useVATCalculations";
+import { useProfile } from "@/hooks/useProfile";
+import { useHMRCConnection } from "@/hooks/useHMRCConnection";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -27,6 +30,16 @@ const Dashboard = () => {
   
   const { transactions: incomeTransactions, isLoading: incomeLoading } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: expenseLoading } = useExpenseTransactions();
+  const { profile } = useProfile();
+  const { isConnected } = useHMRCConnection();
+  
+  const { mtdReadiness } = useVATCalculations(
+    incomeTransactions,
+    expenseTransactions,
+    isConnected,
+    !!profile?.vat_number,
+    !!profile?.business_name
+  );
 
   const incomeThisMonth = useMemo(() => getMonthToDateTotal(incomeTransactions), [incomeTransactions]);
   const expensesThisMonth = useMemo(() => getMonthToDateTotal(expenseTransactions), [expenseTransactions]);
@@ -178,14 +191,14 @@ const Dashboard = () => {
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="text-xs text-muted-foreground">MTD Readiness</div>
-              <div className="font-bold text-lg">{mtdReadyPct}% MTD Ready</div>
+              <div className="font-bold text-lg">{mtdReadiness}% MTD Ready</div>
             </div>
             <div className="text-right">
               <div className="text-sm text-muted-foreground">Next submission: <span className="font-semibold text-foreground">6w</span></div>
             </div>
           </div>
           <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
-            <div className="h-3 rounded-full bg-gradient-to-r from-accent to-success transition-all duration-300" style={{ width: `${mtdReadyPct}%` }}></div>
+            <div className="h-3 rounded-full bg-gradient-to-r from-accent to-success transition-all duration-300" style={{ width: `${mtdReadiness}%` }}></div>
           </div>
           <div className="mt-3 flex items-center gap-2">
             {mtdIssuesCount > 0 ? (
