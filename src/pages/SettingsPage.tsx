@@ -15,7 +15,7 @@ const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, isLoading: profileLoading, updateProfile, isUpdating } = useProfile();
-  const { isConnected, isLoading: hmrcLoading, initiateConnection } = useHMRCConnection();
+  const { isConnected, isLoading: hmrcLoading, initiateConnection, refetch } = useHMRCConnection();
   
   const [businessName, setBusinessName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
@@ -26,6 +26,21 @@ const SettingsPage = () => {
       setVatNumber(profile.vat_number || "");
     }
   }, [profile]);
+
+  useEffect(() => {
+    // Handle OAuth callback
+    const params = new URLSearchParams(location.search);
+    if (params.get('hmrc') === 'connected') {
+      toast.success("Successfully connected to HMRC!");
+      refetch();
+      // Clear the query params
+      navigate('/settings', { replace: true });
+    } else if (params.get('error')) {
+      const error = params.get('error');
+      toast.error(`Failed to connect to HMRC: ${error}`);
+      navigate('/settings', { replace: true });
+    }
+  }, [location.search, navigate, refetch]);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();

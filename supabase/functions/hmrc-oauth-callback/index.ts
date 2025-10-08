@@ -11,12 +11,15 @@ Deno.serve(async (req) => {
     const state = url.searchParams.get('state');
     const error = url.searchParams.get('error');
 
+    // Get frontend URL from request origin or fallback
+    const origin = req.headers.get('origin') || req.headers.get('referer')?.split('/').slice(0, 3).join('/') || '';
+
     if (error) {
       console.error('OAuth error:', error);
       return new Response(null, {
         status: 302,
         headers: {
-          Location: `${Deno.env.get('SUPABASE_URL')}/dashboard?error=${error}`,
+          Location: `${origin}/settings?error=${error}`,
         },
       });
     }
@@ -99,15 +102,16 @@ Deno.serve(async (req) => {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${Deno.env.get('SUPABASE_URL')}/dashboard?hmrc=connected`,
+        Location: `${origin}/settings?hmrc=connected`,
       },
     });
   } catch (error) {
     console.error('Error in hmrc-oauth-callback:', error);
+    const origin = req.headers.get('origin') || req.headers.get('referer')?.split('/').slice(0, 3).join('/') || '';
     return new Response(null, {
       status: 302,
       headers: {
-        Location: `${Deno.env.get('SUPABASE_URL')}/dashboard?error=oauth_failed`,
+        Location: `${origin}/settings?error=oauth_failed`,
       },
     });
   }

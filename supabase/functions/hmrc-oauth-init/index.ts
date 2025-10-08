@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     console.log('Generated OAuth URL:', authUrl.toString());
 
     return new Response(
-      JSON.stringify({ url: authUrl.toString() }),
+      JSON.stringify({ authUrl: authUrl.toString() }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
