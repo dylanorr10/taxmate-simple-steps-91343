@@ -1,11 +1,24 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SettingsPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Error signing out");
+    } else {
+      toast.success("Signed out successfully");
+      navigate("/auth");
+    }
+  };
 
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
@@ -127,10 +140,20 @@ const SettingsPage = () => {
         {/* Account Settings */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-3">Account</h2>
-          <Card className="p-6 text-center">
-            <p className="text-muted-foreground">
-              Account settings coming soon! This is where you'll manage your business details and preferences.
-            </p>
+          <Card className="p-6">
+            <div className="space-y-4">
+              <p className="text-muted-foreground">
+                Account settings coming soon! This is where you'll manage your business details and preferences.
+              </p>
+              <Button 
+                variant="outline" 
+                className="w-full flex items-center justify-center gap-2"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </Button>
+            </div>
           </Card>
         </div>
       </div>

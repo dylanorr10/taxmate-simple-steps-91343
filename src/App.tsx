@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Welcome from "./pages/Welcome";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
@@ -29,16 +30,16 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Navigate to="/auth" replace />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/welcome" element={<Welcome />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/log" element={<Log />} />
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/mileage" element={<Mileage />} />
-            <Route path="/records" element={<Records />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/learning" element={<LearningHub />} />
-            <Route path="/glossary" element={<Glossary />} />
+            <Route path="/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
+            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/log" element={<ProtectedRoute><Log /></ProtectedRoute>} />
+            <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
+            <Route path="/mileage" element={<ProtectedRoute><Mileage /></ProtectedRoute>} />
+            <Route path="/records" element={<ProtectedRoute><Records /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/learning" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
+            <Route path="/glossary" element={<ProtectedRoute><Glossary /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
