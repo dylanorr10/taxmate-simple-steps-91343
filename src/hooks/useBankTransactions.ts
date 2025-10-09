@@ -15,6 +15,7 @@ export interface BankTransaction {
   status: string;
   synced_at: string;
   created_at: string;
+  mapping_type?: string;
 }
 
 export const useBankTransactions = () => {
@@ -28,12 +29,21 @@ export const useBankTransactions = () => {
 
       const { data, error } = await supabase
         .from("bank_transactions")
-        .select("*")
+        .select(`
+          *,
+          transaction_mappings(mapping_type)
+        `)
         .eq("user_id", user.id)
         .order("timestamp", { ascending: false });
 
       if (error) throw error;
-      return data as BankTransaction[];
+      
+      // Flatten the mapping_type from the nested join
+      return (data as any[]).map(tx => ({
+        ...tx,
+        mapping_type: tx.transaction_mappings?.[0]?.mapping_type,
+        transaction_mappings: undefined
+      })) as BankTransaction[];
     },
   });
 

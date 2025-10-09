@@ -58,8 +58,7 @@ const Log = () => {
   const [showIgnored, setShowIgnored] = useState(false);
 
   const ignoredTransactions = transactions?.filter(t => {
-    // Transaction is categorized but check if it has a mapping with type 'ignored'
-    return t.status === 'categorized';
+    return t.status === 'categorized' && t.mapping_type === 'ignored';
   }) || [];
 
   const handleSaveCash = () => {
