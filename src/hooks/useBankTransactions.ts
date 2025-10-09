@@ -193,6 +193,78 @@ export const useBankTransactions = () => {
     return results;
   };
 
+  const recategorizeTransaction = useMutation({
+    mutationFn: async ({ 
+      transactionId, 
+      type, 
+      vatRate 
+    }: { 
+      transactionId: string; 
+      type: 'income' | 'expense'; 
+      vatRate: number;
+    }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Get the bank transaction details
+      const { data: bankTransaction } = await supabase
+        .from('bank_transactions')
+        .select('*')
+        .eq('id', transactionId)
+        .single();
+
+      if (!bankTransaction) throw new Error('Transaction not found');
+
+      // Delete existing mapping
+      await supabase
+        .from('transaction_mappings')
+        .delete()
+        .eq('bank_transaction_id', transactionId);
+
+      // Create new income/expense transaction
+      const transactionData = {
+        user_id: user.id,
+        amount: Math.abs(bankTransaction.amount),
+        transaction_date: new Date(bankTransaction.timestamp).toISOString().split('T')[0],
+        description: bankTransaction.description || 'Bank transaction',
+        vat_rate: vatRate,
+      };
+
+      const table = type === 'income' ? 'income_transactions' : 'expense_transactions';
+      const { data: newTransaction, error: insertError } = await supabase
+        .from(table)
+        .insert(transactionData)
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Create new mapping
+      await supabase.from('transaction_mappings').insert({
+        bank_transaction_id: transactionId,
+        [`${type}_transaction_id`]: newTransaction.id,
+        mapping_type: type,
+        user_confirmed: true,
+        confidence_score: 100,
+      });
+
+      // Update bank transaction status
+      await supabase
+        .from('bank_transactions')
+        .update({ status: 'categorized' })
+        .eq('id', transactionId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bank-transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["income-transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["expense-transactions"] });
+      toast.success("Transaction re-categorized successfully");
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to re-categorize: ${error.message}`);
+    },
+  });
+
   return {
     transactions,
     isLoading,
@@ -202,5 +274,7 @@ export const useBankTransactions = () => {
     confirmCategorization: confirmCategorization.mutate,
     isConfirming: confirmCategorization.isPending,
     bulkCategorize,
+    recategorizeTransaction: recategorizeTransaction.mutate,
+    isRecategorizing: recategorizeTransaction.isPending,
   };
 };

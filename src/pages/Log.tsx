@@ -43,14 +43,24 @@ const Log = () => {
   const { transactions: incomeTransactions, isLoading: incomeLoading, addIncome, isAdding: isAddingIncome, deleteIncome } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: expenseLoading, addExpense, isAdding: isAddingExpense, deleteExpense } = useExpenseTransactions();
   const { 
+    transactions,
     pendingTransactions, 
     isLoading: bankLoading, 
     categorizeTransaction, 
     isCategorizing,
     confirmCategorization,
     isConfirming,
-    bulkCategorize
+    bulkCategorize,
+    recategorizeTransaction,
+    isRecategorizing,
   } = useBankTransactions();
+
+  const [showIgnored, setShowIgnored] = useState(false);
+
+  const ignoredTransactions = transactions?.filter(t => {
+    // Transaction is categorized but check if it has a mapping with type 'ignored'
+    return t.status === 'categorized';
+  }) || [];
 
   const handleSaveCash = () => {
     if (!cashAmount || parseFloat(cashAmount) <= 0) {
@@ -115,10 +125,22 @@ const Log = () => {
   };
 
   const handleIgnore = (bankTxId: string) => {
+    if (!confirm("⚠️ This transaction won't appear in your financial records or dashboard. Continue?")) {
+      return;
+    }
     confirmCategorization({
       bankTransactionId: bankTxId,
       type: 'ignored',
       confidence: 1
+    });
+  };
+
+  const handleRecategorize = async (transaction: any, type: 'income' | 'expense') => {
+    const vatRate = type === 'income' ? 20 : 0;
+    recategorizeTransaction({
+      transactionId: transaction.id,
+      type,
+      vatRate,
     });
   };
 
@@ -401,7 +423,7 @@ const Log = () => {
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
               </div>
-            ) : pendingTransactions.length === 0 ? (
+            ) : pendingTransactions.length === 0 && !showIgnored ? (
               <Card className="p-8 text-center">
                 <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
                 <h3 className="font-semibold text-lg mb-2">All caught up!</h3>
@@ -409,6 +431,65 @@ const Log = () => {
                   No pending bank transactions to categorize.
                 </p>
               </Card>
+            ) : showIgnored ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Ignored Transactions</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowIgnored(false)}
+                  >
+                    Back to Pending
+                  </Button>
+                </div>
+                <ScrollArea className="h-[600px]">
+                  <div className="space-y-3 pr-4">
+                    {ignoredTransactions.map((transaction) => (
+                      <Card key={transaction.id} className="p-4 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium">{transaction.description || transaction.merchant_name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {new Date(transaction.timestamp).toLocaleDateString('en-GB', { 
+                                day: 'numeric', 
+                                month: 'short', 
+                                year: 'numeric' 
+                              })}
+                            </div>
+                            <div className="text-sm text-amber-700 dark:text-amber-500 mt-2 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" />
+                              This transaction was skipped and won't appear on your dashboard
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className={`text-lg font-semibold ${transaction.amount > 0 ? 'text-green-600' : 'text-foreground'}`}>
+                              {formatCurrency(Math.abs(transaction.amount))}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => handleRecategorize(transaction, 'income')}
+                                disabled={isRecategorizing}
+                              >
+                                ✓ Income
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleRecategorize(transaction, 'expense')}
+                                disabled={isRecategorizing}
+                              >
+                                ✓ Expense
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
             ) : !showResults && (
               <ScrollArea className="h-[600px]">
                 <div className="space-y-3 pr-4">
@@ -462,11 +543,11 @@ const Log = () => {
                               <Button
                                 onClick={() => handleConfirmCategorization(aiSuggestion.type, aiSuggestion.vatRate)}
                                 disabled={isConfirming}
-                                className="flex-1"
+                                className="flex-1 bg-primary hover:bg-primary/90"
                                 size="sm"
                               >
                                 {isConfirming ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                                Accept
+                                ✓ Add to {aiSuggestion.type === 'income' ? 'Income' : 'Expenses'}
                               </Button>
                               <Button
                                 onClick={() => setSelectedBankTx(null)}
@@ -532,8 +613,9 @@ const Log = () => {
                               disabled={isConfirming}
                               variant="outline"
                               size="sm"
+                              title="Skip this transaction (won't show on dashboard)"
                             >
-                              <X className="w-4 h-4" />
+                              ⊘ Skip
                             </Button>
                           </div>
                         )}
