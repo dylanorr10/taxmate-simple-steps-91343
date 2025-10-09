@@ -143,6 +143,56 @@ export const useBankTransactions = () => {
     },
   });
 
+  const bulkCategorize = async (
+    transactions: BankTransaction[],
+    onProgress?: (current: number, total: number) => void
+  ) => {
+    const results: {
+      high: Array<{ transaction: BankTransaction; suggestion: any }>;
+      medium: Array<{ transaction: BankTransaction; suggestion: any }>;
+      low: Array<{ transaction: BankTransaction; suggestion: any }>;
+      failed: Array<{ transaction: BankTransaction; error: string }>;
+    } = { high: [], medium: [], low: [], failed: [] };
+
+    for (let i = 0; i < transactions.length; i++) {
+      const tx = transactions[i];
+      
+      try {
+        // Rate limiting: delay between requests (400ms = ~2.5 req/sec)
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 400));
+        }
+
+        const { data, error } = await supabase.functions.invoke("truelayer-categorize-transaction", {
+          body: { transactionId: tx.id },
+        });
+
+        if (error) throw error;
+
+        const confidence = data.confidence || 0;
+        const result = { transaction: tx, suggestion: data };
+
+        if (confidence > 0.8) {
+          results.high.push(result);
+        } else if (confidence > 0.5) {
+          results.medium.push(result);
+        } else {
+          results.low.push(result);
+        }
+
+        onProgress?.(i + 1, transactions.length);
+      } catch (error: any) {
+        results.failed.push({ 
+          transaction: tx, 
+          error: error.message || 'Unknown error' 
+        });
+        onProgress?.(i + 1, transactions.length);
+      }
+    }
+
+    return results;
+  };
+
   return {
     transactions,
     isLoading,
@@ -151,5 +201,6 @@ export const useBankTransactions = () => {
     isCategorizing: categorizeTransaction.isPending,
     confirmCategorization: confirmCategorization.mutate,
     isConfirming: confirmCategorization.isPending,
+    bulkCategorize,
   };
 };

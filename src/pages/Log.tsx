@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
 import {
   FilePlus,
   ShoppingCart,
@@ -15,6 +16,7 @@ import {
   Sparkles,
   X,
   AlertCircle,
+  Zap,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BottomNav from "@/components/BottomNav";
@@ -32,6 +34,12 @@ const Log = () => {
   const [aiSuggestion, setAiSuggestion] = useState<any>(null);
   const [customVatRate, setCustomVatRate] = useState<number>(20);
   
+  // Bulk categorization state
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0 });
+  const [bulkResults, setBulkResults] = useState<any>(null);
+  const [showResults, setShowResults] = useState(false);
+  
   const { transactions: incomeTransactions, isLoading: incomeLoading, addIncome, isAdding: isAddingIncome, deleteIncome } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: expenseLoading, addExpense, isAdding: isAddingExpense, deleteExpense } = useExpenseTransactions();
   const { 
@@ -40,7 +48,8 @@ const Log = () => {
     categorizeTransaction, 
     isCategorizing,
     confirmCategorization,
-    isConfirming 
+    isConfirming,
+    bulkCategorize
   } = useBankTransactions();
 
   const handleSaveCash = () => {
@@ -113,6 +122,49 @@ const Log = () => {
     });
   };
 
+  const handleBulkCategorize = async () => {
+    if (pendingTransactions.length === 0) {
+      toast.error("No pending transactions to categorize");
+      return;
+    }
+
+    setIsBulkProcessing(true);
+    setBulkProgress({ current: 0, total: pendingTransactions.length });
+    setShowResults(false);
+
+    try {
+      const results = await bulkCategorize(pendingTransactions, (current, total) => {
+        setBulkProgress({ current, total });
+      });
+
+      setBulkResults(results);
+      setShowResults(true);
+      
+      toast.success(`Bulk categorization complete! ${results.high.length} high confidence, ${results.medium.length} medium, ${results.low.length} low`);
+    } catch (error: any) {
+      toast.error(`Bulk categorization failed: ${error.message}`);
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
+
+  const handleAcceptBulk = async (items: any[], confidenceLevel: string) => {
+    for (const item of items) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      confirmCategorization({
+        bankTransactionId: item.transaction.id,
+        type: item.suggestion.type,
+        vatRate: item.suggestion.vatRate,
+        confidence: item.suggestion.confidence,
+      });
+    }
+    
+    setBulkResults((prev: any) => ({
+      ...prev,
+      [confidenceLevel]: [],
+    }));
+  };
+
   const allTransactions = [
     ...incomeTransactions.map(t => ({ ...t, type: 'income' as const })),
     ...expenseTransactions.map(t => ({ ...t, type: 'expense' as const })),
@@ -152,6 +204,199 @@ const Log = () => {
           </TabsList>
 
           <TabsContent value="pending" className="space-y-4 mt-4">
+            {/* Bulk Auto-Categorize Section */}
+            {pendingTransactions.length > 0 && !showResults && (
+              <Card className="p-6 border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <Zap className="h-5 w-5 text-primary" />
+                      Auto-Categorize All Transactions
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Let AI categorize {pendingTransactions.length} transactions automatically (FREE)
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={handleBulkCategorize}
+                    disabled={isBulkProcessing}
+                    className="gap-2"
+                  >
+                    {isBulkProcessing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        Auto-Categorize All ({pendingTransactions.length})
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {isBulkProcessing && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Processing {bulkProgress.current} of {bulkProgress.total}</span>
+                      <span>{Math.round((bulkProgress.current / bulkProgress.total) * 100)}%</span>
+                    </div>
+                    <Progress value={(bulkProgress.current / bulkProgress.total) * 100} />
+                    <p className="text-xs text-muted-foreground">
+                      Estimated time: ~{Math.ceil((bulkProgress.total - bulkProgress.current) * 0.4)} seconds
+                    </p>
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* Bulk Results Display */}
+            {showResults && bulkResults && (
+              <div className="space-y-4">
+                <Card className="p-6 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+                  <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">
+                    ✅ Categorization Complete!
+                  </h3>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    Processed {bulkProgress.total} transactions. Review and accept the suggestions below.
+                  </p>
+                </Card>
+
+                {/* High Confidence */}
+                {bulkResults.high.length > 0 && (
+                  <Card className="p-6 border-green-200 dark:border-green-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h4 className="font-semibold text-green-900 dark:text-green-100">
+                          High Confidence ({bulkResults.high.length})
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          80%+ confidence - Safe to auto-accept
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={() => handleAcceptBulk(bulkResults.high, 'high')}
+                        variant="default"
+                        disabled={isConfirming}
+                      >
+                        Accept All
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {bulkResults.high.slice(0, 5).map((item: any) => (
+                        <div key={item.transaction.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg text-sm">
+                          <div>
+                            <p className="font-medium">{item.transaction.description || item.transaction.merchant_name}</p>
+                            <p className="text-muted-foreground">
+                              {item.suggestion.type === 'income' ? 'Income' : 'Expense'} • 
+                              VAT: {item.suggestion.vatRate}% • 
+                              Confidence: {Math.round(item.suggestion.confidence * 100)}%
+                            </p>
+                          </div>
+                          <p className="font-semibold">£{Math.abs(item.transaction.amount).toFixed(2)}</p>
+                        </div>
+                      ))}
+                      {bulkResults.high.length > 5 && (
+                        <p className="text-sm text-muted-foreground text-center">
+                          +{bulkResults.high.length - 5} more...
+                        </p>
+                      )}
+                    </div>
+                  </Card>
+                )}
+
+                {/* Medium Confidence */}
+                {bulkResults.medium.length > 0 && (
+                  <Card className="p-6 border-yellow-200 dark:border-yellow-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h4 className="font-semibold text-yellow-900 dark:text-yellow-100">
+                          Medium Confidence ({bulkResults.medium.length})
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          50-80% confidence - Quick review recommended
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={() => handleAcceptBulk(bulkResults.medium, 'medium')}
+                        variant="outline"
+                        disabled={isConfirming}
+                      >
+                        Accept All
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      {bulkResults.medium.slice(0, 3).map((item: any) => (
+                        <div key={item.transaction.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg text-sm">
+                          <div>
+                            <p className="font-medium">{item.transaction.description || item.transaction.merchant_name}</p>
+                            <p className="text-muted-foreground">
+                              {item.suggestion.type === 'income' ? 'Income' : 'Expense'} • 
+                              VAT: {item.suggestion.vatRate}% • 
+                              Confidence: {Math.round(item.suggestion.confidence * 100)}%
+                            </p>
+                          </div>
+                          <p className="font-semibold">£{Math.abs(item.transaction.amount).toFixed(2)}</p>
+                        </div>
+                      ))}
+                      {bulkResults.medium.length > 3 && (
+                        <p className="text-sm text-muted-foreground text-center">
+                          +{bulkResults.medium.length - 3} more...
+                        </p>
+                      )}
+                    </div>
+                  </Card>
+                )}
+
+                {/* Low Confidence */}
+                {bulkResults.low.length > 0 && (
+                  <Card className="p-6 border-orange-200 dark:border-orange-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h4 className="font-semibold text-orange-900 dark:text-orange-100">
+                          Low Confidence ({bulkResults.low.length})
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          &lt;50% confidence - Manual review required
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {bulkResults.low.slice(0, 3).map((item: any) => (
+                        <div key={item.transaction.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg text-sm">
+                          <div>
+                            <p className="font-medium">{item.transaction.description || item.transaction.merchant_name}</p>
+                            <p className="text-muted-foreground">
+                              Suggested: {item.suggestion.type === 'income' ? 'Income' : 'Expense'} • 
+                              Confidence: {Math.round(item.suggestion.confidence * 100)}%
+                            </p>
+                          </div>
+                          <p className="font-semibold">£{Math.abs(item.transaction.amount).toFixed(2)}</p>
+                        </div>
+                      ))}
+                      {bulkResults.low.length > 3 && (
+                        <p className="text-sm text-muted-foreground text-center">
+                          +{bulkResults.low.length - 3} more - review below
+                        </p>
+                      )}
+                    </div>
+                  </Card>
+                )}
+
+                <Button 
+                  onClick={() => {
+                    setShowResults(false);
+                    setBulkResults(null);
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Done Reviewing
+                </Button>
+              </div>
+            )}
+
             {bankLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -164,7 +409,7 @@ const Log = () => {
                   No pending bank transactions to categorize.
                 </p>
               </Card>
-            ) : (
+            ) : !showResults && (
               <ScrollArea className="h-[600px]">
                 <div className="space-y-3 pr-4">
                   {pendingTransactions.map((tx) => (
@@ -410,26 +655,45 @@ const Log = () => {
                       }`}
                     >
                       <div className="flex-1">
-                        <div className="font-semibold text-sm flex items-center gap-2">
+                        <div className="flex items-center gap-2 mb-1">
                           {transaction.type === 'income' ? (
                             <ShoppingCart className="w-4 h-4 text-success" />
                           ) : (
                             <Tag className="w-4 h-4 text-warning" />
                           )}
-                          {transaction.description || (transaction.type === 'income' ? 'Income' : 'Expense')}
+                          <span className="font-medium text-foreground">
+                            {transaction.description}
+                          </span>
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {formatCurrency(Number(transaction.amount))} • {formatDate(transaction.transaction_date)}
+                        <div className="text-sm text-muted-foreground">
+                          {formatDate(transaction.transaction_date)}
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => transaction.type === 'income' ? deleteIncome(transaction.id) : deleteExpense(transaction.id)}
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className={`font-semibold ${
+                            transaction.type === 'income' ? 'text-success' : 'text-foreground'
+                          }`}>
+                            {formatCurrency(transaction.amount)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {transaction.vat_rate}% VAT
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (transaction.type === 'income') {
+                              deleteIncome(transaction.id);
+                            } else {
+                              deleteExpense(transaction.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
