@@ -2,6 +2,25 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const openOAuthUrl = (url: string) => {
+  try {
+    const inIframe = window.self !== window.top;
+    if (inIframe) {
+      // Open in new tab since TrueLayer blocks iframe embedding
+      const win = window.open(url, '_blank', 'noopener,noreferrer');
+      if (!win) {
+        // Fallback if popups are blocked
+        window.location.assign(url);
+      }
+    } else {
+      window.location.assign(url);
+    }
+  } catch {
+    // Ultimate fallback
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+};
+
 export const useTrueLayerConnection = () => {
   const queryClient = useQueryClient();
 
@@ -26,10 +45,11 @@ export const useTrueLayerConnection = () => {
       const { data, error } = await supabase.functions.invoke("truelayer-oauth-init");
       
       if (error) throw error;
-      return data;
+      return data as { authUrl: string };
     },
     onSuccess: (data) => {
-      window.location.href = data.authUrl;
+      toast.info("Opening bank login in a new tab...");
+      openOAuthUrl(data.authUrl);
     },
     onError: (error: Error) => {
       toast.error(`Failed to initiate connection: ${error.message}`);
