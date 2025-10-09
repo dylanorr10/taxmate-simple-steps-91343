@@ -7,9 +7,18 @@ serve(async (req) => {
     const code = url.searchParams.get('code');
     const state = url.searchParams.get('state');
 
+    console.log('TrueLayer OAuth callback received:', { code: code?.substring(0, 10), state });
+
     if (!code || !state) {
+      console.error('Missing parameters:', { code: !!code, state: !!state });
       throw new Error('Missing code or state parameter');
     }
+
+    // Get app URL from referrer or construct from Supabase URL
+    const referrer = req.headers.get('referer');
+    const appUrl = referrer 
+      ? new URL(referrer).origin 
+      : `https://${Deno.env.get('SUPABASE_URL')?.split('//')[1]?.split('.')[0]}.lovable.app`;
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -58,6 +67,7 @@ serve(async (req) => {
     }
 
     const tokenData = await tokenResponse.json();
+    console.log('Token exchange successful, expires_in:', tokenData.expires_in);
 
     // Get account information
     const accountsResponse = await fetch('https://api.truelayer-sandbox.com/data/v1/accounts', {
@@ -67,12 +77,17 @@ serve(async (req) => {
     });
 
     if (!accountsResponse.ok) {
-      console.error('Failed to fetch accounts');
+      const errorText = await accountsResponse.text();
+      console.error('Failed to fetch accounts:', errorText);
       throw new Error('Failed to fetch account information');
     }
 
     const accountsData = await accountsResponse.json();
     const account = accountsData.results?.[0];
+    console.log('Fetched account:', { 
+      provider: account?.provider?.display_name, 
+      accountId: account?.account_id 
+    });
 
     // Store connection
     const expiresAt = new Date(Date.now() + tokenData.expires_in * 1000);
@@ -94,14 +109,18 @@ serve(async (req) => {
       throw connectionError;
     }
 
+    console.log('TrueLayer connection stored successfully');
+
     // Delete used state
     await supabaseClient
       .from('hmrc_oauth_states')
       .delete()
       .eq('state', state);
 
-    // Redirect back to settings page
-    const redirectUrl = `${url.origin}/settings?truelayer_connected=true`;
+    // Redirect back to settings page using app URL
+    const redirectUrl = `${appUrl}/settings?truelayer_connected=true`;
+    console.log('Redirecting to:', redirectUrl);
+    
     return new Response(null, {
       status: 302,
       headers: {
@@ -110,9 +129,17 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in truelayer-oauth-callback:', error);
-    const url = new URL(req.url);
+    
+    // Get app URL for error redirect
+    const referrer = req.headers.get('referer');
+    const appUrl = referrer 
+      ? new URL(referrer).origin 
+      : `https://${Deno.env.get('SUPABASE_URL')?.split('//')[1]?.split('.')[0]}.lovable.app`;
+    
     const message = error instanceof Error ? error.message : 'Unknown error';
-    const redirectUrl = `${url.origin}/settings?truelayer_error=${encodeURIComponent(message)}`;
+    const redirectUrl = `${appUrl}/settings?truelayer_error=${encodeURIComponent(message)}`;
+    console.log('Error redirect to:', redirectUrl);
+    
     return new Response(null, {
       status: 302,
       headers: {
