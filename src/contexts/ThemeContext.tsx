@@ -44,173 +44,71 @@ export type ColorPalette = {
 
 export const colorPalettes: ColorPalette[] = [
   {
-    id: 'modern-trust',
-    name: 'Modern Trust',
-    description: 'Calm fintech with a heart',
+    id: 'light',
+    name: 'Light Mode',
+    description: 'Fresh and bright',
     colors: {
-      background: '180 11% 97%',
-      foreground: '186 12% 21%',
-      card: '195 40% 98%',
-      cardForeground: '186 12% 21%',
-      popover: '180 11% 97%',
-      popoverForeground: '186 12% 21%',
+      background: '188 100% 93%', // #d9faff
+      foreground: '210 100% 5%', // #000a17
+      card: '0 0% 100%', // #ffffff
+      cardForeground: '210 100% 5%',
+      popover: '0 0% 100%',
+      popoverForeground: '210 100% 5%',
       
-      primary: '187 47% 31%',
+      primary: '213 100% 25%', // #00367d
       primaryForeground: '0 0% 100%',
       
-      secondary: '30 27% 87%',
-      secondaryForeground: '186 12% 21%',
+      secondary: '188 100% 82%', // #a6f3ff
+      secondaryForeground: '210 100% 5%',
       
-      muted: '180 11% 92%',
-      mutedForeground: '186 12% 45%',
+      muted: '188 80% 85%',
+      mutedForeground: '210 100% 15%',
       
-      accent: '177 47% 59%',
-      accentForeground: '186 12% 21%',
+      accent: '188 100% 82%', // #a6f3ff
+      accentForeground: '210 100% 5%',
       
-      border: '180 11% 88%',
-      input: '180 11% 88%',
-      ring: '187 47% 31%',
+      border: '188 50% 80%',
+      input: '188 50% 80%',
+      ring: '213 100% 25%',
       
       success: '142 71% 45%',
       warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '187 47% 59%',
+      info: '213 100% 25%',
     },
   },
   {
-    id: 'fresh-focus',
-    name: 'Fresh Focus',
-    description: 'A wellness app for your money',
+    id: 'dark',
+    name: 'Dark Mode',
+    description: 'Deep and focused',
     colors: {
-      background: '60 20% 98%',
-      foreground: '225 10% 19%',
-      card: '120 35% 97%',
-      cardForeground: '225 10% 19%',
-      popover: '60 20% 98%',
-      popoverForeground: '225 10% 19%',
+      background: '210 100% 5%', // #000a17
+      foreground: '0 0% 100%', // #ffffff
+      card: '210 100% 15%', // #00204a
+      cardForeground: '0 0% 100%',
+      popover: '210 100% 15%',
+      popoverForeground: '0 0% 100%',
       
-      primary: '130 24% 57%',
+      primary: '213 100% 25%', // #00367d
       primaryForeground: '0 0% 100%',
       
-      secondary: '28 43% 73%',
-      secondaryForeground: '225 10% 19%',
+      secondary: '188 100% 82%', // #a6f3ff
+      secondaryForeground: '210 100% 5%',
       
-      muted: '60 20% 93%',
-      mutedForeground: '225 10% 45%',
+      muted: '210 100% 20%',
+      mutedForeground: '188 100% 82%',
       
-      accent: '197 41% 66%',
-      accentForeground: '225 10% 19%',
+      accent: '188 100% 82%', // #a6f3ff
+      accentForeground: '210 100% 5%',
       
-      border: '60 20% 89%',
-      input: '60 20% 89%',
-      ring: '130 24% 57%',
+      border: '210 100% 25%',
+      input: '210 100% 25%',
+      ring: '213 100% 25%',
       
       success: '142 71% 45%',
       warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '197 41% 66%',
-    },
-  },
-  {
-    id: 'calm-energy',
-    name: 'Calm Energy',
-    description: 'Serious about finance but easy to love',
-    colors: {
-      background: '210 20% 98%',
-      foreground: '225 8% 22%',
-      card: '200 35% 97%',
-      cardForeground: '225 8% 22%',
-      popover: '210 20% 98%',
-      popoverForeground: '225 8% 22%',
-      
-      primary: '208 31% 28%',
-      primaryForeground: '0 0% 100%',
-      
-      secondary: '125 11% 69%',
-      secondaryForeground: '225 8% 22%',
-      
-      muted: '210 20% 93%',
-      mutedForeground: '225 8% 45%',
-      
-      accent: '5 82% 73%',
-      accentForeground: '225 8% 22%',
-      
-      border: '210 20% 89%',
-      input: '210 20% 89%',
-      ring: '208 31% 28%',
-      
-      success: '142 71% 45%',
-      warning: '38 92% 50%',
-      destructive: '0 84% 60%',
-      info: '208 31% 60%',
-    },
-  },
-  {
-    id: 'ocean-breeze',
-    name: 'Ocean Breeze',
-    description: 'Refreshing and trustworthy',
-    colors: {
-      background: '195 20% 95%',
-      foreground: '190 20% 15%',
-      card: '185 45% 97%',
-      cardForeground: '190 20% 15%',
-      popover: '195 20% 95%',
-      popoverForeground: '190 20% 15%',
-      
-      primary: '190 58% 27%',
-      primaryForeground: '0 0% 100%',
-      
-      secondary: '36 33% 76%',
-      secondaryForeground: '190 20% 15%',
-      
-      muted: '195 20% 90%',
-      mutedForeground: '190 20% 45%',
-      
-      accent: '165 57% 67%',
-      accentForeground: '190 20% 15%',
-      
-      border: '195 20% 86%',
-      input: '195 20% 86%',
-      ring: '190 58% 27%',
-      
-      success: '142 71% 45%',
-      warning: '38 92% 50%',
-      destructive: '0 84% 60%',
-      info: '190 58% 60%',
-    },
-  },
-  {
-    id: 'earth-sky',
-    name: 'Earth & Sky',
-    description: 'Grounded and harmonious',
-    colors: {
-      background: '40 29% 96%',
-      foreground: '30 7% 16%',
-      card: '160 40% 97%',
-      cardForeground: '30 7% 16%',
-      popover: '40 29% 96%',
-      popoverForeground: '30 7% 16%',
-      
-      primary: '168 33% 26%',
-      primaryForeground: '0 0% 100%',
-      
-      secondary: '145 28% 77%',
-      secondaryForeground: '30 7% 16%',
-      
-      muted: '40 29% 91%',
-      mutedForeground: '30 7% 45%',
-      
-      accent: '6 26% 70%',
-      accentForeground: '30 7% 16%',
-      
-      border: '40 29% 87%',
-      input: '40 29% 87%',
-      ring: '168 33% 26%',
-      
-      success: '142 71% 45%',
-      warning: '38 92% 50%',
-      destructive: '0 84% 60%',
-      info: '168 33% 60%',
+      info: '213 100% 25%',
     },
   },
 ];
@@ -226,7 +124,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentPalette, setCurrentPalette] = useState<ColorPalette>(() => {
     const saved = localStorage.getItem('color-palette');
-    return colorPalettes.find(p => p.id === saved) || colorPalettes[1]; // Default to Slate Blue
+    return colorPalettes.find(p => p.id === saved) || colorPalettes[0]; // Default to light mode
   });
 
   const setPalette = (paletteId: string) => {
