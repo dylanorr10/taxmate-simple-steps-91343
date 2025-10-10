@@ -47,161 +47,49 @@ export const useBankTransactions = () => {
     },
   });
 
-  const categorizeTransaction = useMutation({
-    mutationFn: async (transactionId: string) => {
-      const { data, error } = await supabase.functions.invoke("truelayer-categorize-transaction", {
-        body: { transactionId },
-      });
-
-      if (error) throw error;
-      return data;
-    },
-    onError: (error: Error) => {
-      toast.error(`Categorization failed: ${error.message}`);
-    },
-  });
-
-  const confirmCategorization = useMutation({
+  const updateVATRate = useMutation({
     mutationFn: async ({ 
       bankTransactionId, 
-      type, 
-      vatRate,
-      confidence 
+      newVatRate 
     }: { 
       bankTransactionId: string; 
-      type: 'income' | 'expense' | 'ignored';
-      vatRate?: number;
-      confidence: number;
+      newVatRate: number;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Get bank transaction
-      const { data: bankTx, error: bankError } = await supabase
-        .from("bank_transactions")
+      // Get the mapping to find linked income/expense transaction
+      const { data: mapping } = await supabase
+        .from("transaction_mappings")
         .select("*")
-        .eq("id", bankTransactionId)
+        .eq("bank_transaction_id", bankTransactionId)
         .single();
 
-      if (bankError || !bankTx) throw new Error("Bank transaction not found");
+      if (!mapping) throw new Error("Transaction mapping not found");
 
-      let incomeId = null;
-      let expenseId = null;
-
-      if (type === 'income') {
-        // Create income transaction
-        const { data: income, error: incomeError } = await supabase
+      // Update the VAT rate on the linked transaction
+      if (mapping.income_transaction_id) {
+        await supabase
           .from("income_transactions")
-          .insert({
-            user_id: user.id,
-            amount: Math.abs(bankTx.amount),
-            description: bankTx.description || bankTx.merchant_name || 'Bank import',
-            transaction_date: new Date(bankTx.timestamp).toISOString().split('T')[0],
-            vat_rate: vatRate || 20,
-          })
-          .select()
-          .single();
-
-        if (incomeError) throw incomeError;
-        incomeId = income.id;
-      } else if (type === 'expense') {
-        // Create expense transaction
-        const { data: expense, error: expenseError } = await supabase
+          .update({ vat_rate: newVatRate })
+          .eq("id", mapping.income_transaction_id);
+      } else if (mapping.expense_transaction_id) {
+        await supabase
           .from("expense_transactions")
-          .insert({
-            user_id: user.id,
-            amount: Math.abs(bankTx.amount),
-            description: bankTx.description || bankTx.merchant_name || 'Bank import',
-            transaction_date: new Date(bankTx.timestamp).toISOString().split('T')[0],
-            vat_rate: vatRate || 20,
-          })
-          .select()
-          .single();
-
-        if (expenseError) throw expenseError;
-        expenseId = expense.id;
+          .update({ vat_rate: newVatRate })
+          .eq("id", mapping.expense_transaction_id);
       }
-
-      // Create mapping
-      const { error: mappingError } = await supabase
-        .from("transaction_mappings")
-        .insert({
-          bank_transaction_id: bankTransactionId,
-          income_transaction_id: incomeId,
-          expense_transaction_id: expenseId,
-          mapping_type: type,
-          confidence_score: confidence,
-          user_confirmed: true,
-        });
-
-      if (mappingError) throw mappingError;
-
-      // Update bank transaction status
-      await supabase
-        .from("bank_transactions")
-        .update({ status: 'categorized' })
-        .eq("id", bankTransactionId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bank-transactions"] });
       queryClient.invalidateQueries({ queryKey: ["income-transactions"] });
       queryClient.invalidateQueries({ queryKey: ["expense-transactions"] });
-      toast.success("Transaction categorized successfully");
+      toast.success("VAT rate updated");
     },
     onError: (error: Error) => {
-      toast.error(`Failed to categorize: ${error.message}`);
+      toast.error(`Failed to update VAT rate: ${error.message}`);
     },
   });
-
-  const bulkCategorize = async (
-    transactions: BankTransaction[],
-    onProgress?: (current: number, total: number) => void
-  ) => {
-    const results: {
-      high: Array<{ transaction: BankTransaction; suggestion: any }>;
-      medium: Array<{ transaction: BankTransaction; suggestion: any }>;
-      low: Array<{ transaction: BankTransaction; suggestion: any }>;
-      failed: Array<{ transaction: BankTransaction; error: string }>;
-    } = { high: [], medium: [], low: [], failed: [] };
-
-    for (let i = 0; i < transactions.length; i++) {
-      const tx = transactions[i];
-      
-      try {
-        // Rate limiting: delay between requests (400ms = ~2.5 req/sec)
-        if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 400));
-        }
-
-        const { data, error } = await supabase.functions.invoke("truelayer-categorize-transaction", {
-          body: { transactionId: tx.id },
-        });
-
-        if (error) throw error;
-
-        const confidence = data.confidence || 0;
-        const result = { transaction: tx, suggestion: data };
-
-        if (confidence > 0.8) {
-          results.high.push(result);
-        } else if (confidence > 0.5) {
-          results.medium.push(result);
-        } else {
-          results.low.push(result);
-        }
-
-        onProgress?.(i + 1, transactions.length);
-      } catch (error: any) {
-        results.failed.push({ 
-          transaction: tx, 
-          error: error.message || 'Unknown error' 
-        });
-        onProgress?.(i + 1, transactions.length);
-      }
-    }
-
-    return results;
-  };
 
   const recategorizeTransaction = useMutation({
     mutationFn: async ({ 
@@ -278,12 +166,9 @@ export const useBankTransactions = () => {
   return {
     transactions,
     isLoading,
-    pendingTransactions: transactions.filter(t => t.status === 'pending'),
-    categorizeTransaction: categorizeTransaction.mutate,
-    isCategorizing: categorizeTransaction.isPending,
-    confirmCategorization: confirmCategorization.mutate,
-    isConfirming: confirmCategorization.isPending,
-    bulkCategorize,
+    categorizedTransactions: transactions.filter(t => t.status === 'categorized'),
+    updateVATRate: updateVATRate.mutate,
+    isUpdatingVAT: updateVATRate.isPending,
     recategorizeTransaction: recategorizeTransaction.mutate,
     isRecategorizing: recategorizeTransaction.isPending,
   };

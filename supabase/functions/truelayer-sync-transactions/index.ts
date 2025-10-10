@@ -97,7 +97,7 @@ serve(async (req) => {
     const transactionsData = await transactionsResponse.json();
     const transactions = transactionsData.results || [];
 
-    // Store new transactions
+    // Store new transactions and auto-categorize
     let newCount = 0;
     for (const transaction of transactions) {
       // Check if transaction already exists
@@ -108,7 +108,8 @@ serve(async (req) => {
         .single();
 
       if (!existing) {
-        await supabaseClient
+        // Insert bank transaction
+        const { data: bankTx, error: bankError } = await supabaseClient
           .from('bank_transactions')
           .insert({
             user_id: user.id,
@@ -119,8 +120,74 @@ serve(async (req) => {
             timestamp: transaction.timestamp,
             merchant_name: transaction.merchant_name,
             category: transaction.transaction_category,
-            status: 'pending',
-          });
+            status: 'categorized',
+          })
+          .select()
+          .single();
+
+        if (bankError || !bankTx) {
+          console.error('Failed to insert bank transaction:', bankError);
+          continue;
+        }
+
+        // Auto-categorize based on amount
+        const isIncome = transaction.amount > 0;
+        const absoluteAmount = Math.abs(transaction.amount);
+        
+        if (isIncome) {
+          // Create income transaction
+          const { data: incomeTx, error: incomeError } = await supabaseClient
+            .from('income_transactions')
+            .insert({
+              user_id: user.id,
+              amount: absoluteAmount,
+              description: transaction.description || transaction.merchant_name,
+              transaction_date: new Date(transaction.timestamp).toISOString().split('T')[0],
+              vat_rate: 20,
+            })
+            .select()
+            .single();
+
+          if (!incomeError && incomeTx) {
+            // Create mapping
+            await supabaseClient
+              .from('transaction_mappings')
+              .insert({
+                bank_transaction_id: bankTx.id,
+                income_transaction_id: incomeTx.id,
+                mapping_type: 'income',
+                user_confirmed: true,
+                confidence_score: 1.0,
+              });
+          }
+        } else {
+          // Create expense transaction
+          const { data: expenseTx, error: expenseError } = await supabaseClient
+            .from('expense_transactions')
+            .insert({
+              user_id: user.id,
+              amount: absoluteAmount,
+              description: transaction.description || transaction.merchant_name,
+              transaction_date: new Date(transaction.timestamp).toISOString().split('T')[0],
+              vat_rate: 20,
+            })
+            .select()
+            .single();
+
+          if (!expenseError && expenseTx) {
+            // Create mapping
+            await supabaseClient
+              .from('transaction_mappings')
+              .insert({
+                bank_transaction_id: bankTx.id,
+                expense_transaction_id: expenseTx.id,
+                mapping_type: 'expense',
+                user_confirmed: true,
+                confidence_score: 1.0,
+              });
+          }
+        }
+        
         newCount++;
       }
     }
