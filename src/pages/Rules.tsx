@@ -18,6 +18,7 @@ const Rules = () => {
   
   const [newRule, setNewRule] = useState({
     merchant_pattern: "",
+    description_pattern: null as string | null,
     action: "expense" as 'income' | 'expense' | 'ignore',
     vat_rate: 20,
     enabled: true,
@@ -28,6 +29,7 @@ const Rules = () => {
     createRule(newRule);
     setNewRule({
       merchant_pattern: "",
+      description_pattern: null,
       action: "expense",
       vat_rate: 20,
       enabled: true,

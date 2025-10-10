@@ -143,12 +143,12 @@ serve(async (req) => {
           continue;
         }
 
-        // Determine action and VAT rate
-        let action: 'income' | 'expense' | 'ignore';
+        // Determine action and VAT rate based on rule or amount
+        let actionType = 'expense';
         let vatRate = 20;
 
         if (matchedRule) {
-          action = matchedRule.action;
+          actionType = matchedRule.action;
           vatRate = matchedRule.vat_rate;
           
           // Update rule usage stats
@@ -161,12 +161,12 @@ serve(async (req) => {
             .eq('id', matchedRule.id);
         } else {
           // Fallback to amount-based categorization
-          action = transaction.amount > 0 ? 'income' : 'expense';
+          actionType = transaction.amount > 0 ? 'income' : 'expense';
         }
-
+        
         const absoluteAmount = Math.abs(transaction.amount);
         
-        if (action === 'income') {
+        if (actionType === 'income') {
           // Create income transaction
           const { data: incomeTx, error: incomeError } = await supabaseClient
             .from('income_transactions')
@@ -192,7 +192,7 @@ serve(async (req) => {
                 confidence_score: matchedRule ? 1.0 : 0.8,
               });
           }
-        } else if (action === 'expense') {
+        } else if (actionType === 'expense') {
           // Create expense transaction
           const { data: expenseTx, error: expenseError } = await supabaseClient
             .from('expense_transactions')
