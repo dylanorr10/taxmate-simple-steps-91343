@@ -97,6 +97,13 @@ serve(async (req) => {
     const transactionsData = await transactionsResponse.json();
     const transactions = transactionsData.results || [];
 
+    // Fetch user's transaction rules once
+    const { data: userRules } = await supabaseClient
+      .from('transaction_rules')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('enabled', true);
+
     // Store new transactions and auto-categorize
     let newCount = 0;
     for (const transaction of transactions) {
@@ -108,6 +115,12 @@ serve(async (req) => {
         .single();
 
       if (!existing) {
+        // Check for matching rule first
+        const merchantName = (transaction.merchant_name || transaction.description || '').toUpperCase();
+        const matchedRule = userRules?.find(rule => 
+          merchantName.includes(rule.merchant_pattern.toUpperCase())
+        );
+
         // Insert bank transaction
         const { data: bankTx, error: bankError } = await supabaseClient
           .from('bank_transactions')
@@ -120,7 +133,7 @@ serve(async (req) => {
             timestamp: transaction.timestamp,
             merchant_name: transaction.merchant_name,
             category: transaction.transaction_category,
-            status: 'categorized',
+            status: matchedRule ? 'categorized' : 'categorized',
           })
           .select()
           .single();
@@ -130,11 +143,30 @@ serve(async (req) => {
           continue;
         }
 
-        // Auto-categorize based on amount
-        const isIncome = transaction.amount > 0;
+        // Determine action and VAT rate
+        let action: 'income' | 'expense' | 'ignore';
+        let vatRate = 20;
+
+        if (matchedRule) {
+          action = matchedRule.action;
+          vatRate = matchedRule.vat_rate;
+          
+          // Update rule usage stats
+          await supabaseClient
+            .from('transaction_rules')
+            .update({
+              times_applied: matchedRule.times_applied + 1,
+              last_applied_at: new Date().toISOString(),
+            })
+            .eq('id', matchedRule.id);
+        } else {
+          // Fallback to amount-based categorization
+          action = transaction.amount > 0 ? 'income' : 'expense';
+        }
+
         const absoluteAmount = Math.abs(transaction.amount);
         
-        if (isIncome) {
+        if (action === 'income') {
           // Create income transaction
           const { data: incomeTx, error: incomeError } = await supabaseClient
             .from('income_transactions')
@@ -143,7 +175,7 @@ serve(async (req) => {
               amount: absoluteAmount,
               description: transaction.description || transaction.merchant_name,
               transaction_date: new Date(transaction.timestamp).toISOString().split('T')[0],
-              vat_rate: 20,
+              vat_rate: vatRate,
             })
             .select()
             .single();
@@ -157,10 +189,10 @@ serve(async (req) => {
                 income_transaction_id: incomeTx.id,
                 mapping_type: 'income',
                 user_confirmed: true,
-                confidence_score: 1.0,
+                confidence_score: matchedRule ? 1.0 : 0.8,
               });
           }
-        } else {
+        } else if (action === 'expense') {
           // Create expense transaction
           const { data: expenseTx, error: expenseError } = await supabaseClient
             .from('expense_transactions')
@@ -169,7 +201,7 @@ serve(async (req) => {
               amount: absoluteAmount,
               description: transaction.description || transaction.merchant_name,
               transaction_date: new Date(transaction.timestamp).toISOString().split('T')[0],
-              vat_rate: 20,
+              vat_rate: vatRate,
             })
             .select()
             .single();
@@ -183,9 +215,19 @@ serve(async (req) => {
                 expense_transaction_id: expenseTx.id,
                 mapping_type: 'expense',
                 user_confirmed: true,
-                confidence_score: 1.0,
+                confidence_score: matchedRule ? 1.0 : 0.8,
               });
           }
+        } else {
+          // Ignore action - just create mapping with no income/expense
+          await supabaseClient
+            .from('transaction_mappings')
+            .insert({
+              bank_transaction_id: bankTx.id,
+              mapping_type: 'ignored',
+              user_confirmed: true,
+              confidence_score: 1.0,
+            });
         }
         
         newCount++;

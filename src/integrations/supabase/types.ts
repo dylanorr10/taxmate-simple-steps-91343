@@ -266,6 +266,48 @@ export type Database = {
           },
         ]
       }
+      transaction_rules: {
+        Row: {
+          action: string
+          confidence_level: string | null
+          created_at: string | null
+          description_pattern: string | null
+          enabled: boolean | null
+          id: string
+          last_applied_at: string | null
+          merchant_pattern: string
+          times_applied: number | null
+          user_id: string
+          vat_rate: number | null
+        }
+        Insert: {
+          action: string
+          confidence_level?: string | null
+          created_at?: string | null
+          description_pattern?: string | null
+          enabled?: boolean | null
+          id?: string
+          last_applied_at?: string | null
+          merchant_pattern: string
+          times_applied?: number | null
+          user_id: string
+          vat_rate?: number | null
+        }
+        Update: {
+          action?: string
+          confidence_level?: string | null
+          created_at?: string | null
+          description_pattern?: string | null
+          enabled?: boolean | null
+          id?: string
+          last_applied_at?: string | null
+          merchant_pattern?: string
+          times_applied?: number | null
+          user_id?: string
+          vat_rate?: number | null
+        }
+        Relationships: []
+      }
       truelayer_connections: {
         Row: {
           access_token: string
