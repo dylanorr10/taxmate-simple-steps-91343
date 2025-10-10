@@ -45,6 +45,9 @@ const Dashboard = () => {
   const expensesThisMonth = useMemo(() => getMonthToDateTotal(expenseTransactions), [expenseTransactions]);
   const profit = incomeThisMonth - expensesThisMonth;
   const taxSavings = Math.round(expensesThisMonth * 0.66);
+  
+  // Suggested tax to set aside (30% of profit for Income Tax + Class 4 NIC)
+  const suggestedTaxReserve = profit > 0 ? Math.round(profit * 0.30) : 0;
 
   const incomeHistory = useMemo(() => getLastMonthsData(incomeTransactions, 3), [incomeTransactions]);
   
@@ -155,6 +158,29 @@ const Dashboard = () => {
                 <IncomeChart data={incomeChartData} trendPct={trendPct} />
               </div>
             </Card>
+
+            {/* Tax to Set Aside */}
+            {profit > 0 && (
+              <Card className="p-4 shadow-lg border-2 border-warning/20 bg-warning/5">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <div className="text-xs text-muted-foreground mb-1">💰 Suggested Tax Reserve</div>
+                    <div className="font-bold text-2xl text-warning">{formatCurrency(suggestedTaxReserve)}</div>
+                    <div className="text-xs text-muted-foreground mt-1">Set aside for Income Tax + NI (approx. 30% of profit)</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="px-3 py-1 rounded-full text-xs font-semibold bg-warning/10 text-warning">
+                      Recommended
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-border/50">
+                  <div className="text-xs text-muted-foreground">
+                    Based on {formatCurrency(profit)} profit this month. Transfer this to a separate savings account to cover your tax bill.
+                  </div>
+                </div>
+              </Card>
+            )}
 
         {/* Quick Actions */}
         <Card className="p-3 shadow-lg">
