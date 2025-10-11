@@ -23,6 +23,8 @@ import { toast } from "sonner";
 import { HelpTooltip } from "@/components/HelpTooltip";
 import { MicroCelebration } from "@/components/MicroCelebration";
 import { useStreak } from "@/hooks/useStreak";
+import { ConfidenceRating } from "@/components/ConfidenceRating";
+import { useConfidenceRatings } from "@/hooks/useConfidenceRatings";
 
 const Log = () => {
   const [cashAmount, setCashAmount] = useState("");
@@ -31,6 +33,12 @@ const Log = () => {
   const [expenseDescription, setExpenseDescription] = useState("");
   const [editingVatFor, setEditingVatFor] = useState<string | null>(null);
   const [celebration, setCelebration] = useState<{ message: string; amount?: number } | null>(null);
+  const [showConfidenceRating, setShowConfidenceRating] = useState(false);
+  const [pendingConfidenceAction, setPendingConfidenceAction] = useState<{
+    type: 'income' | 'expense';
+    amount: number;
+    description: string;
+  } | null>(null);
   
   const { transactions: incomeTransactions, isLoading: incomeLoading, addIncome, isAdding: isAddingIncome, deleteIncome } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: expenseLoading, addExpense, isAdding: isAddingExpense, deleteExpense } = useExpenseTransactions();
@@ -45,6 +53,7 @@ const Log = () => {
   } = useBankTransactions();
   
   const { updateStreak } = useStreak();
+  const { addRating } = useConfidenceRatings();
 
   const [showIgnored, setShowIgnored] = useState(false);
 
@@ -55,17 +64,19 @@ const Log = () => {
       return;
     }
     const amount = parseFloat(cashAmount);
-    addIncome({
-      amount,
-      description: cashDescription || "Cash sale",
-    });
-    setCelebration({ 
-      message: "Income logged!", 
-      amount 
-    });
-    updateStreak();
-    setCashAmount("");
-    setCashDescription("");
+    const description = cashDescription || "Cash sale";
+    
+    // 30% chance to show confidence rating
+    if (Math.random() < 0.3) {
+      setPendingConfidenceAction({ type: 'income', amount, description });
+      setShowConfidenceRating(true);
+    } else {
+      addIncome({ amount, description });
+      setCelebration({ message: "Income logged!", amount });
+      updateStreak();
+      setCashAmount("");
+      setCashDescription("");
+    }
   };
 
   const handleSaveExpense = () => {
@@ -73,17 +84,59 @@ const Log = () => {
       return;
     }
     const amount = parseFloat(expenseAmount);
-    addExpense({
-      amount,
-      description: expenseDescription || "Expense",
+    const description = expenseDescription || "Expense";
+    
+    // 30% chance to show confidence rating
+    if (Math.random() < 0.3) {
+      setPendingConfidenceAction({ type: 'expense', amount, description });
+      setShowConfidenceRating(true);
+    } else {
+      addExpense({ amount, description });
+      setCelebration({ message: "Expense saved!", amount });
+      updateStreak();
+      setExpenseAmount("");
+      setExpenseDescription("");
+    }
+  };
+
+  const handleConfidenceRate = (level: number) => {
+    if (!pendingConfidenceAction) return;
+
+    // Record confidence rating
+    addRating({
+      actionType: `manual_${pendingConfidenceAction.type}`,
+      confidenceLevel: level,
+      contextData: {
+        amount: pendingConfidenceAction.amount,
+        description: pendingConfidenceAction.description,
+      },
     });
-    setCelebration({ 
-      message: "Expense saved!", 
-      amount 
+
+    // Complete the action
+    if (pendingConfidenceAction.type === 'income') {
+      addIncome({
+        amount: pendingConfidenceAction.amount,
+        description: pendingConfidenceAction.description,
+      });
+      setCashAmount("");
+      setCashDescription("");
+    } else {
+      addExpense({
+        amount: pendingConfidenceAction.amount,
+        description: pendingConfidenceAction.description,
+      });
+      setExpenseAmount("");
+      setExpenseDescription("");
+    }
+
+    setCelebration({
+      message: `${pendingConfidenceAction.type === 'income' ? 'Income' : 'Expense'} logged!`,
+      amount: pendingConfidenceAction.amount,
     });
     updateStreak();
-    setExpenseAmount("");
-    setExpenseDescription("");
+
+    setShowConfidenceRating(false);
+    setPendingConfidenceAction(null);
   };
 
   const handleRecategorize = async (transaction: any, type: 'income' | 'expense') => {
@@ -116,6 +169,19 @@ const Log = () => {
           message={celebration.message}
           amount={celebration.amount}
           onComplete={() => setCelebration(null)}
+        />
+      )}
+      
+      {showConfidenceRating && pendingConfidenceAction && (
+        <ConfidenceRating
+          question={`How confident are you about categorizing this ${
+            pendingConfidenceAction.type === 'income' ? 'income' : 'expense'
+          }?`}
+          onRate={handleConfidenceRate}
+          onSkip={() => {
+            setShowConfidenceRating(false);
+            handleConfidenceRate(3); // Default to neutral if skipped
+          }}
         />
       )}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">

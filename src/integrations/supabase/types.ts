@@ -398,6 +398,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_confidence_ratings: {
+        Row: {
+          action_type: string
+          confidence_level: number
+          context_data: Json | null
+          created_at: string | null
+          id: string
+          user_id: string
+          was_correct: boolean | null
+        }
+        Insert: {
+          action_type: string
+          confidence_level: number
+          context_data?: Json | null
+          created_at?: string | null
+          id?: string
+          user_id: string
+          was_correct?: boolean | null
+        }
+        Update: {
+          action_type?: string
+          confidence_level?: number
+          context_data?: Json | null
+          created_at?: string | null
+          id?: string
+          user_id?: string
+          was_correct?: boolean | null
+        }
+        Relationships: []
+      }
       user_learning_progress: {
         Row: {
           completed_at: string | null

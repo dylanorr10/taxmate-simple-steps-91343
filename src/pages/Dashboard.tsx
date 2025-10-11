@@ -28,6 +28,7 @@ import { InlineLesson } from "@/components/InlineLesson";
 import { lessons } from "@/data/learningContent";
 import { StreakCounter } from "@/components/StreakCounter";
 import { SurpriseTip } from "@/components/SurpriseTip";
+import { ConfidenceProgress } from "@/components/ConfidenceProgress";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -307,6 +308,8 @@ const Dashboard = () => {
               </div>
             </div>
           </Card>
+          
+          <ConfidenceProgress />
         </div>
 
         {/* Recent Activity */}
