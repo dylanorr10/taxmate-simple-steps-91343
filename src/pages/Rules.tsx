@@ -10,6 +10,8 @@ import { Loader2, Trash2, Plus, Target, ShoppingCart, Tag, EyeOff, Edit2, X } fr
 import BottomNav from "@/components/BottomNav";
 import { useTransactionRules } from "@/hooks/useTransactionRules";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { HelpTooltip } from "@/components/HelpTooltip";
+import { LessonQuickLink } from "@/components/LessonQuickLink";
 
 const Rules = () => {
   const { rules, isLoading, createRule, isCreating, updateRule, deleteRule, toggleRule } = useTransactionRules();
@@ -53,10 +55,15 @@ const Rules = () => {
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <Target className="w-6 h-6 text-primary" />
-              Transaction Rules
+              <HelpTooltip
+                term="Transaction Rules"
+                explanation="Rules automatically categorize future transactions from the same merchant. Set them once, save hours every month!"
+                icon="⚡"
+                tooltipId="transaction-rules"
+              />
             </h1>
             <p className="text-muted-foreground mt-1">
-              Automatically categorize recurring transactions
+              Automatically categorize recurring transactions • <LessonQuickLink lessonId="using-rules" />
             </p>
           </div>
           <Dialog open={isAddingRule} onOpenChange={setIsAddingRule}>
@@ -74,7 +81,14 @@ const Rules = () => {
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div>
-                  <Label>Merchant Name Pattern</Label>
+                  <Label>
+                    <HelpTooltip
+                      term="Merchant Name Pattern"
+                      explanation="A merchant pattern is text that appears in transaction descriptions. For example, 'TESCO' will match 'TESCO STORES 123' or 'TESCO.COM'. Use capital letters for best results."
+                      icon="🎯"
+                      tooltipId="merchant-pattern"
+                    />
+                  </Label>
                   <Input
                     placeholder="e.g., NETFLIX, AMAZON, ADOBE"
                     value={newRule.merchant_pattern}

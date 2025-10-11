@@ -5,19 +5,32 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLearningProgress } from "@/hooks/useLearningProgress";
 
 interface HelpTooltipProps {
   term: string;
   explanation: string;
   icon?: string;
+  tooltipId?: string;
 }
 
-export const HelpTooltip = ({ term, explanation, icon }: HelpTooltipProps) => {
+export const HelpTooltip = ({ term, explanation, icon, tooltipId }: HelpTooltipProps) => {
+  const { trackTooltipClick } = useLearningProgress();
+
+  const handleClick = () => {
+    if (tooltipId) {
+      trackTooltipClick(tooltipId);
+    }
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors">
+          <button 
+            className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+            onClick={handleClick}
+          >
             <span className="font-medium">{term}</span>
             <HelpCircle className="w-4 h-4" />
           </button>

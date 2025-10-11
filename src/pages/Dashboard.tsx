@@ -20,6 +20,12 @@ import { getMonthToDateTotal, getLastMonthsData, formatCurrency } from "@/utils/
 import { useVATCalculations } from "@/hooks/useVATCalculations";
 import { useProfile } from "@/hooks/useProfile";
 import { useHMRCConnection } from "@/hooks/useHMRCConnection";
+import { HelpTooltip } from "@/components/HelpTooltip";
+import { LessonQuickLink } from "@/components/LessonQuickLink";
+import { DailyTipToast } from "@/components/DailyTipToast";
+import { useDailyTip } from "@/hooks/useDailyTip";
+import { InlineLesson } from "@/components/InlineLesson";
+import { lessons } from "@/data/learningContent";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -27,6 +33,10 @@ const Dashboard = () => {
   const [modalContent, setModalContent] = useState<string | null>(null);
   const [mtdReadyPct, setMtdReadyPct] = useState(78);
   const [mtdIssuesCount, setMtdIssuesCount] = useState(3);
+  const [showLessonModal, setShowLessonModal] = useState(false);
+  const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
+  
+  const { todaysTip, shouldShow, dismissTip, markLessonOpened } = useDailyTip();
   
   const { transactions: incomeTransactions, isLoading: incomeLoading } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: expenseLoading } = useExpenseTransactions();
@@ -133,13 +143,15 @@ const Dashboard = () => {
             {/* Hero: Current Financial Position */}
             <Card className="p-4 shadow-lg">
               <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="text-xs text-muted-foreground">This Month</div>
-                  <div className="text-lg font-bold mt-1">
-                    £{incomeThisMonth.toFixed(0)} in — £{expensesThisMonth.toFixed(0)} out — <span className={profit >= 0 ? "text-success" : "text-destructive"}>£{Math.abs(profit).toFixed(0)} {profit >= 0 ? "profit" : "loss"}</span>
-                  </div>
-                  <div className="text-sm text-muted-foreground mt-1">Instant snapshot: are you making money?</div>
+              <div>
+                <div className="text-xs text-muted-foreground">This Month</div>
+                <div className="text-lg font-bold mt-1">
+                  £{incomeThisMonth.toFixed(0)} in — £{expensesThisMonth.toFixed(0)} out — <span className={profit >= 0 ? "text-success" : "text-destructive"}>£{Math.abs(profit).toFixed(0)} {profit >= 0 ? "profit" : "loss"}</span>
                 </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  Instant snapshot: are you making money? <LessonQuickLink lessonId="understanding-profit" linkText="How is this calculated?" />
+                </div>
+              </div>
                 <div>
                   <div className={`px-3 py-1 rounded-full text-xs font-semibold ${profit >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                     {profit >= 0 ? "Profit" : "Loss"}
@@ -149,7 +161,14 @@ const Dashboard = () => {
 
               {/* Income Trend */}
               <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">Income trend (3 months)</div>
+                <div className="text-sm text-muted-foreground">
+                  <HelpTooltip
+                    term="Income trend"
+                    explanation="This shows how your current month's income compares to the average of previous months. An upward trend (↗) means you're earning more than usual."
+                    icon="📈"
+                    tooltipId="income-trend"
+                  /> (3 months)
+                </div>
                 <div className={`text-sm font-semibold ${trendPct >= 0 ? "text-success" : "text-destructive"}`}>
                   {trendPct >= 0 ? "↗" : "↘"} {Math.abs(trendPct)}%
                 </div>
@@ -164,9 +183,16 @@ const Dashboard = () => {
               <Card className="p-4 shadow-lg border-2 border-warning/20 bg-warning/5">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
-                    <div className="text-xs text-muted-foreground mb-1">💰 Suggested Tax Reserve</div>
+                    <div className="text-xs text-muted-foreground mb-1">💰 Suggested <HelpTooltip
+                      term="Tax Reserve"
+                      explanation="As a sole trader, tax isn't deducted automatically. You should set aside approximately 30% of your profit for Income Tax and National Insurance."
+                      icon="🏦"
+                      tooltipId="tax-reserve"
+                    /></div>
                     <div className="font-bold text-2xl text-warning">{formatCurrency(suggestedTaxReserve)}</div>
-                    <div className="text-xs text-muted-foreground mt-1">Set aside for Income Tax + NI (approx. 30% of profit)</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Set aside for Income Tax + NI (approx. 30% of profit) • <LessonQuickLink lessonId="tax-planning" linkText="Why 30%?" />
+                    </div>
                   </div>
                   <div className="text-right">
                     <div className="px-3 py-1 rounded-full text-xs font-semibold bg-warning/10 text-warning">
@@ -216,7 +242,14 @@ const Dashboard = () => {
         <Card className="p-4 shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <div className="text-xs text-muted-foreground">MTD Readiness</div>
+              <div className="text-xs text-muted-foreground">
+                <HelpTooltip
+                  term="MTD Readiness"
+                  explanation="Making Tax Digital (MTD) is HMRC's requirement to keep digital tax records and submit VAT returns using compatible software. Your readiness score shows how well your records meet these requirements."
+                  icon="📊"
+                  tooltipId="mtd"
+                />
+              </div>
               <div className="font-bold text-lg">{mtdReadiness}% MTD Ready</div>
             </div>
             <div className="text-right">
@@ -255,7 +288,14 @@ const Dashboard = () => {
           <Card className="p-4 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm text-muted-foreground">Tax Savings</div>
+                <div className="text-sm text-muted-foreground">
+                  <HelpTooltip
+                    term="Tax Savings"
+                    explanation="Business expenses reduce your taxable profit. By claiming legitimate expenses, you pay less Income Tax and National Insurance."
+                    icon="💡"
+                    tooltipId="tax-savings"
+                  />
+                </div>
                 <div className="font-semibold mt-1">You've saved £{taxSavings} this month</div>
               </div>
               <div className="text-right">
@@ -300,6 +340,35 @@ const Dashboard = () => {
           </>
         )}
       </main>
+
+      {/* Daily Tip Toast */}
+      {shouldShow && todaysTip && (
+        <DailyTipToast
+          tip={todaysTip}
+          onDismiss={dismissTip}
+          onReadMore={() => {
+            if (todaysTip.relatedLessonId) {
+              setSelectedLesson(todaysTip.relatedLessonId);
+              setShowLessonModal(true);
+              markLessonOpened();
+            }
+          }}
+        />
+      )}
+
+      {/* Lesson Modal */}
+      {selectedLesson && (
+        <InlineLesson
+          isOpen={showLessonModal}
+          onClose={() => {
+            setShowLessonModal(false);
+            setSelectedLesson(null);
+          }}
+          title={lessons.find(l => l.id === selectedLesson)?.title || ''}
+          content={lessons.find(l => l.id === selectedLesson)?.content || ''}
+          emoji={lessons.find(l => l.id === selectedLesson)?.icon}
+        />
+      )}
 
       {/* Floating one-tap fix */}
       <div className="fixed right-6 bottom-24 z-40">

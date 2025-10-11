@@ -67,6 +67,33 @@ export type Database = {
           },
         ]
       }
+      daily_tips_shown: {
+        Row: {
+          dismissed: boolean | null
+          id: string
+          opened_full_lesson: boolean | null
+          shown_at: string | null
+          tip_id: string
+          user_id: string
+        }
+        Insert: {
+          dismissed?: boolean | null
+          id?: string
+          opened_full_lesson?: boolean | null
+          shown_at?: string | null
+          tip_id: string
+          user_id: string
+        }
+        Update: {
+          dismissed?: boolean | null
+          id?: string
+          opened_full_lesson?: boolean | null
+          shown_at?: string | null
+          tip_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       expense_transactions: {
         Row: {
           amount: number
@@ -211,6 +238,27 @@ export type Database = {
         }
         Relationships: []
       }
+      tooltip_interactions: {
+        Row: {
+          clicked_at: string | null
+          id: string
+          tooltip_id: string
+          user_id: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          id?: string
+          tooltip_id: string
+          user_id: string
+        }
+        Update: {
+          clicked_at?: string | null
+          id?: string
+          tooltip_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       transaction_mappings: {
         Row: {
           bank_transaction_id: string
@@ -346,6 +394,39 @@ export type Database = {
           provider?: string
           refresh_token?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_learning_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          lesson_id: string
+          saved: boolean | null
+          started_at: string | null
+          time_spent: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          lesson_id: string
+          saved?: boolean | null
+          started_at?: string | null
+          time_spent?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          lesson_id?: string
+          saved?: boolean | null
+          started_at?: string | null
+          time_spent?: number | null
           user_id?: string
         }
         Relationships: []
