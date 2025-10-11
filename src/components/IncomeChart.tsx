@@ -4,9 +4,10 @@ import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 interface IncomeChartProps {
   data: Array<{ month: string; income: number }>;
   trendPct: number;
+  suggestedTaxReserve?: number;
 }
 
-const IncomeChart = ({ data, trendPct }: IncomeChartProps) => {
+const IncomeChart = ({ data, trendPct, suggestedTaxReserve }: IncomeChartProps) => {
   const chartConfig = {
     income: {
       label: "Income",
@@ -121,6 +122,22 @@ const IncomeChart = ({ data, trendPct }: IncomeChartProps) => {
           <p className="text-[10px] text-muted-foreground">this month</p>
         </div>
       </div>
+
+      {/* Tax Reserve - only shown when profit > 0 */}
+      {suggestedTaxReserve && suggestedTaxReserve > 0 && (
+        <div className="mt-3 pt-3 border-t border-warning/30 bg-warning/5 -mx-2 px-2 pb-2 rounded-b-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">💰 Set Aside for Tax</p>
+              <p className="text-lg font-bold text-warning">{formatCurrency(suggestedTaxReserve)}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">~30% of profit for Income Tax + NI</p>
+            </div>
+            <div className="px-2 py-1 rounded-full text-[10px] font-semibold bg-warning/10 text-warning">
+              Recommended
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -143,7 +143,7 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            {/* Hero: Financial Summary + Quick Actions */}
+            {/* Hero: Financial Summary */}
             <Card className="p-3 shadow-lg">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex-1 min-w-0">
@@ -162,7 +162,15 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Quick Actions - Compact */}
+              {/* Chart with integrated tax reserve */}
+              <div className="mt-3 pt-3 border-t border-border">
+                <div className="text-xs text-muted-foreground mb-2">
+                  3-month trend <LessonQuickLink lessonId="understanding-profit" linkText="Learn more" />
+                </div>
+                <IncomeChart data={incomeChartData} trendPct={trendPct} suggestedTaxReserve={suggestedTaxReserve} />
+              </div>
+
+              {/* Quick Actions - Below Chart */}
               <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-border">
                 <Link to="/log" className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
                   <div className="flex flex-col items-center gap-1">
@@ -189,46 +197,7 @@ const Dashboard = () => {
                   </div>
                 </Link>
               </div>
-
-              {/* Expandable Chart */}
-              <div className="mt-3 pt-3 border-t border-border">
-                <div className="text-xs text-muted-foreground mb-2">
-                  3-month trend <LessonQuickLink lessonId="understanding-profit" linkText="Learn more" />
-                </div>
-                <IncomeChart data={incomeChartData} trendPct={trendPct} />
-              </div>
             </Card>
-
-            {/* Tax to Set Aside */}
-            {profit > 0 && (
-              <Card className="p-4 shadow-lg border-2 border-warning/20 bg-warning/5">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className="text-xs text-muted-foreground mb-1">💰 Suggested <HelpTooltip
-                      term="Tax Reserve"
-                      explanation="As a sole trader, tax isn't deducted automatically. You should set aside approximately 30% of your profit for Income Tax and National Insurance."
-                      icon="🏦"
-                      tooltipId="tax-reserve"
-                    /></div>
-                    <div className="font-bold text-2xl text-warning">{formatCurrency(suggestedTaxReserve)}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Set aside for Income Tax + NI (approx. 30% of profit) • <LessonQuickLink lessonId="tax-planning" linkText="Why 30%?" />
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="px-3 py-1 rounded-full text-xs font-semibold bg-warning/10 text-warning">
-                      Recommended
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-3 pt-3 border-t border-border/50">
-                  <div className="text-xs text-muted-foreground">
-                    Based on {formatCurrency(profit)} profit this month. Transfer this to a separate savings account to cover your tax bill.
-                  </div>
-                </div>
-              </Card>
-            )}
-
 
         {/* MTD Compliance */}
         <Card className="p-4 shadow-lg">
