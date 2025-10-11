@@ -144,20 +144,29 @@ const Dashboard = () => {
         ) : (
           <>
             {/* Hero: Financial Summary */}
-            <Card className="p-3 shadow-lg">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-muted-foreground">This Month</div>
-                  <div className="text-base font-bold mt-0.5">
-                    £{incomeThisMonth.toFixed(0)} in — £{expensesThisMonth.toFixed(0)} out
+            <Card className="p-4 shadow-lg">
+              {/* Hero Profit Display */}
+              <div className="text-center pb-4 border-b border-border">
+                <div className="text-xs text-muted-foreground mb-2 flex items-center justify-center gap-2">
+                  Your Profit This Month
+                  <div className={`px-2 py-0.5 rounded-full text-xs font-semibold ${profit >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                    {trendPct >= 0 ? "↗" : "↘"} {Math.abs(trendPct)}%
                   </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-lg font-bold ${profit >= 0 ? "text-success" : "text-destructive"}`}>
-                      £{Math.abs(profit).toFixed(0)} {profit >= 0 ? "profit" : "loss"}
-                    </span>
-                    <div className={`px-2 py-0.5 rounded-full text-xs font-semibold ${profit >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
-                      {trendPct >= 0 ? "↗" : "↘"} {Math.abs(trendPct)}%
-                    </div>
+                </div>
+                <div className={`text-6xl font-bold mb-4 ${profit >= 0 ? "text-success" : "text-destructive"}`}>
+                  £{Math.abs(profit).toFixed(0)}
+                </div>
+                
+                {/* Secondary: Income & Expenses */}
+                <div className="flex items-center justify-center gap-6 text-sm">
+                  <div className="text-center">
+                    <div className="text-xs text-muted-foreground mb-1">Income</div>
+                    <div className="font-semibold text-foreground">£{incomeThisMonth.toFixed(0)}</div>
+                  </div>
+                  <div className="h-8 w-px bg-border" />
+                  <div className="text-center">
+                    <div className="text-xs text-muted-foreground mb-1">Expenses</div>
+                    <div className="font-semibold text-foreground">£{expensesThisMonth.toFixed(0)}</div>
                   </div>
                 </div>
               </div>
