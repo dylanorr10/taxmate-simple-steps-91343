@@ -6,13 +6,31 @@ interface MTDGaugeProps {
 
 const MTDGauge = ({ score }: MTDGaugeProps) => {
   const [animatedScore, setAnimatedScore] = useState(0);
+  const [previousScore, setPreviousScore] = useState(0);
+  const [showChange, setShowChange] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    if (animatedScore !== 0 && score !== animatedScore) {
+      setPreviousScore(animatedScore);
+      setShowChange(true);
+      
+      const changeTimer = setTimeout(() => {
+        setShowChange(false);
+      }, 2000);
+      
+      const timer = setTimeout(() => {
+        setAnimatedScore(score);
+      }, 300);
+      
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(changeTimer);
+      };
+    } else if (animatedScore === 0) {
       setAnimatedScore(score);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [score]);
+      setPreviousScore(score);
+    }
+  }, [score, animatedScore]);
 
   const circumference = 2 * Math.PI * 70;
   const offset = circumference - (animatedScore / 100) * circumference;
@@ -59,6 +77,13 @@ const MTDGauge = ({ score }: MTDGaugeProps) => {
           <div className="text-4xl font-bold" style={{ color: getColor() }}>
             {animatedScore}%
           </div>
+          {showChange && previousScore !== animatedScore && (
+            <div className={`text-xs font-semibold mt-1 animate-in fade-in slide-in-from-bottom-2 ${
+              animatedScore > previousScore ? 'text-success' : 'text-warning'
+            }`}>
+              {animatedScore > previousScore ? '↗' : '↘'} {Math.abs(animatedScore - previousScore)}%
+            </div>
+          )}
           <div className="text-xs text-muted-foreground mt-1">MTD Ready</div>
         </div>
       </div>

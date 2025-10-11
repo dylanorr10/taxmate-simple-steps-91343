@@ -21,6 +21,8 @@ import { useBankTransactions } from "@/hooks/useBankTransactions";
 import { formatCurrency, formatDate } from "@/utils/transactionHelpers";
 import { toast } from "sonner";
 import { HelpTooltip } from "@/components/HelpTooltip";
+import { MicroCelebration } from "@/components/MicroCelebration";
+import { useStreak } from "@/hooks/useStreak";
 
 const Log = () => {
   const [cashAmount, setCashAmount] = useState("");
@@ -28,6 +30,7 @@ const Log = () => {
   const [expenseAmount, setExpenseAmount] = useState("");
   const [expenseDescription, setExpenseDescription] = useState("");
   const [editingVatFor, setEditingVatFor] = useState<string | null>(null);
+  const [celebration, setCelebration] = useState<{ message: string; amount?: number } | null>(null);
   
   const { transactions: incomeTransactions, isLoading: incomeLoading, addIncome, isAdding: isAddingIncome, deleteIncome } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: expenseLoading, addExpense, isAdding: isAddingExpense, deleteExpense } = useExpenseTransactions();
@@ -40,6 +43,8 @@ const Log = () => {
     recategorizeTransaction,
     isRecategorizing,
   } = useBankTransactions();
+  
+  const { updateStreak } = useStreak();
 
   const [showIgnored, setShowIgnored] = useState(false);
 
@@ -49,10 +54,16 @@ const Log = () => {
     if (!cashAmount || parseFloat(cashAmount) <= 0) {
       return;
     }
+    const amount = parseFloat(cashAmount);
     addIncome({
-      amount: parseFloat(cashAmount),
+      amount,
       description: cashDescription || "Cash sale",
     });
+    setCelebration({ 
+      message: "Income logged!", 
+      amount 
+    });
+    updateStreak();
     setCashAmount("");
     setCashDescription("");
   };
@@ -61,10 +72,16 @@ const Log = () => {
     if (!expenseAmount || parseFloat(expenseAmount) <= 0) {
       return;
     }
+    const amount = parseFloat(expenseAmount);
     addExpense({
-      amount: parseFloat(expenseAmount),
+      amount,
       description: expenseDescription || "Expense",
     });
+    setCelebration({ 
+      message: "Expense saved!", 
+      amount 
+    });
+    updateStreak();
     setExpenseAmount("");
     setExpenseDescription("");
   };
@@ -94,6 +111,13 @@ const Log = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-24">
+      {celebration && (
+        <MicroCelebration
+          message={celebration.message}
+          amount={celebration.amount}
+          onComplete={() => setCelebration(null)}
+        />
+      )}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">

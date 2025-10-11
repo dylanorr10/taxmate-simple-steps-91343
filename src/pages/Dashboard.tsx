@@ -26,6 +26,7 @@ import { DailyTipToast } from "@/components/DailyTipToast";
 import { useDailyTip } from "@/hooks/useDailyTip";
 import { InlineLesson } from "@/components/InlineLesson";
 import { lessons } from "@/data/learningContent";
+import { StreakCounter } from "@/components/StreakCounter";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -122,9 +123,10 @@ const Dashboard = () => {
             <div className="w-10 h-10 rounded-full bg-success/10 text-success font-bold flex items-center justify-center text-sm">
               TM
             </div>
-            <div>
+            <div className="flex flex-col gap-1">
               <div className="text-xs text-muted-foreground">Welcome back</div>
               <div className="font-bold text-base">TaxMate Dashboard</div>
+              <StreakCounter />
             </div>
           </div>
           <div className="text-right">
