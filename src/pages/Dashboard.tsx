@@ -143,40 +143,58 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            {/* Hero: Current Financial Position */}
-            <Card className="p-4 shadow-lg">
-              <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="text-xs text-muted-foreground">This Month</div>
-                <div className="text-lg font-bold mt-1">
-                  £{incomeThisMonth.toFixed(0)} in — £{expensesThisMonth.toFixed(0)} out — <span className={profit >= 0 ? "text-success" : "text-destructive"}>£{Math.abs(profit).toFixed(0)} {profit >= 0 ? "profit" : "loss"}</span>
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  Instant snapshot: are you making money? <LessonQuickLink lessonId="understanding-profit" linkText="How is this calculated?" />
-                </div>
-              </div>
-                <div>
-                  <div className={`px-3 py-1 rounded-full text-xs font-semibold ${profit >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
-                    {profit >= 0 ? "Profit" : "Loss"}
+            {/* Hero: Financial Summary + Quick Actions */}
+            <Card className="p-3 shadow-lg">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs text-muted-foreground">This Month</div>
+                  <div className="text-base font-bold mt-0.5">
+                    £{incomeThisMonth.toFixed(0)} in — £{expensesThisMonth.toFixed(0)} out
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`text-lg font-bold ${profit >= 0 ? "text-success" : "text-destructive"}`}>
+                      £{Math.abs(profit).toFixed(0)} {profit >= 0 ? "profit" : "loss"}
+                    </span>
+                    <div className={`px-2 py-0.5 rounded-full text-xs font-semibold ${profit >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                      {trendPct >= 0 ? "↗" : "↘"} {Math.abs(trendPct)}%
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Income Trend */}
-              <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  <HelpTooltip
-                    term="Income trend"
-                    explanation="This shows how your current month's income compares to the average of previous months. An upward trend (↗) means you're earning more than usual."
-                    icon="📈"
-                    tooltipId="income-trend"
-                  /> (3 months)
-                </div>
-                <div className={`text-sm font-semibold ${trendPct >= 0 ? "text-success" : "text-destructive"}`}>
-                  {trendPct >= 0 ? "↗" : "↘"} {Math.abs(trendPct)}%
-                </div>
+              {/* Quick Actions - Compact */}
+              <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-border">
+                <Link to="/log" className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
+                  <div className="flex flex-col items-center gap-1">
+                    <FilePlus className="w-5 h-5" />
+                    <div className="text-xs font-semibold">Invoice</div>
+                  </div>
+                </Link>
+                <Link to="/log" className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
+                  <div className="flex flex-col items-center gap-1">
+                    <PlusCircle className="w-5 h-5" />
+                    <div className="text-xs font-semibold">Expense</div>
+                  </div>
+                </Link>
+                <button onClick={() => toast({ title: "Coming soon", description: "Receipt scanning coming soon!" })} className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
+                  <div className="flex flex-col items-center gap-1">
+                    <Camera className="w-5 h-5" />
+                    <div className="text-xs font-semibold">Receipt</div>
+                  </div>
+                </button>
+                <Link to="/mileage" className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
+                  <div className="flex flex-col items-center gap-1">
+                    <Car className="w-5 h-5" />
+                    <div className="text-xs font-semibold">Mileage</div>
+                  </div>
+                </Link>
               </div>
-              <div className="mt-3">
+
+              {/* Expandable Chart */}
+              <div className="mt-3 pt-3 border-t border-border">
+                <div className="text-xs text-muted-foreground mb-2">
+                  3-month trend <LessonQuickLink lessonId="understanding-profit" linkText="Learn more" />
+                </div>
                 <IncomeChart data={incomeChartData} trendPct={trendPct} />
               </div>
             </Card>
@@ -211,35 +229,6 @@ const Dashboard = () => {
               </Card>
             )}
 
-        {/* Quick Actions */}
-        <Card className="p-3 shadow-lg">
-          <div className="grid grid-cols-4 gap-3">
-            <Link to="/log" className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
-              <div className="flex flex-col items-center gap-1">
-                <FilePlus className="w-5 h-5" />
-                <div className="text-xs font-semibold">Invoice</div>
-              </div>
-            </Link>
-            <Link to="/log" className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
-              <div className="flex flex-col items-center gap-1">
-                <PlusCircle className="w-5 h-5" />
-                <div className="text-xs font-semibold">Expense</div>
-              </div>
-            </Link>
-            <button onClick={() => toast({ title: "Coming soon", description: "Receipt scanning coming soon!" })} className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
-              <div className="flex flex-col items-center gap-1">
-                <Camera className="w-5 h-5" />
-                <div className="text-xs font-semibold">Receipt</div>
-              </div>
-            </button>
-            <Link to="/mileage" className="flex-1 bg-background border border-border p-3 rounded-lg hover:bg-muted transition-all active:scale-95">
-              <div className="flex flex-col items-center gap-1">
-                <Car className="w-5 h-5" />
-                <div className="text-xs font-semibold">Mileage</div>
-              </div>
-            </Link>
-          </div>
-        </Card>
 
         {/* MTD Compliance */}
         <Card className="p-4 shadow-lg">
