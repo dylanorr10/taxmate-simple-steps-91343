@@ -27,6 +27,7 @@ import { useDailyTip } from "@/hooks/useDailyTip";
 import { InlineLesson } from "@/components/InlineLesson";
 import { lessons } from "@/data/learningContent";
 import { StreakCounter } from "@/components/StreakCounter";
+import { SurpriseTip } from "@/components/SurpriseTip";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -343,19 +344,28 @@ const Dashboard = () => {
         )}
       </main>
 
-      {/* Daily Tip Toast */}
+      {/* Daily Tip Toast - Use SurpriseTip for special tips */}
       {shouldShow && todaysTip && (
-        <DailyTipToast
-          tip={todaysTip}
-          onDismiss={dismissTip}
-          onReadMore={() => {
-            if (todaysTip.relatedLessonId) {
-              setSelectedLesson(todaysTip.relatedLessonId);
-              setShowLessonModal(true);
-              markLessonOpened();
-            }
-          }}
-        />
+        <>
+          {(todaysTip.isBonus || todaysTip.isEasterEgg || todaysTip.isPro) ? (
+            <SurpriseTip
+              tip={todaysTip}
+              onDismiss={dismissTip}
+            />
+          ) : (
+            <DailyTipToast
+              tip={todaysTip}
+              onDismiss={dismissTip}
+              onReadMore={() => {
+                if (todaysTip.relatedLessonId) {
+                  setSelectedLesson(todaysTip.relatedLessonId);
+                  setShowLessonModal(true);
+                  markLessonOpened();
+                }
+              }}
+            />
+          )}
+        </>
       )}
 
       {/* Lesson Modal */}

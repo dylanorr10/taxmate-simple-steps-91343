@@ -3,6 +3,9 @@ export interface DailyTip {
   content: string;
   emoji: string;
   relatedLessonId?: string;
+  isBonus?: boolean;
+  isEasterEgg?: boolean;
+  isPro?: boolean;
   trigger?: {
     type: 'expense_count' | 'profit_threshold' | 'no_rules' | 'random';
     condition?: number;
@@ -85,5 +88,57 @@ export const dailyTips: DailyTip[] = [
     emoji: '💻',
     trigger: { type: 'random' },
     relatedLessonId: 'mtd-basics',
+  },
+  // Bonus Tips (10% chance)
+  {
+    id: 'bonus-tax-hack',
+    content: '🎁 BONUS TIP: Buying equipment? Claim 100% Annual Investment Allowance - deduct the full cost from profits this year!',
+    emoji: '🎁',
+    isBonus: true,
+    trigger: { type: 'random' },
+  },
+  {
+    id: 'bonus-early-bird',
+    content: '🎁 BONUS TIP: File your Self Assessment before Christmas to avoid the January rush and reduce stress!',
+    emoji: '🎄',
+    isBonus: true,
+    trigger: { type: 'random' },
+  },
+  {
+    id: 'bonus-pension',
+    content: '🎁 BONUS TIP: Pension contributions reduce your tax bill AND build retirement savings. Double win!',
+    emoji: '🏦',
+    isBonus: true,
+    trigger: { type: 'random' },
+  },
+  // Easter Eggs (1 in 20 chance)
+  {
+    id: 'easter-tax-joke',
+    content: '🥚 You found a hidden tip! Why did the accountant break up with the calculator? Too many problems!',
+    emoji: '🥚',
+    isEasterEgg: true,
+    trigger: { type: 'random' },
+  },
+  {
+    id: 'easter-record',
+    content: '🥚 Secret unlocked! The world record for fastest tax return filing is 11 seconds. You\'re doing great by comparison!',
+    emoji: '🥚',
+    isEasterEgg: true,
+    trigger: { type: 'random' },
+  },
+  // Pro Tips
+  {
+    id: 'pro-vat-flat-rate',
+    content: '⚡ PRO TIP: VAT Flat Rate Scheme can save admin time. You charge 20% but pay HMRC a lower % based on your industry.',
+    emoji: '⚡',
+    isPro: true,
+    trigger: { type: 'random' },
+  },
+  {
+    id: 'pro-cash-basis',
+    content: '⚡ PRO TIP: Cash Basis accounting (record when paid, not invoiced) is simpler for sole traders earning under £150k.',
+    emoji: '⚡',
+    isPro: true,
+    trigger: { type: 'random' },
   },
 ];
