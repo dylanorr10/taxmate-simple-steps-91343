@@ -8,123 +8,118 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* ============================================
-       WORKING-CLASS SOLE TRADER PALETTE
-       Research-backed colors for trust & completion
-       ============================================ */
+    /* PRIMARY: Cyan/Turquoise - #00CFC8 */
+    --primary: 178 100% 40%;
+    --primary-hover: 178 100% 35%;
+    --primary-active: 178 100% 30%;
+    --primary-light: 178 100% 95%;
+    --primary-foreground: 0 0% 100%;
     
-    /* PRIMARY: Blue Palette - Custom Colors */
-    --primary: 234 77% 43%; /* Persian Blue #192bc2 - Main CTA color */
-    --primary-hover: 202 61% 54%; /* Celestial Blue #449dd1 - Lighter for hover */
-    --primary-active: 248 92% 25%; /* Navy Blue #150578 - Darker for active/pressed */
-    --primary-light: 197 64% 90%; /* Light Sky Blue tint for backgrounds */
-    --primary-foreground: 0 0% 100%; /* White text on blue */
+    /* SUCCESS: Green */
+    --success: 134 61% 41%;
+    --success-hover: 134 61% 36%;
+    --success-active: 134 61% 31%;
+    --success-light: 134 61% 95%;
+    --success-foreground: 0 0% 100%;
     
-    /* SUCCESS: Green - Completed tasks, confirmations */
-    --success: 134 61% 41%; /* #28A745 - Success states */
-    --success-hover: 134 61% 36%; /* Darker for hover */
-    --success-active: 134 61% 31%; /* Darker for active */
-    --success-light: 134 61% 95%; /* Light tint for backgrounds */
-    --success-foreground: 0 0% 100%; /* White text on green */
+    /* WARNING: Orange */
+    --warning: 24 100% 63%;
+    --warning-hover: 24 100% 58%;
+    --warning-active: 24 100% 53%;
+    --warning-light: 24 100% 95%;
+    --warning-foreground: 0 0% 100%;
     
-    /* HIGHLIGHT: Orange - Tips, hints, friendly prompts */
-    --warning: 24 100% 63%; /* #FF8C42 - Attention/tips */
-    --warning-hover: 24 100% 58%; /* Darker for hover */
-    --warning-active: 24 100% 53%; /* Darker for active */
-    --warning-light: 24 100% 95%; /* Light tint for backgrounds */
-    --warning-foreground: 0 0% 100%; /* White text on orange */
-    
-    /* ERROR: Red - For errors only */
-    --destructive: 0 84% 60%; /* Error states */
+    /* ERROR: Red */
+    --destructive: 0 84% 60%;
     --destructive-hover: 0 84% 55%;
     --destructive-active: 0 84% 50%;
     --destructive-light: 0 84% 95%;
     --destructive-foreground: 0 0% 100%;
     
-    /* INFO: Using primary blue for neutral info */
-    --info: 211 100% 50%;
+    /* INFO */
+    --info: 178 100% 40%;
     --info-foreground: 0 0% 100%;
     
-    /* BACKGROUNDS: Blue palette */
-    --background: 197 64% 67%; /* Sky Blue #78c0e0 */
-    --card: 202 61% 54%; /* Celestial Blue #449dd1 */
-    --popover: 202 61% 54%;
+    /* BACKGROUNDS */
+    --background: 0 0% 100%; /* #ffffff */
+    --card: 0 0% 98%;
+    --popover: 0 0% 100%;
     
-    /* TEXT: Dark for readability on blue backgrounds */
-    --foreground: 240 71% 19%; /* Federal Blue #0e0e52 - Dark text */
-    --card-foreground: 240 71% 19%; /* Dark text on cards */
-    --popover-foreground: 240 71% 19%; /* Dark text on popovers */
+    /* TEXT */
+    --foreground: 200 16% 38%; /* #687b88 */
+    --card-foreground: 200 16% 38%;
+    --popover-foreground: 200 16% 38%;
     
-    /* NEUTRALS: Light grays for hierarchy */
-    --muted: 210 10% 96%; /* Very light gray backgrounds */
-    --muted-foreground: 210 11% 46%; /* Mid gray for secondary text */
-    --border: 210 10% 90%; /* Light gray borders */
-    --input: 210 10% 96%; /* Input backgrounds */
+    /* NEUTRALS */
+    --muted: 200 16% 95%;
+    --muted-foreground: 200 16% 38%;
+    --border: 200 16% 85%;
+    --input: 200 16% 85%;
     
     /* SUPPORTING COLORS */
-    --secondary: 206 94% 19%; /* Prussian Blue as secondary */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 179 100% 51%; /* #03fff6 - Bright cyan */
+    --secondary-foreground: 200 16% 24%; /* #3c474e */
     
-    --accent: 192 96% 44%; /* Aero - Bright cyan accent */
-    --accent-foreground: 0 0% 100%;
+    --accent: 179 100% 51%; /* #03fff6 */
+    --accent-foreground: 200 16% 24%;
     
-    --ring: 210 100% 26%; /* Polynesian Blue focus rings */
+    --ring: 178 100% 40%;
     --radius: 0.5rem;
     
     /* DISABLED STATES */
-    --disabled: 210 10% 90%;
-    --disabled-foreground: 210 10% 65%;
+    --disabled: 200 16% 90%;
+    --disabled-foreground: 200 16% 60%;
     
-    /* GRADIENTS: Blue palette gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(240 71% 19%) 0%, hsl(248 92% 25%) 50%, hsl(234 77% 43%) 100%);
+    /* GRADIENTS */
+    --gradient-primary: linear-gradient(135deg, hsl(178 100% 40%) 0%, hsl(179 100% 51%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(134 61% 41%) 0%, hsl(134 61% 36%) 100%);
-    --gradient-highlight: linear-gradient(135deg, hsl(202 61% 54%) 0%, hsl(197 64% 67%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(197 64% 67%) 0%, hsl(202 61% 54%) 50%, hsl(234 77% 43%) 100%);
-    --gradient-background: linear-gradient(135deg, hsl(210 100% 98%) 0%, hsl(192 60% 97%) 40%, hsl(24 80% 98%) 70%, hsl(134 50% 97%) 100%);
+    --gradient-highlight: linear-gradient(135deg, hsl(178 100% 40%) 0%, hsl(179 100% 51%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(200 16% 95%) 100%);
+    --gradient-background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(179 100% 98%) 100%);
     
-    /* SHADOWS: Professional depth (7.8:1, 6.2:1, 4.9:1 contrast ratios met) */
-    --shadow-sm: 0 1px 2px 0 hsl(210 11% 46% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(210 11% 46% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(210 11% 46% / 0.1);
-    --shadow-primary: 0 4px 12px -2px hsl(210 100% 26% / 0.25);
+    /* SHADOWS */
+    --shadow-sm: 0 1px 2px 0 hsl(200 16% 38% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(200 16% 38% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(200 16% 38% / 0.1);
+    --shadow-primary: 0 4px 12px -2px hsl(178 100% 40% / 0.25);
     --shadow-success: 0 4px 12px -2px hsl(134 61% 41% / 0.25);
-    --shadow-card: 0 2px 8px -2px hsl(210 11% 46% / 0.08);
+    --shadow-card: 0 2px 8px -2px hsl(200 16% 38% / 0.08);
     
-    /* SIDEBAR (if needed) */
+    /* SIDEBAR */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 210 11% 46%;
-    --sidebar-primary: 210 100% 26%;
+    --sidebar-foreground: 200 16% 38%;
+    --sidebar-primary: 178 100% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 10% 96%;
-    --sidebar-accent-foreground: 210 11% 46%;
-    --sidebar-border: 210 10% 90%;
-    --sidebar-ring: 210 100% 26%;
+    --sidebar-accent: 200 16% 95%;
+    --sidebar-accent-foreground: 200 16% 38%;
+    --sidebar-border: 200 16% 85%;
+    --sidebar-ring: 178 100% 40%;
   }
 
   .dark {
-    /* DARK MODE: Future-proof accessible variants */
-    --background: 210 15% 12%;
-    --foreground: 210 10% 90%;
+    /* DARK MODE */
+    --background: 200 16% 24%; /* #3c474e */
+    --foreground: 0 0% 100%; /* #ffffff */
     
-    --card: 210 15% 16%;
-    --card-foreground: 210 10% 90%;
+    --card: 200 16% 28%;
+    --card-foreground: 0 0% 100%;
     
-    --popover: 210 15% 16%;
-    --popover-foreground: 210 10% 90%;
+    --popover: 200 16% 28%;
+    --popover-foreground: 0 0% 100%;
     
-    --primary: 196 91% 34%; /* Cerulean - Lighter for dark mode */
-    --primary-hover: 192 96% 44%; /* Aero - Even lighter for hover */
-    --primary-active: 210 100% 50%;
-    --primary-light: 227 95% 15%;
+    --primary: 178 100% 40%; /* #00CFC8 */
+    --primary-hover: 178 100% 45%;
+    --primary-active: 178 100% 50%;
+    --primary-light: 178 100% 15%;
     --primary-foreground: 0 0% 100%;
     
-    --success: 134 61% 50%; /* Lighter green for dark mode */
+    --success: 134 61% 50%;
     --success-hover: 134 61% 55%;
     --success-active: 134 61% 60%;
     --success-light: 134 61% 20%;
     --success-foreground: 0 0% 100%;
     
-    --warning: 24 100% 65%; /* Lighter orange for dark mode */
+    --warning: 24 100% 65%;
     --warning-hover: 24 100% 70%;
     --warning-active: 24 100% 75%;
     --warning-light: 24 100% 20%;
@@ -135,42 +130,42 @@ All colors MUST be HSL.
     --destructive-light: 0 84% 20%;
     --destructive-foreground: 0 0% 100%;
     
-    --muted: 210 15% 22%;
-    --muted-foreground: 210 10% 65%;
+    --muted: 200 16% 32%;
+    --muted-foreground: 200 16% 70%;
     
-    --border: 210 15% 25%;
-    --input: 210 15% 22%;
-    --ring: 196 91% 34%;
+    --border: 200 16% 38%;
+    --input: 200 16% 32%;
+    --ring: 178 100% 40%;
     
-    --secondary: 206 94% 25%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 179 100% 51%; /* #03fff6 */
+    --secondary-foreground: 200 16% 24%;
     
-    --accent: 192 96% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 179 100% 51%;
+    --accent-foreground: 200 16% 24%;
     
-    --disabled: 210 15% 25%;
-    --disabled-foreground: 210 10% 50%;
+    --disabled: 200 16% 35%;
+    --disabled-foreground: 200 16% 55%;
     
-    --gradient-primary: linear-gradient(135deg, hsl(210 100% 26%) 0%, hsl(196 91% 34%) 50%, hsl(192 96% 44%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(178 100% 40%) 0%, hsl(179 100% 51%) 100%);
     --gradient-success: linear-gradient(135deg, hsl(134 61% 45%) 0%, hsl(134 61% 55%) 100%);
-    --gradient-highlight: linear-gradient(135deg, hsl(196 91% 34%) 0%, hsl(192 96% 50%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(210 15% 12%) 0%, hsl(210 15% 18%) 100%);
+    --gradient-highlight: linear-gradient(135deg, hsl(178 100% 40%) 0%, hsl(179 100% 51%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(200 16% 24%) 0%, hsl(200 16% 28%) 100%);
     
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.1);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.2);
     --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.3);
-    --shadow-primary: 0 4px 12px -2px hsl(210 100% 26% / 0.4);
+    --shadow-primary: 0 4px 12px -2px hsl(178 100% 40% / 0.4);
     --shadow-success: 0 4px 12px -2px hsl(134 61% 41% / 0.4);
     --shadow-card: 0 2px 8px -2px hsl(0 0% 0% / 0.2);
     
-    --sidebar-background: 210 15% 12%;
-    --sidebar-foreground: 210 10% 90%;
-    --sidebar-primary: 196 91% 34%;
+    --sidebar-background: 200 16% 24%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 178 100% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 15% 22%;
-    --sidebar-accent-foreground: 210 10% 90%;
-    --sidebar-border: 210 15% 25%;
-    --sidebar-ring: 196 91% 34%;
+    --sidebar-accent: 200 16% 32%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 200 16% 38%;
+    --sidebar-ring: 178 100% 40%;
   }
 }
 

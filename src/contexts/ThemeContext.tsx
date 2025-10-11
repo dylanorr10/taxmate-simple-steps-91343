@@ -46,69 +46,69 @@ export const colorPalettes: ColorPalette[] = [
   {
     id: 'light',
     name: 'Light Mode',
-    description: 'Fresh and bright',
+    description: 'Clean and modern',
     colors: {
-      background: '188 100% 93%', // #d9faff
-      foreground: '210 100% 5%', // #000a17
-      card: '0 0% 100%', // #ffffff
-      cardForeground: '210 100% 5%',
+      background: '0 0% 100%', // #ffffff
+      foreground: '200 16% 38%', // #687b88
+      card: '0 0% 98%',
+      cardForeground: '200 16% 38%',
       popover: '0 0% 100%',
-      popoverForeground: '210 100% 5%',
+      popoverForeground: '200 16% 38%',
       
-      primary: '213 100% 25%', // #00367d
+      primary: '178 100% 40%', // #00CFC8
       primaryForeground: '0 0% 100%',
       
-      secondary: '188 100% 82%', // #a6f3ff
-      secondaryForeground: '210 100% 5%',
+      secondary: '179 100% 51%', // #03fff6
+      secondaryForeground: '200 16% 24%', // #3c474e
       
-      muted: '188 80% 85%',
-      mutedForeground: '210 100% 15%',
+      muted: '200 16% 95%',
+      mutedForeground: '200 16% 38%', // #687b88
       
-      accent: '188 100% 82%', // #a6f3ff
-      accentForeground: '210 100% 5%',
+      accent: '179 100% 51%', // #03fff6
+      accentForeground: '200 16% 24%',
       
-      border: '188 50% 80%',
-      input: '188 50% 80%',
-      ring: '213 100% 25%',
+      border: '200 16% 85%',
+      input: '200 16% 85%',
+      ring: '178 100% 40%',
       
       success: '142 71% 45%',
       warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '213 100% 25%',
+      info: '178 100% 40%',
     },
   },
   {
     id: 'dark',
     name: 'Dark Mode',
-    description: 'Deep and focused',
+    description: 'Sleek and sophisticated',
     colors: {
-      background: '210 100% 5%', // #000a17
+      background: '200 16% 24%', // #3c474e
       foreground: '0 0% 100%', // #ffffff
-      card: '210 100% 15%', // #00204a
+      card: '200 16% 28%',
       cardForeground: '0 0% 100%',
-      popover: '210 100% 15%',
+      popover: '200 16% 28%',
       popoverForeground: '0 0% 100%',
       
-      primary: '213 100% 25%', // #00367d
+      primary: '178 100% 40%', // #00CFC8
       primaryForeground: '0 0% 100%',
       
-      secondary: '188 100% 82%', // #a6f3ff
-      secondaryForeground: '210 100% 5%',
+      secondary: '179 100% 51%', // #03fff6
+      secondaryForeground: '200 16% 24%', // #3c474e
       
-      muted: '210 100% 20%',
-      mutedForeground: '188 100% 82%',
+      muted: '200 16% 32%',
+      mutedForeground: '200 16% 70%',
       
-      accent: '188 100% 82%', // #a6f3ff
-      accentForeground: '210 100% 5%',
+      accent: '179 100% 51%', // #03fff6
+      accentForeground: '200 16% 24%',
       
-      border: '210 100% 25%',
-      input: '210 100% 25%',
-      ring: '213 100% 25%',
+      border: '200 16% 38%',
+      input: '200 16% 32%',
+      ring: '178 100% 40%',
       
       success: '142 71% 45%',
       warning: '38 92% 50%',
       destructive: '0 84% 60%',
-      info: '213 100% 25%',
+      info: '178 100% 40%',
     },
   },
 ];
