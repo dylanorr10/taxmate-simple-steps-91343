@@ -314,48 +314,6 @@ export type Database = {
           },
         ]
       }
-      transaction_rules: {
-        Row: {
-          action: string
-          confidence_level: string | null
-          created_at: string | null
-          description_pattern: string | null
-          enabled: boolean | null
-          id: string
-          last_applied_at: string | null
-          merchant_pattern: string
-          times_applied: number | null
-          user_id: string
-          vat_rate: number | null
-        }
-        Insert: {
-          action: string
-          confidence_level?: string | null
-          created_at?: string | null
-          description_pattern?: string | null
-          enabled?: boolean | null
-          id?: string
-          last_applied_at?: string | null
-          merchant_pattern: string
-          times_applied?: number | null
-          user_id: string
-          vat_rate?: number | null
-        }
-        Update: {
-          action?: string
-          confidence_level?: string | null
-          created_at?: string | null
-          description_pattern?: string | null
-          enabled?: boolean | null
-          id?: string
-          last_applied_at?: string | null
-          merchant_pattern?: string
-          times_applied?: number | null
-          user_id?: string
-          vat_rate?: number | null
-        }
-        Relationships: []
-      }
       truelayer_connections: {
         Row: {
           access_token: string
@@ -395,6 +353,36 @@ export type Database = {
           refresh_token?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_confidence_ratings: {
+        Row: {
+          action_type: string
+          confidence_level: number
+          context_data: Json | null
+          created_at: string | null
+          id: string
+          user_id: string
+          was_correct: boolean | null
+        }
+        Insert: {
+          action_type: string
+          confidence_level: number
+          context_data?: Json | null
+          created_at?: string | null
+          id?: string
+          user_id: string
+          was_correct?: boolean | null
+        }
+        Update: {
+          action_type?: string
+          confidence_level?: number
+          context_data?: Json | null
+          created_at?: string | null
+          id?: string
+          user_id?: string
+          was_correct?: boolean | null
         }
         Relationships: []
       }
