@@ -252,4 +252,27 @@ All colors MUST be HSL.
   .focus-visible-success {
     @apply outline-none ring-2 ring-success ring-offset-2;
   }
+  
+  /* ============================================
+     MICRO-INTERACTIONS
+     Subtle animations for better UX
+     ============================================ */
+  .tap-feedback {
+    @apply transition-transform duration-150 active:scale-95;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  }
+  
+  .shimmer-loading {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
 }

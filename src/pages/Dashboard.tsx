@@ -28,6 +28,8 @@ import { InlineLesson } from "@/components/InlineLesson";
 import { lessons } from "@/data/learningContent";
 import { StreakCounter } from "@/components/StreakCounter";
 import { SurpriseTip } from "@/components/SurpriseTip";
+import { QuickAddFab } from "@/components/QuickAddFab";
+import { ExpandableSection } from "@/components/ExpandableSection";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -136,83 +138,65 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-md mx-auto p-4 space-y-4 pb-28">
+      <main className="max-w-md mx-auto p-4 space-y-6 pb-28">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            <div className="shimmer-loading w-full h-64 rounded-lg"></div>
           </div>
         ) : (
           <>
             {/* Hero: Financial Summary */}
-            <Card className="p-4 shadow-lg">
+            <Card className="p-6 shadow-card hover-lift animate-fade-in">
               {/* Hero Profit Display */}
-              <div className="text-center pb-4 border-b border-border">
-                <div className="text-xs text-muted-foreground mb-2 flex items-center justify-center gap-2">
+              <div className="text-center pb-6 border-b border-border">
+                <div className="text-sm text-muted-foreground mb-3 flex items-center justify-center gap-2 font-medium">
                   Your Profit This Month
-                  <div className={`px-2 py-0.5 rounded-full text-xs font-semibold ${profit >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                  <div className={`px-3 py-1 rounded-full text-xs font-bold ${profit >= 0 ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive"}`}>
                     {trendPct >= 0 ? "↗" : "↘"} {Math.abs(trendPct)}%
                   </div>
                 </div>
-                <div className={`text-6xl font-bold mb-4 ${profit >= 0 ? "text-success" : "text-destructive"}`}>
+                <div className={`text-7xl font-bold mb-6 ${profit >= 0 ? "text-success" : "text-destructive"}`}>
                   £{Math.abs(profit).toFixed(0)}
                 </div>
                 
                 {/* Secondary: Income & Expenses */}
-                <div className="flex items-center justify-center gap-6 text-sm">
+                <div className="flex items-center justify-center gap-8 text-base">
                   <div className="text-center">
-                    <div className="text-xs text-muted-foreground mb-1">Income</div>
-                    <div className="font-semibold text-foreground">£{incomeThisMonth.toFixed(0)}</div>
+                    <div className="text-sm text-muted-foreground mb-2 font-medium">Income</div>
+                    <div className="text-xl font-bold text-foreground">£{incomeThisMonth.toFixed(0)}</div>
                   </div>
-                  <div className="h-8 w-px bg-border" />
+                  <div className="h-12 w-px bg-border" />
                   <div className="text-center">
-                    <div className="text-xs text-muted-foreground mb-1">Expenses</div>
-                    <div className="font-semibold text-foreground">£{expensesThisMonth.toFixed(0)}</div>
+                    <div className="text-sm text-muted-foreground mb-2 font-medium">Expenses</div>
+                    <div className="text-xl font-bold text-foreground">£{expensesThisMonth.toFixed(0)}</div>
                   </div>
                 </div>
               </div>
 
               {/* Chart with integrated tax reserve */}
-              <div className="mt-3 pt-3 border-t border-border">
-                <div className="text-xs text-muted-foreground mb-2">
-                  3-month trend <LessonQuickLink lessonId="understanding-profit" linkText="Learn more" />
+              <div className="mt-6 pt-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground font-medium">3-month trend</div>
+                  <LessonQuickLink lessonId="understanding-profit" linkText="Learn more" />
                 </div>
                 <IncomeChart data={incomeChartData} trendPct={trendPct} suggestedTaxReserve={suggestedTaxReserve} />
+                
+                <ExpandableSection title="Understanding your trend">
+                  <p className="leading-relaxed">
+                    This chart shows your income over the last 3 months. The trend percentage compares 
+                    your current month to your average income from previous months. A positive trend 
+                    means your business is growing!
+                  </p>
+                </ExpandableSection>
               </div>
 
-              {/* Quick Actions - Below Chart */}
-              <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-border">
-                <Link to="/log" className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
-                  <div className="flex flex-col items-center gap-1">
-                    <FilePlus className="w-5 h-5" />
-                    <div className="text-xs font-semibold">Invoice</div>
-                  </div>
-                </Link>
-                <Link to="/log" className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
-                  <div className="flex flex-col items-center gap-1">
-                    <PlusCircle className="w-5 h-5" />
-                    <div className="text-xs font-semibold">Expense</div>
-                  </div>
-                </Link>
-                <button onClick={() => toast({ title: "Coming soon", description: "Receipt scanning coming soon!" })} className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
-                  <div className="flex flex-col items-center gap-1">
-                    <Camera className="w-5 h-5" />
-                    <div className="text-xs font-semibold">Receipt</div>
-                  </div>
-                </button>
-                <Link to="/mileage" className="flex-1 bg-background border border-border p-2 rounded-lg hover:bg-muted transition-all active:scale-95">
-                  <div className="flex flex-col items-center gap-1">
-                    <Car className="w-5 h-5" />
-                    <div className="text-xs font-semibold">Mileage</div>
-                  </div>
-                </Link>
-              </div>
             </Card>
 
         {/* MTD Compliance */}
-        <Card className="p-4 shadow-lg">
-          <div className="flex items-center justify-between mb-3">
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-sm text-muted-foreground mb-1">
                 <HelpTooltip
                   term="MTD Readiness"
                   explanation="Making Tax Digital (MTD) is HMRC's requirement to keep digital tax records and submit VAT returns using compatible software. Your readiness score shows how well your records meet these requirements."
@@ -220,87 +204,107 @@ const Dashboard = () => {
                   tooltipId="mtd"
                 />
               </div>
-              <div className="font-bold text-lg">{mtdReadiness}% MTD Ready</div>
+              <div className="font-bold text-2xl">{mtdReadiness}% Ready</div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-muted-foreground">Next submission: <span className="font-semibold text-foreground">6w</span></div>
+              <div className="text-xs text-muted-foreground mb-1">Next submission</div>
+              <div className="text-base font-bold text-foreground">6 weeks</div>
             </div>
           </div>
-          <div className="h-3 w-full bg-muted rounded-full overflow-hidden">
-            <div className="h-3 rounded-full bg-gradient-to-r from-accent to-success transition-all duration-300" style={{ width: `${mtdReadiness}%` }}></div>
+          <div className="h-4 w-full bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-4 rounded-full bg-gradient-to-r from-accent to-success transition-all duration-500 ease-out" 
+              style={{ width: `${mtdReadiness}%` }}
+            ></div>
           </div>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-3">
             {mtdIssuesCount > 0 ? (
-              <Button onClick={handleFixMtd} className="bg-warning hover:bg-warning/90 text-warning-foreground">
+              <Button onClick={handleFixMtd} className="bg-warning hover:bg-warning/90 text-warning-foreground tap-feedback">
                 Fix {mtdIssuesCount} issues
               </Button>
             ) : (
               <div className="flex items-center gap-2 text-success">
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm font-semibold">All issues resolved!</span>
+                <CheckCircle className="w-5 h-5" />
+                <span className="font-semibold">All set!</span>
               </div>
             )}
-            <div className="text-sm text-muted-foreground">or <button onClick={() => toast({ title: "Coming soon", description: "MTD guide will help you understand the requirements" })} className="text-primary underline">learn more</button></div>
           </div>
+          
+          <ExpandableSection title="What is MTD readiness?">
+            <p className="leading-relaxed mb-3">
+              Making Tax Digital (MTD) requires you to keep digital records and submit VAT returns 
+              using compatible software. Your readiness score reflects:
+            </p>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Complete business details</li>
+              <li>HMRC connection status</li>
+              <li>VAT registration</li>
+              <li>Transaction categorization</li>
+            </ul>
+          </ExpandableSection>
         </Card>
 
-        {/* Expense Breakdown & Tax Savings */}
-        <div className="space-y-3">
-          <Card className="p-4 shadow-lg">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <div className="text-sm text-muted-foreground">This month's expenses</div>
-                <div className="font-semibold text-sm mt-1">{formatCurrency(expensesThisMonth)}</div>
+        {/* Tax Savings Card */}
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "200ms" }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex-1">
+              <div className="text-sm text-muted-foreground mb-2">
+                <HelpTooltip
+                  term="Tax Savings"
+                  explanation="Business expenses reduce your taxable profit. By claiming legitimate expenses, you pay less Income Tax and National Insurance."
+                  icon="💡"
+                  tooltipId="tax-savings"
+                />
               </div>
+              <div className="text-3xl font-bold text-success mb-1">£{taxSavings}</div>
+              <div className="text-sm text-muted-foreground">saved this month</div>
             </div>
-          </Card>
-
-          <Card className="p-4 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-muted-foreground">
-                  <HelpTooltip
-                    term="Tax Savings"
-                    explanation="Business expenses reduce your taxable profit. By claiming legitimate expenses, you pay less Income Tax and National Insurance."
-                    icon="💡"
-                    tooltipId="tax-savings"
-                  />
-                </div>
-                <div className="font-semibold mt-1">You've saved £{taxSavings} this month</div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm text-muted-foreground">Est tax reduction</div>
-                <div className="font-bold">£{Math.round(taxSavings * 0.2)} less tax</div>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
-        <Card className="p-4 shadow-lg">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <div className="text-sm text-muted-foreground">Recent activity</div>
-              <div className="font-semibold">Latest updates</div>
-            </div>
-            <div className="text-sm">
-              <Link to="/log" className="text-primary underline">View all</Link>
+            <div className="text-right">
+              <div className="text-xs text-muted-foreground mb-1">Est. tax reduction</div>
+              <div className="text-2xl font-bold text-foreground">£{Math.round(taxSavings * 0.2)}</div>
             </div>
           </div>
+          
+          <ExpandableSection title="How tax savings work">
+            <p className="leading-relaxed mb-3">
+              Every pound you spend on legitimate business expenses reduces your taxable profit. 
+              This means you pay less tax overall.
+            </p>
+            <p className="leading-relaxed">
+              For example, if you're in the 20% tax bracket and claim £1,000 in expenses, 
+              you'll save approximately £200 in Income Tax and National Insurance.
+            </p>
+          </ExpandableSection>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "300ms" }}>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="text-xs text-muted-foreground mb-1">Recent activity</div>
+              <div className="text-lg font-bold">Latest updates</div>
+            </div>
+            <Link to="/log" className="text-sm text-primary font-medium hover:underline tap-feedback">
+              View all
+            </Link>
+          </div>
           {recentActivity.length === 0 ? (
-            <p className="text-muted-foreground text-center py-4 text-sm">
+            <p className="text-muted-foreground text-center py-8 text-sm">
               No activity yet. Start by adding income or expenses!
             </p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {recentActivity.map((activity, idx) => (
-                <div key={idx} className="flex items-start justify-between">
-                  <div>
-                    <div className="font-semibold text-sm">{activity.text}</div>
-                    <div className="text-xs text-muted-foreground">{activity.when}</div>
+                <div 
+                  key={idx} 
+                  className="flex items-start justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors tap-feedback"
+                >
+                  <div className="flex-1">
+                    <div className="font-semibold text-sm text-foreground">{activity.text}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{activity.when}</div>
                   </div>
-                  <div className="text-success">
-                    <CheckCircle className="w-4 h-4" />
+                  <div className="text-success ml-3">
+                    <CheckCircle className="w-5 h-5" />
                   </div>
                 </div>
               ))}
@@ -349,16 +353,7 @@ const Dashboard = () => {
         />
       )}
 
-      {/* Floating one-tap fix */}
-      <div className="fixed right-6 bottom-24 z-40">
-        <Link to="/log">
-          <button 
-            className="bg-card p-3 rounded-full shadow-xl hover:shadow-2xl transition-all active:scale-95 border border-border"
-          >
-            <Zap className="w-5 h-5 text-warning" />
-          </button>
-        </Link>
-      </div>
+      <QuickAddFab />
 
       <BottomNav />
     </div>
