@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { dailyTips, DailyTip } from '@/data/dailyTips';
 import { useIncomeTransactions, useExpenseTransactions } from './useTransactions';
-import { useTransactionRules } from './useTransactionRules';
 import { getMonthToDateTotal } from '@/utils/transactionHelpers';
 
 export const useDailyTip = () => {
@@ -12,7 +11,6 @@ export const useDailyTip = () => {
 
   const { transactions: incomeTransactions } = useIncomeTransactions();
   const { transactions: expenseTransactions } = useExpenseTransactions();
-  const { rules } = useTransactionRules();
 
   useEffect(() => {
     const checkAndShowTip = async () => {
@@ -77,7 +75,6 @@ export const useDailyTip = () => {
         const expensesThisMonth = getMonthToDateTotal(expenseTransactions);
         const profit = incomeThisMonth - expensesThisMonth;
         const expenseCount = expenseTransactions.length;
-        const ruleCount = rules.length;
 
         // Select appropriate tip based on triggers
         let selectedTip: DailyTip | null = null;
@@ -94,11 +91,6 @@ export const useDailyTip = () => {
               break;
             case 'profit_threshold':
               if (profit >= (tip.trigger.condition || 0)) {
-                selectedTip = tip;
-              }
-              break;
-            case 'no_rules':
-              if (ruleCount === 0) {
                 selectedTip = tip;
               }
               break;
@@ -130,7 +122,7 @@ export const useDailyTip = () => {
     };
 
     checkAndShowTip();
-  }, [incomeTransactions, expenseTransactions, rules]);
+  }, [incomeTransactions, expenseTransactions]);
 
   const dismissTip = async () => {
     if (!todaysTip) return;
