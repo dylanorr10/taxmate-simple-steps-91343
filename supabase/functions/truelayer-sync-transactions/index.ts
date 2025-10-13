@@ -97,15 +97,10 @@ serve(async (req) => {
     const transactionsData = await transactionsResponse.json();
     const transactions = transactionsData.results || [];
 
-    // Fetch user's transaction rules once
-    const { data: userRules } = await supabaseClient
-      .from('transaction_rules')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('enabled', true);
-
-    // Store new transactions and auto-categorize
+    // Store new transactions and auto-categorize with AI
     let newCount = 0;
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    
     for (const transaction of transactions) {
       // Check if transaction already exists
       const { data: existing } = await supabaseClient
@@ -115,12 +110,6 @@ serve(async (req) => {
         .single();
 
       if (!existing) {
-        // Check for matching rule first
-        const merchantName = (transaction.merchant_name || transaction.description || '').toUpperCase();
-        const matchedRule = userRules?.find(rule => 
-          merchantName.includes(rule.merchant_pattern.toUpperCase())
-        );
-
         // Insert bank transaction
         const { data: bankTx, error: bankError } = await supabaseClient
           .from('bank_transactions')
@@ -133,7 +122,7 @@ serve(async (req) => {
             timestamp: transaction.timestamp,
             merchant_name: transaction.merchant_name,
             category: transaction.transaction_category,
-            status: matchedRule ? 'categorized' : 'categorized',
+            status: 'categorized',
           })
           .select()
           .single();
@@ -143,24 +132,103 @@ serve(async (req) => {
           continue;
         }
 
-        // Determine action and VAT rate based on rule or amount
+        // Use AI to categorize transaction
         let actionType = 'expense';
         let vatRate = 20;
+        let confidenceScore = 0.5;
 
-        if (matchedRule) {
-          actionType = matchedRule.action;
-          vatRate = matchedRule.vat_rate;
-          
-          // Update rule usage stats
-          await supabaseClient
-            .from('transaction_rules')
-            .update({
-              times_applied: matchedRule.times_applied + 1,
-              last_applied_at: new Date().toISOString(),
-            })
-            .eq('id', matchedRule.id);
-        } else {
-          // Fallback to amount-based categorization
+        try {
+          const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'google/gemini-2.5-flash',
+              messages: [
+                {
+                  role: 'system',
+                  content: 'You are a UK tax expert helping sole traders categorize transactions. Respond only with valid JSON.'
+                },
+                {
+                  role: 'user',
+                  content: `Categorize this transaction:
+Amount: £${transaction.amount}
+Merchant: ${transaction.merchant_name || 'Unknown'}
+Description: ${transaction.description || 'No description'}
+
+Return JSON with:
+- action: "income" | "expense" | "ignore"
+- vatRate: number (0, 5, or 20)
+- confidence: number (0.0-1.0)
+- reasoning: string (brief explanation)
+
+Rules:
+- Positive amounts are usually income, negative are expenses
+- Personal transactions (groceries, entertainment) = "ignore"
+- Standard VAT rate in UK is 20%
+- Some items are 0% (most food, books) or 5% (energy)
+- HMRC refunds = income at 0% VAT`
+                }
+              ],
+              tools: [
+                {
+                  type: 'function',
+                  function: {
+                    name: 'categorize_transaction',
+                    description: 'Categorize a bank transaction for tax purposes',
+                    parameters: {
+                      type: 'object',
+                      properties: {
+                        action: {
+                          type: 'string',
+                          enum: ['income', 'expense', 'ignore'],
+                          description: 'How to categorize this transaction'
+                        },
+                        vatRate: {
+                          type: 'number',
+                          enum: [0, 5, 20],
+                          description: 'UK VAT rate applicable'
+                        },
+                        confidence: {
+                          type: 'number',
+                          minimum: 0,
+                          maximum: 1,
+                          description: 'Confidence in categorization (0-1)'
+                        },
+                        reasoning: {
+                          type: 'string',
+                          description: 'Brief explanation for the categorization'
+                        }
+                      },
+                      required: ['action', 'vatRate', 'confidence', 'reasoning'],
+                      additionalProperties: false
+                    }
+                  }
+                }
+              ],
+              tool_choice: { type: 'function', function: { name: 'categorize_transaction' } }
+            }),
+          });
+
+          if (aiResponse.ok) {
+            const aiData = await aiResponse.json();
+            const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+            if (toolCall?.function?.arguments) {
+              const result = JSON.parse(toolCall.function.arguments);
+              actionType = result.action;
+              vatRate = result.vatRate;
+              confidenceScore = result.confidence;
+              console.log(`AI categorized ${transaction.merchant_name}: ${actionType} (${confidenceScore} confidence) - ${result.reasoning}`);
+            }
+          } else {
+            console.error('AI categorization failed, falling back to amount-based');
+            actionType = transaction.amount > 0 ? 'income' : 'expense';
+          }
+        } catch (aiError) {
+          console.error('AI categorization error:', aiError);
+          // Fallback to amount-based
           actionType = transaction.amount > 0 ? 'income' : 'expense';
         }
         
@@ -181,15 +249,15 @@ serve(async (req) => {
             .single();
 
           if (!incomeError && incomeTx) {
-            // Create mapping
+            // Create mapping with AI confidence score
             await supabaseClient
               .from('transaction_mappings')
               .insert({
                 bank_transaction_id: bankTx.id,
                 income_transaction_id: incomeTx.id,
                 mapping_type: 'income',
-                user_confirmed: true,
-                confidence_score: matchedRule ? 1.0 : 0.8,
+                user_confirmed: false,
+                confidence_score: confidenceScore,
               });
           }
         } else if (actionType === 'expense') {
@@ -207,15 +275,15 @@ serve(async (req) => {
             .single();
 
           if (!expenseError && expenseTx) {
-            // Create mapping
+            // Create mapping with AI confidence score
             await supabaseClient
               .from('transaction_mappings')
               .insert({
                 bank_transaction_id: bankTx.id,
                 expense_transaction_id: expenseTx.id,
                 mapping_type: 'expense',
-                user_confirmed: true,
-                confidence_score: matchedRule ? 1.0 : 0.8,
+                user_confirmed: false,
+                confidence_score: confidenceScore,
               });
           }
         } else {
@@ -225,8 +293,8 @@ serve(async (req) => {
             .insert({
               bank_transaction_id: bankTx.id,
               mapping_type: 'ignored',
-              user_confirmed: true,
-              confidence_score: 1.0,
+              user_confirmed: false,
+              confidence_score: confidenceScore,
             });
         }
         

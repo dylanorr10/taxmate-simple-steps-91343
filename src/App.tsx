@@ -15,7 +15,6 @@ import Glossary from "./pages/Glossary";
 import Log from "./pages/Log";
 import Learn from "./pages/Learn";
 import Mileage from "./pages/Mileage";
-import Rules from "./pages/Rules";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 
@@ -41,7 +40,6 @@ const App = () => (
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/learning" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
             <Route path="/glossary" element={<ProtectedRoute><Glossary /></ProtectedRoute>} />
-            <Route path="/rules" element={<ProtectedRoute><Rules /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
