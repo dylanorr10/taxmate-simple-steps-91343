@@ -217,24 +217,33 @@ export type Database = {
       profiles: {
         Row: {
           business_name: string | null
+          business_type: string | null
           created_at: string
+          experience_level: string | null
           id: string
           updated_at: string
           vat_number: string | null
+          vat_registered: boolean | null
         }
         Insert: {
           business_name?: string | null
+          business_type?: string | null
           created_at?: string
+          experience_level?: string | null
           id: string
           updated_at?: string
           vat_number?: string | null
+          vat_registered?: boolean | null
         }
         Update: {
           business_name?: string | null
+          business_type?: string | null
           created_at?: string
+          experience_level?: string | null
           id?: string
           updated_at?: string
           vat_number?: string | null
+          vat_registered?: boolean | null
         }
         Relationships: []
       }
@@ -389,30 +398,36 @@ export type Database = {
       user_learning_progress: {
         Row: {
           completed_at: string | null
+          completion_rate: number | null
           created_at: string | null
           id: string
           lesson_id: string
           saved: boolean | null
+          source: string | null
           started_at: string | null
           time_spent: number | null
           user_id: string
         }
         Insert: {
           completed_at?: string | null
+          completion_rate?: number | null
           created_at?: string | null
           id?: string
           lesson_id: string
           saved?: boolean | null
+          source?: string | null
           started_at?: string | null
           time_spent?: number | null
           user_id: string
         }
         Update: {
           completed_at?: string | null
+          completion_rate?: number | null
           created_at?: string | null
           id?: string
           lesson_id?: string
           saved?: boolean | null
+          source?: string | null
           started_at?: string | null
           time_spent?: number | null
           user_id?: string

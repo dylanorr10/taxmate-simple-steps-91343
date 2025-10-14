@@ -2,9 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, CheckCircle, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [currentScreen, setCurrentScreen] = useState(0);
   const [formData, setFormData] = useState({
     name: "",
@@ -30,8 +33,37 @@ const Onboarding = () => {
     }
   };
 
-  const handleComplete = () => {
-    navigate("/dashboard");
+  const handleComplete = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Determine experience level and VAT registration from income
+      let experience_level = 'beginner';
+      let vat_registered = false;
+      
+      if (formData.incomeEstimate === 'over85k') {
+        experience_level = 'advanced';
+        vat_registered = true;
+      } else if (formData.incomeEstimate === '50to85k' || formData.incomeEstimate === '30to50k') {
+        experience_level = 'intermediate';
+      }
+
+      await supabase.from('profiles').update({
+        business_type: formData.businessType,
+        vat_registered,
+        experience_level
+      }).eq('id', user.id);
+
+      navigate("/dashboard");
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: "Error saving profile",
+        description: "Please try again",
+        variant: "destructive"
+      });
+    }
   };
 
   const updateFormData = (field: string, value: string) => {
