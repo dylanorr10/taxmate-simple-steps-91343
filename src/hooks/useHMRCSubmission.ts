@@ -35,10 +35,10 @@ export const useHMRCSubmission = () => {
       return data;
     },
     onSuccess: () => {
-      toast.success("VAT return submitted to HMRC successfully");
+      toast.success("Submitted to HMRC successfully");
     },
     onError: (error: Error) => {
-      toast.error(`Failed to submit VAT return: ${error.message}`);
+      toast.error(`Failed to submit to HMRC: ${error.message}`);
     },
   });
 

@@ -61,6 +61,7 @@ Deno.serve(async (req) => {
     const authUrl = new URL(`${baseUrl}/oauth/authorize`);
     authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('client_id', clientId);
+    // Current scope: VAT. Can expand to include: read:self-assessment write:self-assessment, etc.
     authUrl.searchParams.append('scope', 'read:vat write:vat');
     authUrl.searchParams.append('redirect_uri', redirectUri);
     authUrl.searchParams.append('state', state);

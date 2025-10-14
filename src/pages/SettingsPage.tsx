@@ -153,7 +153,7 @@ const SettingsPage = () => {
                         <div>
                           <p className="font-semibold text-foreground">Connected to HMRC</p>
                           <p className="text-sm text-muted-foreground">
-                            You can submit VAT returns to HMRC
+                            Ready for Making Tax Digital submissions
                           </p>
                         </div>
                       </>
@@ -163,7 +163,7 @@ const SettingsPage = () => {
                         <div>
                           <p className="font-semibold text-foreground">Not Connected</p>
                           <p className="text-sm text-muted-foreground">
-                            Connect to HMRC to submit VAT returns
+                            Connect to HMRC for Making Tax Digital
                           </p>
                         </div>
                       </>

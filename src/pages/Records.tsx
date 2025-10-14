@@ -334,7 +334,7 @@ const Records = () => {
               className="w-full mb-3 h-12 text-base font-semibold"
             >
               <Shield className="w-5 h-5 mr-2" />
-              {isSubmitting || isSaving ? "Submitting..." : "Submit VAT Return to HMRC"}
+              {isSubmitting || isSaving ? "Submitting..." : "Submit to HMRC via MTD"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
