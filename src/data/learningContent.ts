@@ -89,7 +89,7 @@ export const lessons: LessonContent[] = [
 - Eventually, all sole traders and landlords
 
 **What you need:**
-- Digital record-keeping software (like TaxMate!)
+- Digital record-keeping software (like Reelin!)
 - Digital links between your records and HMRC
 - Submit returns using compatible software
 

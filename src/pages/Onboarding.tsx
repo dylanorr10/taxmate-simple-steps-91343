@@ -89,10 +89,10 @@ const Onboarding = () => {
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-3">
-            Welcome to TaxMate
+            Welcome to Reelin 🎣
           </h1>
           <p className="text-lg text-muted-foreground mb-8">
-            Tax & accounting made simple for sole traders
+            Helping the self-employed reel-in their finances
           </p>
         </div>
 

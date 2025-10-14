@@ -84,7 +84,7 @@ export const dailyTips: DailyTip[] = [
   },
   {
     id: 'digital-records',
-    content: 'MTD requires digital record-keeping. Good news - you\'re already doing it with TaxMate!',
+    content: 'MTD requires digital record-keeping. Good news - you\'re already doing it with Reelin!',
     emoji: '💻',
     trigger: { type: 'random' },
     relatedLessonId: 'mtd-basics',

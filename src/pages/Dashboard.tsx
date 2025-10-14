@@ -124,11 +124,11 @@ const Dashboard = () => {
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-success/10 text-success font-bold flex items-center justify-center text-sm">
-              TM
+              RL
             </div>
             <div className="flex flex-col gap-1">
               <div className="text-xs text-muted-foreground">Welcome back</div>
-              <div className="font-bold text-base">TaxMate Dashboard</div>
+              <div className="font-bold text-base">Reelin Dashboard</div>
               <StreakCounter />
             </div>
           </div>

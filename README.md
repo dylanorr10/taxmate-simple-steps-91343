@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Reelin - Helping the Self-Employed Reel-In Their Finances
 
 ## Project info
 

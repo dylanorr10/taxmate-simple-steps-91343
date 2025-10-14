@@ -39,7 +39,7 @@ const Glossary = () => {
     {
       term: "MTD (Making Tax Digital)",
       icon: "📊",
-      explanation: "HMRC's new way of doing tax returns online using software (like TaxMate!). You'll need it when you earn over £30k. Don't worry - we handle all the technical bits for you.",
+      explanation: "HMRC's new way of doing tax returns online using software (like Reelin!). You'll need it when you earn over £30k. Don't worry - we handle all the technical bits for you.",
       example: "Instead of paper forms, you'll submit your taxes through this app. Much easier!",
       relatedTerms: ["Self Assessment", "Tax Return", "HMRC"],
     },
@@ -82,7 +82,7 @@ const Glossary = () => {
       term: "Receipts",
       icon: "🧾",
       explanation: "Proof you bought something for your business. Keep them for at least 5 years! Photos on your phone count.",
-      example: "Fuel receipt, tool invoice, phone bill - snap a photo and log it in TaxMate.",
+      example: "Fuel receipt, tool invoice, phone bill - snap a photo and log it in Reelin.",
       relatedTerms: ["Business Expenses", "Record Keeping"],
     },
     {

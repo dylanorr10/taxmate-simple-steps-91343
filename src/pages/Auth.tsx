@@ -104,8 +104,8 @@ const Auth = () => {
           <CardTitle>{isLogin ? "Welcome Back" : "Create Account"}</CardTitle>
           <CardDescription>
             {isLogin
-              ? "Sign in to access your VAT dashboard"
-              : "Sign up to start managing your VAT returns"}
+              ? "Sign in to access your financial dashboard"
+              : "Sign up to start reeling in your finances"}
           </CardDescription>
         </CardHeader>
         <CardContent>

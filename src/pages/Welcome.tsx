@@ -27,10 +27,10 @@ const Welcome = () => {
       <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
         <div className="text-center mb-8 space-y-3">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-            Welcome to TaxMate! 👋
+            Welcome to Reelin! 🎣
           </h1>
           <p className="text-xl text-muted-foreground">
-            Finally, tax software that speaks your language!
+            Helping the self-employed reel-in their finances
           </p>
         </div>
 
@@ -40,7 +40,7 @@ const Welcome = () => {
               What kind of work do you do?
             </h2>
             <p className="text-muted-foreground text-lg">
-              This helps us tailor TaxMate to your needs
+              This helps us tailor Reelin to your needs
             </p>
           </div>
 
