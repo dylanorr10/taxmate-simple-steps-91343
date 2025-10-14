@@ -54,11 +54,13 @@ Deno.serve(async (req) => {
     }
 
     const redirectUri = `${supabaseUrl}/functions/v1/hmrc-oauth-callback`;
-    const baseUrl = environment === 'production'
-      ? 'https://api.service.hmrc.gov.uk'
-      : 'https://test-api.service.hmrc.gov.uk';
+    
+    // Authorization endpoint uses different domain than API endpoint
+    const authBaseUrl = environment === 'production'
+      ? 'https://www.tax.service.gov.uk'
+      : 'https://test-www.tax.service.gov.uk';
 
-    const authUrl = new URL(`${baseUrl}/oauth/authorize`);
+    const authUrl = new URL(`${authBaseUrl}/oauth/authorize`);
     authUrl.searchParams.append('response_type', 'code');
     authUrl.searchParams.append('client_id', clientId);
     // Current scope: VAT. Can expand to include: read:self-assessment write:self-assessment, etc.
