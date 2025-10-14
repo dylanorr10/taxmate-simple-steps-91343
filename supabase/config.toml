@@ -11,3 +11,12 @@ verify_jwt = true
 
 [functions.truelayer-categorize-transaction]
 verify_jwt = true
+
+[functions.hmrc-oauth-init]
+verify_jwt = true
+
+[functions.hmrc-oauth-callback]
+verify_jwt = false
+
+[functions.hmrc-submit-vat]
+verify_jwt = true
