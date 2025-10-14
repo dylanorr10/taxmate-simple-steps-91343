@@ -57,8 +57,8 @@ Deno.serve(async (req) => {
     
     // Authorization endpoint uses different domain than API endpoint
     const authBaseUrl = environment === 'production'
-      ? 'https://www.tax.service.gov.uk'
-      : 'https://test-www.tax.service.gov.uk';
+      ? 'https://api.service.hmrc.gov.uk'
+      : 'https://test-api.service.hmrc.gov.uk';
 
     const authUrl = new URL(`${authBaseUrl}/oauth/authorize`);
     authUrl.searchParams.append('response_type', 'code');
