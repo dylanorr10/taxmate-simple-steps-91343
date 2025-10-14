@@ -114,9 +114,7 @@ export const lessons: LessonContent[] = [
 Profit = Total Income - Total Expenses
 
 **Example:**
-- You earned £5,000 this month
-- You spent £2,000 on business expenses
-- Your profit = £3,000
+{{CUSTOM_EXAMPLES}}
 
 **Why it matters:**
 You pay Income Tax and National Insurance on your profit, NOT on your total income. This is why claiming legitimate expenses is so important - they reduce your taxable profit.
@@ -136,14 +134,13 @@ As a sole trader, you'll typically pay around 30% of your profit in Income Tax a
     icon: '💡',
     content: `You can claim expenses that are "wholly and exclusively" for business use. Here's what that means:
 
-**Allowable Expenses:**
+**Allowable Expenses for Your Business:**
+{{CUSTOM_EXAMPLES}}
+
+**General Allowable Expenses:**
 ✅ Office supplies (stationery, postage)
-✅ Travel costs (fuel, train tickets for business trips)
-✅ Equipment (computers, tools, machinery)
 ✅ Professional fees (accountant, solicitor)
 ✅ Marketing (website, advertising, business cards)
-✅ Premises costs (rent if you have a shop/office)
-✅ Utilities (if working from home - claim a proportion)
 ✅ Professional subscriptions and insurance
 
 **NOT Allowable:**
@@ -184,10 +181,8 @@ For every £100 you claim in expenses, you save roughly £30 in tax (assuming ty
 2. Pay VAT on your purchases (Input VAT)
 3. Submit to HMRC: Output VAT minus Input VAT
 
-**Example:**
-- You sell services for £1,000 + £200 VAT = £1,200 total
-- You buy supplies for £500 + £100 VAT = £600 total
-- You owe HMRC: £200 - £100 = £100
+**Example for Your Business:**
+{{CUSTOM_EXAMPLES}}
 
 **VAT Returns:**
 Submit quarterly returns showing:
@@ -272,9 +267,7 @@ Set aside approximately 30% of your profit for:
 - Class 4 National Insurance (9% on profits £12,570-£50,270)
 
 **Example:**
-Monthly profit: £3,000
-Tax to set aside: £900 (30%)
-Keep in separate savings account!
+{{CUSTOM_EXAMPLES}}
 
 **When you pay:**
 
@@ -309,5 +302,312 @@ Year 1 tax bill: £6,000
 
 **What if you can't pay?**
 Contact HMRC ASAP to arrange a payment plan. They're more flexible if you reach out before the deadline rather than after.`,
+  },
+  {
+    id: 'cis-basics',
+    title: 'Construction Industry Scheme (CIS) Basics',
+    category: 'Tax',
+    difficulty: 'intermediate',
+    duration: '4 min',
+    icon: '🔨',
+    content: `If you work in construction, understanding CIS is crucial. Here's everything you need to know:
+
+**What is CIS?**
+The Construction Industry Scheme requires contractors to deduct money from subcontractor payments and pass it to HMRC. This counts as advance payment of tax and National Insurance.
+
+**Who needs to register?**
+- Contractors who pay subcontractors
+- Subcontractors working for contractors
+- Trades including: builders, plumbers, electricians, decorators, scaffolders
+
+**The 20% Deduction:**
+If you're a registered subcontractor, contractors deduct 20% from your payments and send it to HMRC:
+- Gross payment: £1,000
+- CIS deduction (20%): £200
+- Net payment to you: £800
+
+**How to claim it back:**
+The £200 deducted counts towards your tax bill. When you file your Self Assessment:
+- If your tax bill is £150: HMRC refunds £50
+- If your tax bill is £250: You pay £50 more
+- Keep all CIS statements as proof
+
+**Gross Payment Status:**
+Once you prove a good compliance record, you can apply for gross payment status and receive full payment without deductions.
+
+**Common examples:**
+{{CUSTOM_EXAMPLES}}
+
+**Important:**
+Always verify your employment status - genuine self-employment means you're truly in business for yourself, not just a disguised employee.`,
+  },
+  {
+    id: 'mileage-tracking',
+    title: 'Mileage Tracking for Tax Relief',
+    category: 'Expenses',
+    difficulty: 'beginner',
+    duration: '3 min',
+    icon: '🚗',
+    content: `Claim tax relief for business mileage using these two methods:
+
+**Method 1: Simplified Mileage (45p/mile)**
+- First 10,000 miles: 45p per mile
+- Additional miles: 25p per mile
+- No need to track fuel costs
+- Easy to calculate
+
+**What counts as business mileage:**
+{{CUSTOM_EXAMPLES}}
+
+**What DOESN'T count:**
+❌ Home to regular workplace (commuting)
+❌ Personal trips
+❌ Detours for personal errands
+
+**Method 2: Actual Costs**
+Track all vehicle expenses:
+- Fuel
+- Insurance
+- MOT & servicing
+- Road tax
+- Repairs
+- Depreciation
+
+Calculate business percentage of total miles and claim that proportion.
+
+**Which method to choose?**
+- High mileage + cheap car = Simplified mileage
+- Low mileage + expensive car = Actual costs
+- You can switch methods each tax year
+
+**Record keeping:**
+Keep a mileage log showing:
+- Date
+- Start/end location
+- Purpose of trip
+- Miles traveled
+- Client/job reference
+
+**Example:**
+{{CUSTOM_EXAMPLES}}
+
+**Pro tip:** Use a mileage tracking app to automatically log journeys.`,
+  },
+  {
+    id: 'home-office',
+    title: 'Home Office Expense Deductions',
+    category: 'Expenses',
+    difficulty: 'intermediate',
+    duration: '4 min',
+    icon: '🏠',
+    content: `Working from home? You can claim these expenses:
+
+**Method 1: Simplified Expenses (£6/month)**
+- Flat rate: £6 per month
+- No calculations needed
+- No receipts required
+- Annual claim: £72
+
+**Method 2: Actual Costs (Proportion Method)**
+Calculate business use percentage:
+- Number of rooms used ÷ Total rooms
+- Hours worked ÷ Total hours (if part-time)
+
+**Claimable costs:**
+{{CUSTOM_EXAMPLES}}
+
+**Example calculation:**
+Home office = 1 room out of 5 rooms = 20%
+Work 40 hours/week out of 168 hours = 24%
+Claim 20% × 24% = 4.8% of costs
+
+Or simpler: Just use room percentage if you work regular hours.
+
+**What you CAN'T claim:**
+❌ Mortgage payments (only mortgage interest proportion)
+❌ Council tax
+❌ Insurance (unless specific business policy)
+
+**Which method?**
+- Small home office = £6/month
+- Dedicated office space with high costs = Proportion method
+
+**Important:**
+Using proportion method might affect Capital Gains Tax if you sell your home. Seek professional advice if claiming significant amounts.
+
+**Record keeping:**
+- Keep utility bills
+- Calculate percentage annually
+- Document room usage
+- Save for 6 years`,
+  },
+  {
+    id: 'invoicing-clients',
+    title: 'Professional Invoicing Best Practices',
+    category: 'Admin',
+    difficulty: 'beginner',
+    duration: '3 min',
+    icon: '📄',
+    content: `Create professional invoices that get paid faster:
+
+**Essential invoice elements:**
+- Your business name & contact details
+- Client name & address
+- Unique invoice number
+- Invoice date
+- Payment due date
+- Itemized services/products
+- Amounts (net, VAT, total)
+- Payment terms & methods
+- Bank details for payment
+
+**Payment terms examples:**
+{{CUSTOM_EXAMPLES}}
+
+**Invoice numbering:**
+Use sequential numbers: INV-001, INV-002, etc.
+Or date-based: 2024-001, 2024-002
+
+**VAT considerations:**
+If VAT registered, include:
+- Your VAT number
+- VAT rate for each item
+- Total VAT amount
+- Total including VAT
+
+**Late payment rights:**
+You can charge interest on late payments:
+- 8% + Bank of England base rate
+- Plus £40-£100 debt recovery fee
+- State this clearly on invoices
+
+**Getting paid faster:**
+- Send immediately after work completed
+- Make payment easy (multiple methods)
+- Follow up politely after 7 days
+- Offer small discount for early payment
+- Consider deposits for large projects
+
+**Common mistakes:**
+❌ Missing invoice numbers
+❌ Unclear payment terms
+❌ No due date
+❌ Incorrect VAT calculations
+❌ Missing bank details
+
+**Pro tip:** Use invoice templates or software to ensure consistency and professionalism.`,
+  },
+  {
+    id: 'vehicle-expenses',
+    title: 'Vehicle Expenses Explained',
+    category: 'Expenses',
+    difficulty: 'intermediate',
+    duration: '4 min',
+    icon: '🚙',
+    content: `Maximize your vehicle expense claims:
+
+**Simplified vs Actual Costs:**
+
+**Simplified (Mileage Rate):**
+- 45p first 10,000 miles
+- 25p additional miles
+- Covers ALL vehicle costs
+- Can't claim anything else
+
+**Actual Costs (Full tracking):**
+{{CUSTOM_EXAMPLES}}
+
+**Business use percentage:**
+Calculate: Business miles ÷ Total miles
+
+Example:
+- Total miles: 15,000
+- Business miles: 10,000
+- Business use: 67%
+- Claim 67% of all costs
+
+**Capital allowances (depreciation):**
+If you buy a vehicle, claim:
+- Writing Down Allowance: 18% per year
+- Or 100% First Year Allowance for electric vehicles
+
+**Record keeping requirements:**
+- Mileage log (start, end, purpose)
+- All receipts for costs
+- Insurance documents
+- Service records
+- Purchase invoice
+
+**Which method to choose?**
+
+Choose SIMPLIFIED if:
+- High business mileage
+- Cheap/old vehicle
+- Don't want admin
+
+Choose ACTUAL if:
+- Expensive vehicle
+- Low mileage
+- High running costs
+- Electric vehicle
+
+**Pro tip:** Calculate both methods at year-end and choose the one giving highest claim.`,
+  },
+  {
+    id: 'copyright-basics',
+    title: 'Copyright & IP for Creatives',
+    category: 'Legal',
+    difficulty: 'intermediate',
+    duration: '5 min',
+    icon: '©️',
+    content: `Protect your creative work and understand your rights:
+
+**Copyright basics:**
+- Automatic protection (no registration needed in UK)
+- Protects: photos, designs, music, writing, software
+- Lasts: 70 years after creator's death
+- You own it unless you assign it
+
+**Licensing vs Assignment:**
+
+**License:**
+- Client gets permission to use work
+- You keep copyright
+- Can specify: duration, territory, usage
+- Can license to multiple clients
+
+**Assignment:**
+- Client owns copyright completely
+- You lose all rights
+- Should charge significantly more
+- Get it in writing
+
+**Common scenarios:**
+{{CUSTOM_EXAMPLES}}
+
+**Client contracts should specify:**
+- Who owns copyright
+- Usage rights granted
+- Exclusivity period
+- Attribution requirements
+- Payment terms
+
+**Protecting your work:**
+- Watermark samples
+- Use contracts for all jobs
+- Register with copyright services
+- Keep dated records of creation
+- Document all client communications
+
+**If someone infringes:**
+1. Send cease & desist letter
+2. Negotiate licensing fee
+3. Legal action if necessary
+4. Register with IPO for stronger case
+
+**Fair use exceptions:**
+Clients can't claim fair use just to avoid payment. Fair use is very limited in UK law.
+
+**Pro tip:** Build standard license tiers (personal use, commercial, exclusive) with clear pricing for each.`,
   },
 ];
