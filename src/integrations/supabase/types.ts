@@ -221,6 +221,7 @@ export type Database = {
           created_at: string
           experience_level: string | null
           id: string
+          nav_items: Json | null
           updated_at: string
           vat_number: string | null
           vat_registered: boolean | null
@@ -231,6 +232,7 @@ export type Database = {
           created_at?: string
           experience_level?: string | null
           id: string
+          nav_items?: Json | null
           updated_at?: string
           vat_number?: string | null
           vat_registered?: boolean | null
@@ -241,6 +243,7 @@ export type Database = {
           created_at?: string
           experience_level?: string | null
           id?: string
+          nav_items?: Json | null
           updated_at?: string
           vat_number?: string | null
           vat_registered?: boolean | null

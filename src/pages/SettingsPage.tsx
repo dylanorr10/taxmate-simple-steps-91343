@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2 } from "lucide-react";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation } from "lucide-react";
+import NavigationCustomizer from "@/components/NavigationCustomizer";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -253,6 +254,17 @@ const SettingsPage = () => {
                 )}
               </div>
             )}
+          </Card>
+        </div>
+
+        {/* Navigation Preferences */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Navigation className="w-5 h-5" />
+            Navigation Preferences
+          </h2>
+          <Card className="p-6">
+            <NavigationCustomizer />
           </Card>
         </div>
 

@@ -4,6 +4,7 @@ import { ChevronRight, CheckCircle, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getDefaultNavItems } from "@/data/navigationConfig";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -49,11 +50,20 @@ const Onboarding = () => {
         experience_level = 'intermediate';
       }
 
+      // Get smart default navigation items based on business type and experience
+      const defaultNavItems = getDefaultNavItems(formData.businessType, experience_level);
+
       await supabase.from('profiles').update({
         business_type: formData.businessType,
         vat_registered,
-        experience_level
+        experience_level,
+        nav_items: defaultNavItems
       }).eq('id', user.id);
+
+      toast({
+        title: "Welcome aboard! 🎉",
+        description: "Tip: You can customize your navigation in Settings"
+      });
 
       navigate("/dashboard");
     } catch (error) {
