@@ -13,7 +13,6 @@ import SettingsPage from "./pages/SettingsPage";
 import LearningHub from "./pages/LearningHub";
 import Glossary from "./pages/Glossary";
 import Log from "./pages/Log";
-import Learn from "./pages/Learn";
 import Mileage from "./pages/Mileage";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -34,11 +33,10 @@ const App = () => (
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/log" element={<ProtectedRoute><Log /></ProtectedRoute>} />
-            <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
+            <Route path="/learn" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
             <Route path="/mileage" element={<ProtectedRoute><Mileage /></ProtectedRoute>} />
             <Route path="/records" element={<ProtectedRoute><Records /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-            <Route path="/learning" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
             <Route path="/glossary" element={<ProtectedRoute><Glossary /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
