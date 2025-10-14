@@ -38,8 +38,9 @@ export const useHMRCConnection = () => {
       if (error) throw error;
 
       if (data?.authUrl) {
-        // Redirect to HMRC OAuth page
-        window.location.href = data.authUrl;
+        // Redirect to HMRC OAuth page in top-level window to avoid iframe restrictions
+        // HMRC blocks embedding via X-Frame-Options, so use _top
+        window.open(data.authUrl, "_top");
       } else {
         toast.error("Failed to initiate HMRC connection");
       }
