@@ -515,54 +515,12 @@ export type Database = {
         }
         Relationships: []
       }
-      waitlist_signups: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          notified: boolean
-          profession_interest: string | null
-          referrer: string | null
-          user_agent: string | null
-          utm_campaign: string | null
-          utm_medium: string | null
-          utm_source: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          notified?: boolean
-          profession_interest?: string | null
-          referrer?: string | null
-          user_agent?: string | null
-          utm_campaign?: string | null
-          utm_medium?: string | null
-          utm_source?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          notified?: boolean
-          profession_interest?: string | null
-          referrer?: string | null
-          user_agent?: string | null
-          utm_campaign?: string | null
-          utm_medium?: string | null
-          utm_source?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_waitlist_count: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
