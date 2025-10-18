@@ -1,10 +1,11 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation } from "lucide-react";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation, Presentation } from "lucide-react";
 import NavigationCustomizer from "@/components/NavigationCustomizer";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -78,6 +79,10 @@ const SettingsPage = () => {
       business_name: businessName,
       vat_number: vatNumber,
     });
+  };
+
+  const handleToggleDemoMode = async (enabled: boolean) => {
+    updateProfile({ demo_mode: enabled });
   };
 
   const navItems = [
@@ -276,6 +281,36 @@ const SettingsPage = () => {
           </h2>
           <Card className="p-6">
             <ThemeSwitcher />
+          </Card>
+        </div>
+
+        {/* Demo Mode Section */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Presentation className="w-5 h-5" />
+            Investor Demo Mode
+          </h2>
+          <Card className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground mb-1">Demo Mode</h3>
+                <p className="text-sm text-muted-foreground">
+                  Show mock connections and data for demonstrations. Perfect for investor presentations and previewing features.
+                </p>
+              </div>
+              <Switch
+                checked={profile?.demo_mode || false}
+                onCheckedChange={handleToggleDemoMode}
+                disabled={isUpdating}
+              />
+            </div>
+            {profile?.demo_mode && (
+              <div className="mt-4 p-3 bg-accent/10 border border-accent/20 rounded-lg">
+                <p className="text-xs text-muted-foreground">
+                  ✨ Demo mode is active. HMRC and bank connections will appear connected with sample data.
+                </p>
+              </div>
+            )}
           </Card>
         </div>
 

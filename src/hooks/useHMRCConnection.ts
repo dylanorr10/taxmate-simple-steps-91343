@@ -1,11 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useProfile } from "./useProfile";
 
 export const useHMRCConnection = () => {
+  const { profile } = useProfile();
+  const isDemoMode = profile?.demo_mode || false;
+
   const { data: isConnected, isLoading, refetch } = useQuery({
     queryKey: ["hmrc-connection"],
     queryFn: async () => {
+      // Return mock connection in demo mode
+      if (isDemoMode) return true;
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
 
@@ -30,6 +37,11 @@ export const useHMRCConnection = () => {
   });
 
   const initiateConnection = async () => {
+    if (isDemoMode) {
+      toast.info("Demo mode: HMRC connection simulated");
+      return;
+    }
+
     try {
       const { data, error } = await supabase.functions.invoke("hmrc-oauth-init", {
         body: {},

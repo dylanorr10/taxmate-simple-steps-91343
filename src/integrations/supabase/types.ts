@@ -219,9 +219,11 @@ export type Database = {
           business_name: string | null
           business_type: string | null
           created_at: string
+          demo_mode: boolean | null
           experience_level: string | null
           id: string
           nav_items: Json | null
+          profile_complete: boolean | null
           updated_at: string
           vat_number: string | null
           vat_registered: boolean | null
@@ -230,9 +232,11 @@ export type Database = {
           business_name?: string | null
           business_type?: string | null
           created_at?: string
+          demo_mode?: boolean | null
           experience_level?: string | null
           id: string
           nav_items?: Json | null
+          profile_complete?: boolean | null
           updated_at?: string
           vat_number?: string | null
           vat_registered?: boolean | null
@@ -241,9 +245,11 @@ export type Database = {
           business_name?: string | null
           business_type?: string | null
           created_at?: string
+          demo_mode?: boolean | null
           experience_level?: string | null
           id?: string
           nav_items?: Json | null
+          profile_complete?: boolean | null
           updated_at?: string
           vat_number?: string | null
           vat_registered?: boolean | null
@@ -515,12 +521,54 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist_signups: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          notified: boolean
+          profession_interest: string | null
+          referrer: string | null
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          notified?: boolean
+          profession_interest?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          notified?: boolean
+          profession_interest?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_waitlist_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

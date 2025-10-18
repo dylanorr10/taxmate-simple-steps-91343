@@ -10,6 +10,8 @@ export interface Profile {
   vat_registered: boolean | null;
   experience_level: string | null;
   nav_items: string[] | null;
+  profile_complete: boolean | null;
+  demo_mode: boolean | null;
   created_at: string;
   updated_at: string;
 }

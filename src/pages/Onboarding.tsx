@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getDefaultNavItems } from "@/data/navigationConfig";
+import { generateDemoData } from "@/utils/demoDataSeeder";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -53,16 +54,22 @@ const Onboarding = () => {
       // Get smart default navigation items based on business type and experience
       const defaultNavItems = getDefaultNavItems(formData.businessType, experience_level);
 
+      // Update profile with complete flag
       await supabase.from('profiles').update({
         business_type: formData.businessType,
         vat_registered,
         experience_level,
-        nav_items: defaultNavItems
+        nav_items: defaultNavItems,
+        profile_complete: true,
+        demo_mode: true // Enable demo mode by default for new users
       }).eq('id', user.id);
+
+      // Generate demo data for realistic presentation
+      await generateDemoData(user.id, formData.businessType);
 
       toast({
         title: "Welcome aboard! 🎉",
-        description: "Tip: You can customize your navigation in Settings"
+        description: "We've added some sample data to help you explore"
       });
 
       navigate("/dashboard");

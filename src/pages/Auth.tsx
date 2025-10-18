@@ -24,14 +24,38 @@ const Auth = () => {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/dashboard");
+        // Check if profile is complete before redirecting
+        supabase
+          .from('profiles')
+          .select('profile_complete')
+          .eq('id', session.user.id)
+          .single()
+          .then(({ data }) => {
+            if (data?.profile_complete) {
+              navigate("/dashboard");
+            } else {
+              navigate("/welcome");
+            }
+          });
       }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/dashboard");
+      if (session && event === 'SIGNED_IN') {
+        // Check if profile is complete
+        supabase
+          .from('profiles')
+          .select('profile_complete')
+          .eq('id', session.user.id)
+          .single()
+          .then(({ data }) => {
+            if (data?.profile_complete) {
+              navigate("/dashboard");
+            } else {
+              navigate("/welcome");
+            }
+          });
       }
     });
 
@@ -68,7 +92,7 @@ const Auth = () => {
 
         toast.success("Welcome back!");
       } else {
-        const redirectUrl = `${window.location.origin}/dashboard`;
+        const redirectUrl = `${window.location.origin}/welcome`;
         
         const { error } = await supabase.auth.signUp({
           email,
@@ -87,8 +111,16 @@ const Auth = () => {
           return;
         }
 
-        toast.success("Account created successfully! You can now sign in.");
-        setIsLogin(true);
+        toast.success("Account created! Redirecting to onboarding...");
+        // Auto-login and redirect to welcome
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (!signInError) {
+          navigate("/welcome");
+        }
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
