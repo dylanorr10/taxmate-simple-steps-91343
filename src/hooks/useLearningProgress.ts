@@ -1,8 +1,25 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useLearningProgress = () => {
   const [isTracking, setIsTracking] = useState(false);
+
+  const { data: progress, isLoading } = useQuery({
+    queryKey: ['learning-progress'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('user_learning_progress')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const startLesson = async (lessonId: string) => {
     try {
@@ -84,6 +101,8 @@ export const useLearningProgress = () => {
   };
 
   return {
+    progress: progress || [],
+    isLoading,
     startLesson,
     completeLesson,
     toggleSaveLesson,

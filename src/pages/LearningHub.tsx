@@ -1,234 +1,326 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, Video, Award, MessageCircle } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Award, BookOpen, Search, Filter, Clock, CheckCircle, Play, TrendingUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useMemo } from "react";
+import { lessons } from "@/data/learningContent";
+import { useLearningProgress } from "@/hooks/useLearningProgress";
+import BottomNav from "@/components/BottomNav";
+import { useBusinessProfile } from "@/hooks/useBusinessProfile";
 
 const LearningHub = () => {
-  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const { progress, isLoading: progressLoading } = useLearningProgress();
+  const { data: businessProfile } = useBusinessProfile();
 
-  const navItems = [
-    { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/records", label: "Records", icon: FileText },
-    { path: "/settings", label: "Settings", icon: Settings },
-  ];
+  // Get unique categories
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(lessons.map(l => l.category)));
+    return ['all', ...cats];
+  }, []);
 
-  const lessons = [
-    {
-      id: 1,
-      title: "What counts as a business expense?",
-      duration: "5 min read",
-      icon: "💰",
-      difficulty: "Beginner",
-      description: "Learn what you can claim to reduce your tax bill",
-    },
-    {
-      id: 2,
-      title: "Understanding your tax timeline",
-      duration: "3 min read",
-      icon: "📅",
-      difficulty: "Beginner",
-      description: "Important dates and deadlines made simple",
-    },
-    {
-      id: 3,
-      title: "Why keeping records matters",
-      duration: "4 min read",
-      icon: "🧾",
-      difficulty: "Beginner",
-      description: "How good records save you money and stress",
-    },
-    {
-      id: 4,
-      title: "MTD explained in plain English",
-      duration: "6 min read",
-      icon: "📊",
-      difficulty: "Intermediate",
-      description: "Making Tax Digital without the confusing jargon",
-    },
-    {
-      id: 5,
-      title: "Profit vs Revenue - What's the difference?",
-      duration: "3 min read",
-      icon: "📈",
-      difficulty: "Beginner",
-      description: "Understanding the money you make vs money you keep",
-    },
-    {
-      id: 6,
-      title: "Receipt keeping made easy",
-      duration: "5 min read",
-      icon: "📸",
-      difficulty: "Beginner",
-      description: "What to keep, how long, and why it matters",
-    },
-  ];
+  // Filter lessons
+  const filteredLessons = useMemo(() => {
+    return lessons.filter(lesson => {
+      const matchesSearch = 
+        lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lesson.content.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesDifficulty = 
+        selectedDifficulty === 'all' || lesson.difficulty === selectedDifficulty;
+      
+      const matchesCategory = 
+        selectedCategory === 'all' || lesson.category === selectedCategory;
 
-  const videos = [
-    {
-      id: 1,
-      title: "Sarah explains: Tracking delivery driver expenses",
-      duration: "2:30",
-      views: "1.2k",
-    },
-    {
-      id: 2,
-      title: "Ahmed's story: From confused to confident",
-      duration: "3:15",
-      views: "890",
-    },
-    {
-      id: 3,
-      title: "Dave's tips: What receipts electricians need",
-      duration: "2:45",
-      views: "1.5k",
-    },
-  ];
+      return matchesSearch && matchesDifficulty && matchesCategory;
+    });
+  }, [searchQuery, selectedDifficulty, selectedCategory]);
 
-  const badges = [
-    { name: "Basic Expenses", earned: true, icon: "✅" },
-    { name: "Record Keeper", earned: true, icon: "✅" },
-    { name: "Tax Timeline", earned: false, icon: "🔒" },
-    { name: "MTD Ready", earned: false, icon: "🔒" },
-  ];
+  // Get lesson progress
+  const getLessonProgress = (lessonId: string) => {
+    return progress?.find(p => p.lesson_id === lessonId);
+  };
+
+  // Get in-progress lessons
+  const inProgressLessons = useMemo(() => {
+    if (!progress) return [];
+    return lessons.filter(lesson => {
+      const prog = getLessonProgress(lesson.id);
+      return prog && !prog.completed_at && prog.completion_rate && prog.completion_rate > 0;
+    }).slice(0, 3);
+  }, [progress]);
+
+  // Get completed count
+  const completedCount = useMemo(() => {
+    if (!progress) return 0;
+    return progress.filter(p => p.completed_at).length;
+  }, [progress]);
+
+  // Get recommended lessons based on business type
+  const recommendedLessons = useMemo(() => {
+    const businessType = businessProfile?.businessType;
+    const recommended: typeof lessons = [];
+
+    if (businessType === 'trades') {
+      recommended.push(
+        ...lessons.filter(l => ['cis-basics', 'mileage-tracking', 'claiming-expenses'].includes(l.id))
+      );
+    } else if (businessType === 'transport') {
+      recommended.push(
+        ...lessons.filter(l => ['mileage-tracking', 'claiming-expenses', 'vat-explained'].includes(l.id))
+      );
+    } else if (businessType === 'creative') {
+      recommended.push(
+        ...lessons.filter(l => ['home-office', 'invoicing-clients', 'claiming-expenses'].includes(l.id))
+      );
+    }
+
+    // Fill remaining with beginner lessons
+    const beginnerLessons = lessons.filter(l => 
+      l.difficulty === 'beginner' && !recommended.find(r => r.id === l.id)
+    );
+    
+    return [...recommended, ...beginnerLessons].slice(0, 3);
+  }, [businessProfile]);
+
+  const difficultyColors = {
+    beginner: 'bg-success/10 text-success border-success/20',
+    intermediate: 'bg-primary/10 text-primary border-primary/20',
+    advanced: 'bg-destructive/10 text-destructive border-destructive/20',
+  };
+
+  const renderLessonCard = (lesson: typeof lessons[0]) => {
+    const lessonProgress = getLessonProgress(lesson.id);
+    const isCompleted = lessonProgress?.completed_at;
+    const progressPercent = lessonProgress?.completion_rate || 0;
+
+    return (
+      <Card
+        key={lesson.id}
+        className="p-4 hover:shadow-md transition-all cursor-pointer hover:border-primary/50 group"
+      >
+        <div className="flex items-start gap-4">
+          <div className="text-3xl flex-shrink-0">{lesson.icon}</div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start gap-2 mb-2">
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors flex-1">
+                {lesson.title}
+              </h3>
+              {isCompleted && (
+                <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
+              )}
+            </div>
+            
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <Badge variant="outline" className={difficultyColors[lesson.difficulty]}>
+                {lesson.difficulty}
+              </Badge>
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {lesson.duration}
+              </span>
+              <Badge variant="outline">{lesson.category}</Badge>
+            </div>
+
+            {progressPercent > 0 && !isCompleted && (
+              <div className="mb-2">
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+                <span className="text-xs text-muted-foreground mt-1">
+                  {Math.round(progressPercent)}% complete
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between mt-2">
+              <Button variant="ghost" size="sm" className="h-8 px-3">
+                {isCompleted ? 'Review' : progressPercent > 0 ? 'Continue' : 'Start Learning'}
+                <Play className="w-3 h-3 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
       <div className="max-w-2xl mx-auto px-4 py-6">
+        {/* Header */}
         <div className="mb-6">
-          <Link to="/settings" className="text-primary hover:text-primary/80 text-sm flex items-center gap-1 mb-2">
-            ← Back to Settings
-          </Link>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Tax Made Simple</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Learning Hub</h1>
           <p className="text-muted-foreground">
-            Learn at your own pace - no jargon, no stress
+            Build your tax knowledge at your own pace
           </p>
         </div>
 
-        {/* Knowledge Builder Progress */}
-        <Card className="p-6 mb-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+        {/* Progress Overview */}
+        <Card className="p-6 mb-6 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
           <div className="flex items-center gap-3 mb-4">
             <Award className="w-8 h-8 text-primary" />
-            <div>
-              <h2 className="text-xl font-bold text-foreground">Knowledge Builder</h2>
-              <p className="text-sm text-muted-foreground">You've mastered 2 of 4 topics</p>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-foreground">Your Progress</h2>
+              <p className="text-sm text-muted-foreground">
+                {completedCount} of {lessons.length} lessons completed
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-primary">{Math.round((completedCount / lessons.length) * 100)}%</div>
+              <div className="text-xs text-muted-foreground">Complete</div>
             </div>
           </div>
-          <div className="flex gap-2">
-            {badges.map((badge) => (
-              <div
-                key={badge.name}
-                className={`flex-1 p-3 rounded-lg text-center ${
-                  badge.earned
-                    ? "bg-success/20 border border-success/30"
-                    : "bg-muted/50 border border-muted"
-                }`}
-              >
-                <div className="text-2xl mb-1">{badge.icon}</div>
-                <div className="text-xs font-medium">{badge.name}</div>
-              </div>
-            ))}
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-primary to-accent transition-all"
+              style={{ width: `${(completedCount / lessons.length) * 100}%` }}
+            />
           </div>
         </Card>
 
-        {/* Bite-sized Lessons */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5" />
-            Bite-sized Lessons
-          </h2>
-          <div className="space-y-3">
-            {lessons.map((lesson) => (
-              <Card
-                key={lesson.id}
-                className="p-4 hover:shadow-md transition-all cursor-pointer hover:border-primary/50"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl">{lesson.icon}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-foreground">{lesson.title}</h3>
-                      <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                        {lesson.difficulty}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {lesson.description}
-                    </p>
-                    <div className="text-xs text-muted-foreground">{lesson.duration}</div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+        {/* Continue Learning Section */}
+        {inProgressLessons.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+              <Play className="w-5 h-5 text-primary" />
+              Continue Learning
+            </h2>
+            <div className="space-y-3">
+              {inProgressLessons.map(lesson => renderLessonCard(lesson))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Video Explanations */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-            <Video className="w-5 h-5" />
-            Video Explanations
-          </h2>
-          <div className="space-y-3">
-            {videos.map((video) => (
-              <Card
-                key={video.id}
-                className="p-4 hover:shadow-md transition-all cursor-pointer hover:border-primary/50"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Video className="w-8 h-8 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground mb-1">{video.title}</h3>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>{video.duration}</span>
-                      <span>•</span>
-                      <span>{video.views} views</span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+        {/* Recommended for You */}
+        {recommendedLessons.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-accent" />
+              Recommended for You
+            </h2>
+            <div className="space-y-3">
+              {recommendedLessons.map(lesson => renderLessonCard(lesson))}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Quick Links */}
-        <div className="grid grid-cols-2 gap-3">
-          <Link to="/glossary">
-            <Button variant="outline" className="w-full h-auto py-4 flex flex-col gap-2">
-              <BookOpen className="w-6 h-6" />
-              <span className="text-sm">Tax Dictionary</span>
+        {/* Search and Filters */}
+        <div className="mb-6 space-y-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search lessons..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            <Button
+              variant={selectedDifficulty === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedDifficulty('all')}
+            >
+              All Levels
             </Button>
-          </Link>
-          <Button variant="outline" className="w-full h-auto py-4 flex flex-col gap-2">
-            <MessageCircle className="w-6 h-6" />
-            <span className="text-sm">Community Q&A</span>
-          </Button>
+            <Button
+              variant={selectedDifficulty === 'beginner' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedDifficulty('beginner')}
+            >
+              Beginner
+            </Button>
+            <Button
+              variant={selectedDifficulty === 'intermediate' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedDifficulty('intermediate')}
+            >
+              Intermediate
+            </Button>
+            <Button
+              variant={selectedDifficulty === 'advanced' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSelectedDifficulty('advanced')}
+            >
+              Advanced
+            </Button>
+          </div>
+        </div>
+
+        {/* Category Tabs */}
+        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-6">
+          <TabsList className="w-full justify-start overflow-x-auto">
+            {categories.map(cat => (
+              <TabsTrigger key={cat} value={cat} className="capitalize">
+                {cat === 'all' ? 'All Topics' : cat}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+
+        {/* All Lessons */}
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+            <BookOpen className="w-5 h-5" />
+            {searchQuery || selectedDifficulty !== 'all' || selectedCategory !== 'all' 
+              ? `${filteredLessons.length} Lessons Found` 
+              : 'All Lessons'}
+          </h2>
+          
+          {filteredLessons.length === 0 ? (
+            <Card className="p-8 text-center">
+              <div className="text-4xl mb-3">🔍</div>
+              <p className="text-muted-foreground">
+                No lessons found matching your search.
+              </p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedDifficulty('all');
+                  setSelectedCategory('all');
+                }}
+              >
+                Clear Filters
+              </Button>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {filteredLessons.map(lesson => renderLessonCard(lesson))}
+            </div>
+          )}
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <Card className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary">{completedCount}</div>
+            <div className="text-xs text-muted-foreground">Completed</div>
+          </Card>
+          <Card className="p-4 text-center">
+            <div className="text-2xl font-bold text-accent">{inProgressLessons.length}</div>
+            <div className="text-xs text-muted-foreground">In Progress</div>
+          </Card>
+          <Card className="p-4 text-center">
+            <div className="text-2xl font-bold text-muted-foreground">
+              {lessons.length - completedCount - inProgressLessons.length}
+            </div>
+            <div className="text-xs text-muted-foreground">Not Started</div>
+          </Card>
         </div>
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg">
-        <div className="max-w-2xl mx-auto flex justify-around py-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-all ${
-                  isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 };
