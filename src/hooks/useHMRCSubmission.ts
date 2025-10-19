@@ -34,11 +34,28 @@ export const useHMRCSubmission = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      toast.success("Submitted to HMRC successfully");
+    onSuccess: (data) => {
+      if (data?.demo) {
+        toast.success("Demo submission successful! 🎯", {
+          description: "In production, this would be submitted to HMRC"
+        });
+      } else {
+        toast.success("Submitted to HMRC successfully");
+      }
     },
     onError: (error: Error) => {
-      toast.error(`Failed to submit to HMRC: ${error.message}`);
+      const message = error.message;
+      if (message.includes("Token expired")) {
+        toast.error("HMRC connection expired", {
+          description: "Please reconnect to HMRC in Settings"
+        });
+      } else if (message.includes("not connected")) {
+        toast.error("HMRC not connected", {
+          description: "Please connect to HMRC in Settings first"
+        });
+      } else {
+        toast.error(`Failed to submit: ${message}`);
+      }
     },
   });
 

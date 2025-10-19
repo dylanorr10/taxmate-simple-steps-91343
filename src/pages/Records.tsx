@@ -123,9 +123,15 @@ const Records = () => {
                 Apr–Jun 2025 • Due <span className="font-semibold text-warning">7 Aug 2025</span>
               </p>
             </div>
-            <Badge variant="secondary" className="bg-primary/10 text-primary">
-              In Progress
-            </Badge>
+            {profile?.demo_mode ? (
+              <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">
+                Demo Mode
+              </Badge>
+            ) : (
+              <Badge variant="secondary" className="bg-primary/10 text-primary">
+                In Progress
+              </Badge>
+            )}
           </div>
         </div>
 
@@ -334,12 +340,17 @@ const Records = () => {
               className="w-full mb-3 h-12 text-base font-semibold"
             >
               <Shield className="w-5 h-5 mr-2" />
-              {isSubmitting || isSaving ? "Submitting..." : "Submit to HMRC via MTD"}
+              {isSubmitting || isSaving 
+                ? "Submitting..." 
+                : profile?.demo_mode 
+                ? "Submit to HMRC (Demo)" 
+                : "Submit to HMRC via MTD"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
-              Submission via HMRC MTD API. By tapping submit, you confirm this return is accurate
-              and complete.
+              {profile?.demo_mode 
+                ? "Demo mode: Submission will be simulated for demonstration purposes"
+                : "Submission via HMRC MTD API. By tapping submit, you confirm this return is accurate and complete."}
             </p>
 
             {hasErrors && (

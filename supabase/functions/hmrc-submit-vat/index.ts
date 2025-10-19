@@ -31,6 +31,60 @@ Deno.serve(async (req) => {
 
     const { periodKey, vatReturn } = await req.json();
 
+    // Check if user is in demo mode
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('demo_mode, vat_number')
+      .eq('id', user.id)
+      .single();
+
+    const isDemoMode = profile?.demo_mode === true;
+
+    // Handle demo mode - simulate successful submission
+    if (isDemoMode) {
+      console.log('Demo mode: Simulating HMRC submission');
+      
+      // Store submission in database
+      const { error: submissionError } = await supabase
+        .from('vat_submissions')
+        .insert({
+          user_id: user.id,
+          period_key: periodKey,
+          vat_due_sales: vatReturn.vatDueSales,
+          vat_due_acquisitions: vatReturn.vatDueAcquisitions,
+          total_vat_due: vatReturn.totalVatDue,
+          vat_reclaimed_curr_period: vatReturn.vatReclaimedCurrPeriod,
+          net_vat_due: vatReturn.netVatDue,
+          total_value_sales_ex_vat: vatReturn.totalValueSalesExVAT,
+          total_value_purchases_ex_vat: vatReturn.totalValuePurchasesExVAT,
+          total_value_goods_supplied_ex_vat: vatReturn.totalValueGoodsSuppliedExVAT,
+          total_acquisitions_ex_vat: vatReturn.totalAcquisitionsExVAT,
+          submitted_at: new Date().toISOString(),
+        });
+
+      if (submissionError) {
+        console.error('Error storing demo submission:', submissionError);
+        throw new Error('Failed to save demo submission');
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          demo: true,
+          result: { 
+            processingDate: new Date().toISOString(),
+            paymentIndicator: 'DD',
+            formBundleNumber: 'DEMO-' + Date.now()
+          } 
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      );
+    }
+
+    // Production mode - real HMRC submission
     // Get HMRC tokens
     const { data: tokenData, error: tokenError } = await supabase
       .from('hmrc_tokens')
@@ -54,13 +108,6 @@ Deno.serve(async (req) => {
     const baseUrl = environment === 'production'
       ? 'https://api.service.hmrc.gov.uk'
       : 'https://test-api.service.hmrc.gov.uk';
-
-    // Get VAT number from profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('vat_number')
-      .eq('id', user.id)
-      .single();
 
     if (!profile?.vat_number) {
       throw new Error('VAT number not set in profile');
