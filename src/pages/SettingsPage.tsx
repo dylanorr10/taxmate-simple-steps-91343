@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation, Presentation } from "lucide-react";
 import NavigationCustomizer from "@/components/NavigationCustomizer";
+import BottomNav from "@/components/BottomNav";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -430,28 +431,7 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg">
-        <div className="max-w-2xl mx-auto flex justify-around py-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-all ${
-                  isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 };

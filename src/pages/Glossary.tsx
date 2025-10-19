@@ -1,18 +1,12 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Home, FileText, Settings, Search } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Search } from "lucide-react";
+import { Link } from "react-router-dom";
+import BottomNav from "@/components/BottomNav";
 
 const Glossary = () => {
-  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
-
-  const navItems = [
-    { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/tax", label: "Tax", icon: FileText },
-    { path: "/settings", label: "Settings", icon: Settings },
-  ];
 
   const glossaryTerms = [
     {
@@ -182,28 +176,7 @@ const Glossary = () => {
         )}
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg">
-        <div className="max-w-2xl mx-auto flex justify-around py-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex flex-col items-center gap-1 px-6 py-2 rounded-lg transition-all ${
-                  isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                <Icon className="w-6 h-6" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 };
