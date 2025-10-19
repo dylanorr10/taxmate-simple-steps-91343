@@ -41,11 +41,11 @@ export const availableNavItems: NavItem[] = [
     recommendedFor: ['all'] 
   },
   { 
-    id: 'records', 
-    path: '/records', 
-    label: 'Records', 
-    icon: 'FolderOpen', 
-    description: 'Document storage', 
+    id: 'tax', 
+    path: '/tax', 
+    label: 'Tax', 
+    icon: 'Receipt', 
+    description: 'VAT returns & submissions', 
     recommendedFor: ['all'] 
   },
   { 
@@ -72,7 +72,7 @@ export const getDefaultNavItems = (businessType?: string, experienceLevel?: stri
     return ['dashboard', 'log', 'mileage', 'learn'];
   }
   if (businessType === 'creative' || businessType === 'content_creator') {
-    return ['dashboard', 'log', 'records', 'learn'];
+    return ['dashboard', 'log', 'tax', 'learn'];
   }
   if (experienceLevel === 'beginner') {
     return ['dashboard', 'log', 'learn', 'glossary'];

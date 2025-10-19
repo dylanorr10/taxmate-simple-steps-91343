@@ -87,7 +87,7 @@ const SettingsPage = () => {
 
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
-    { path: "/records", label: "Records", icon: FileText },
+    { path: "/tax", label: "Tax", icon: FileText },
     { path: "/settings", label: "Settings", icon: Settings },
   ];
 

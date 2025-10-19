@@ -29,7 +29,7 @@ import { formatCurrency } from "@/utils/transactionHelpers";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-const Records = () => {
+const Tax = () => {
   const navigate = useNavigate();
   const [showCalculation, setShowCalculation] = useState(false);
   const [expandedBox, setExpandedBox] = useState<number | null>(null);
@@ -434,4 +434,4 @@ const Records = () => {
   );
 };
 
-export default Records;
+export default Tax;

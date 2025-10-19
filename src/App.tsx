@@ -8,7 +8,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Welcome from "./pages/Welcome";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
-import Records from "./pages/Records";
+import Tax from "./pages/Tax";
 import SettingsPage from "./pages/SettingsPage";
 import LearningHub from "./pages/LearningHub";
 import Glossary from "./pages/Glossary";
@@ -35,7 +35,7 @@ const App = () => (
             <Route path="/log" element={<ProtectedRoute><Log /></ProtectedRoute>} />
             <Route path="/learn" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
             <Route path="/mileage" element={<ProtectedRoute><Mileage /></ProtectedRoute>} />
-            <Route path="/records" element={<ProtectedRoute><Records /></ProtectedRoute>} />
+            <Route path="/tax" element={<ProtectedRoute><Tax /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/glossary" element={<ProtectedRoute><Glossary /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
