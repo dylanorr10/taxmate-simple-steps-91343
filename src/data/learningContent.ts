@@ -610,4 +610,185 @@ Clients can't claim fair use just to avoid payment. Fair use is very limited in 
 
 **Pro tip:** Build standard license tiers (personal use, commercial, exclusive) with clear pricing for each.`,
   },
+  {
+    id: 'ai-automation',
+    title: 'Using AI & Automation as a Sole Trader',
+    category: 'Automation',
+    difficulty: 'intermediate',
+    duration: '5 min',
+    icon: '🤖',
+    content: `AI and automation tools can save sole traders hours every week. Here's how to leverage them:
+
+**Why sole traders need automation:**
+- Limited time for admin tasks
+- Can't afford full-time staff
+- Need to focus on billable work
+- Reduce repetitive tasks
+- Minimize human error
+
+**AI tools for your business:**
+
+**1. Administrative Tasks**
+{{CUSTOM_EXAMPLES}}
+
+**2. Communication & Customer Service**
+- Email auto-responses and templates
+- Chatbots for common inquiries
+- Automated appointment reminders
+- Follow-up sequences
+- Review requests
+
+**3. Financial Management**
+- Receipt scanning & categorization
+- Invoice generation
+- Payment reminders
+- Expense tracking
+- Tax calculation tools
+
+**4. Marketing Automation**
+- Social media scheduling
+- Email campaigns
+- Content generation (with your editing)
+- SEO optimization
+- Ad campaign management
+
+**Getting started with AI:**
+
+**Step 1: Identify time-drains**
+Track your time for one week. Look for:
+- Tasks taking 30+ minutes daily
+- Repetitive processes
+- Data entry work
+- Customer communication patterns
+
+**Step 2: Start small**
+Pick ONE area to automate:
+- Invoicing (QuickBooks, Xero)
+- Bookkeeping (Reelin, FreeAgent)
+- Social media (Buffer, Hootsuite)
+- Scheduling (Calendly, Acuity)
+
+**Step 3: AI writing assistants**
+Use AI for first drafts:
+- Proposals and quotes
+- Email responses
+- Social media posts
+- Blog content
+- Product descriptions
+
+⚠️ Always review and personalize AI output!
+
+**Cost-effective AI tools:**
+
+**Free/Low-cost options:**
+- ChatGPT (£0-£20/month)
+- Canva AI (£10/month)
+- Zapier automation (free tier)
+- Google Workspace AI (included)
+- Grammarly (free/£12/month)
+
+**Business tools:**
+- Receipt scanning: Dext, AutoEntry
+- Scheduling: Calendly, Cal.com
+- CRM: HubSpot, Pipedrive
+- Email: Mailchimp, ConvertKit
+
+**Common automation workflows:**
+
+**New client workflow:**
+1. Client books via Calendly
+2. Auto-sends welcome email
+3. Creates contact in CRM
+4. Generates onboarding form
+5. Schedules follow-up tasks
+
+**Invoice workflow:**
+1. Job completed
+2. Auto-generate invoice
+3. Send via email
+4. Set payment reminder
+5. Record in accounting software
+6. Update cash flow forecast
+
+**Content workflow:**
+1. AI generates content ideas
+2. Create draft content
+3. Schedule social posts
+4. Auto-publish at optimal times
+5. Track engagement
+6. Respond to comments (with AI help)
+
+**AI for your specific work:**
+{{CUSTOM_EXAMPLES}}
+
+**Common mistakes to avoid:**
+
+❌ Over-automating - losing personal touch
+❌ Not reviewing AI output
+❌ Ignoring data privacy (GDPR)
+❌ Using too many tools
+❌ Not training AI with your brand voice
+
+✅ Start with high-impact, low-risk tasks
+✅ Keep human oversight
+✅ Test before fully implementing
+✅ Integrate tools together
+✅ Monitor performance regularly
+
+**ROI of automation:**
+
+Example time savings:
+- Invoicing: 5 hours → 30 minutes/month
+- Bookkeeping: 8 hours → 2 hours/month
+- Social media: 10 hours → 2 hours/month
+- Email responses: 6 hours → 1 hour/month
+
+Total saved: 28 hours/month = £700-£1,400 in billable time (at £25-£50/hour)
+
+**Security & privacy:**
+- Use secure, reputable tools
+- Enable 2-factor authentication
+- Don't share sensitive client data with AI
+- Review privacy policies
+- Comply with GDPR
+- Backup your data
+
+**Advanced automations:**
+
+**If-then sequences:**
+- If invoice unpaid after 7 days → Send reminder
+- If customer inquiry received → Auto-respond + log in CRM
+- If new review posted → Thank customer + share on social
+
+**Integration examples:**
+- Stripe → QuickBooks → Email receipt
+- Contact form → CRM → Task list → Calendar
+- Bank transaction → Accounting software → Expense report
+
+**Pro tips:**
+1. Automate recurring tasks first (biggest ROI)
+2. Use AI for research and ideas, not final output
+3. Build templates for common tasks
+4. Schedule dedicated time for automation setup
+5. Review monthly - adjust what's not working
+6. Join communities to learn new tools
+7. Don't automate everything - clients value human touch
+
+**When NOT to use AI:**
+- Sensitive client conversations
+- Complex negotiations
+- Creative work requiring originality
+- Legal or compliance matters
+- Personal relationship building
+
+**Getting help:**
+Most AI tools have:
+- Free trials (test before buying)
+- Tutorial videos
+- Community forums
+- Customer support
+- Template libraries
+
+Start with one tool, master it, then expand. The goal is more time for what matters - growing your business and serving clients.`,
+  },
 ];
