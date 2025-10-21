@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { HelpTooltip } from "@/components/HelpTooltip";
 import { MicroCelebration } from "@/components/MicroCelebration";
 import { useStreak } from "@/hooks/useStreak";
+import { InvoiceTracker } from "@/components/InvoiceTracker";
 
 const Log = () => {
   const [cashAmount, setCashAmount] = useState("");
@@ -144,9 +145,10 @@ const Log = () => {
         </div>
 
         <Tabs defaultValue="bank" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="bank">Bank Transactions</TabsTrigger>
-            <TabsTrigger value="manual">Manual Entry</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="bank">Bank</TabsTrigger>
+            <TabsTrigger value="manual">Manual</TabsTrigger>
+            <TabsTrigger value="invoices">Invoices</TabsTrigger>
           </TabsList>
 
           <TabsContent value="bank" className="space-y-4 mt-4">
@@ -586,6 +588,10 @@ const Log = () => {
                 </div>
               )}
             </Card>
+          </TabsContent>
+
+          <TabsContent value="invoices" className="space-y-4 mt-4">
+            <InvoiceTracker />
           </TabsContent>
         </Tabs>
       </div>
