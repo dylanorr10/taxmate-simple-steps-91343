@@ -124,12 +124,13 @@ const handler = async (req: Request): Promise<Response> => {
     // Get transaction details
     const { data: transaction, error: txError } = await supabase
       .from("income_transactions")
-      .select("*, profiles!inner(business_name)")
+      .select("*")
       .eq("id", incomeTransactionId)
       .eq("user_id", user.id)
       .single();
 
     if (txError || !transaction) {
+      console.error("Transaction query error:", txError);
       throw new Error("Transaction not found");
     }
 
@@ -137,12 +138,19 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("No client email address");
     }
 
+    // Get business name from profile
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("business_name")
+      .eq("id", user.id)
+      .single();
+
     // Calculate days overdue
     const dueDate = new Date(transaction.due_date);
     const today = new Date();
     const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    const businessName = transaction.profiles?.business_name || "Your Business";
+    const businessName = profile?.business_name || "Your Business";
     const template = getEmailTemplate(
       transaction.client_name || "Valued Client",
       Number(transaction.amount),
