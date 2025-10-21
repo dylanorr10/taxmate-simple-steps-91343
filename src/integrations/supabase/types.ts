@@ -184,9 +184,14 @@ export type Database = {
       income_transactions: {
         Row: {
           amount: number
+          client_email: string | null
+          client_name: string | null
           created_at: string
           description: string | null
+          due_date: string | null
           id: string
+          invoice_number: string | null
+          payment_status: string | null
           transaction_date: string
           updated_at: string
           user_id: string
@@ -194,9 +199,14 @@ export type Database = {
         }
         Insert: {
           amount: number
+          client_email?: string | null
+          client_name?: string | null
           created_at?: string
           description?: string | null
+          due_date?: string | null
           id?: string
+          invoice_number?: string | null
+          payment_status?: string | null
           transaction_date: string
           updated_at?: string
           user_id: string
@@ -204,15 +214,58 @@ export type Database = {
         }
         Update: {
           amount?: number
+          client_email?: string | null
+          client_name?: string | null
           created_at?: string
           description?: string | null
+          due_date?: string | null
           id?: string
+          invoice_number?: string | null
+          payment_status?: string | null
           transaction_date?: string
           updated_at?: string
           user_id?: string
           vat_rate?: number
         }
         Relationships: []
+      }
+      payment_reminders: {
+        Row: {
+          created_at: string
+          days_overdue: number
+          id: string
+          income_transaction_id: string
+          reminder_type: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          days_overdue: number
+          id?: string
+          income_transaction_id: string
+          reminder_type: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          days_overdue?: number
+          id?: string
+          income_transaction_id?: string
+          reminder_type?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reminders_income_transaction_id_fkey"
+            columns: ["income_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "income_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

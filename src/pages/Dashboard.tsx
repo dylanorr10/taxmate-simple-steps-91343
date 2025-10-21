@@ -30,6 +30,7 @@ import { StreakCounter } from "@/components/StreakCounter";
 import { SurpriseTip } from "@/components/SurpriseTip";
 import { QuickAddFab } from "@/components/QuickAddFab";
 import { ExpandableSection } from "@/components/ExpandableSection";
+import { InvoiceTracker } from "@/components/InvoiceTracker";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -191,6 +192,11 @@ const Dashboard = () => {
               </div>
 
             </Card>
+
+        {/* Invoice Tracker - Overdue Payments */}
+        <div className="animate-fade-in" style={{ animationDelay: "50ms" }}>
+          <InvoiceTracker />
+        </div>
 
         {/* MTD Compliance */}
         <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "100ms" }}>

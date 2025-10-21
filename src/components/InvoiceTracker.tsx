@@ -1,0 +1,138 @@
+import { useIncomeTransactions } from "@/hooks/useTransactions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, Clock, CheckCircle } from "lucide-react";
+import { formatCurrency, formatDate } from "@/utils/transactionHelpers";
+import { usePaymentReminders } from "@/hooks/usePaymentReminders";
+import { useState } from "react";
+
+export const InvoiceTracker = () => {
+  const { transactions } = useIncomeTransactions();
+  const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
+  const { sendReminder, isSending } = usePaymentReminders(selectedInvoice || undefined);
+
+  // Filter for pending/overdue invoices
+  const pendingInvoices = transactions.filter(
+    (t) => t.payment_status === "pending" || t.payment_status === "overdue"
+  );
+
+  // Calculate overdue invoices
+  const overdueInvoices = pendingInvoices.filter((t) => {
+    if (!t.due_date) return false;
+    const dueDate = new Date(t.due_date);
+    const today = new Date();
+    return dueDate < today;
+  });
+
+  const totalOverdue = overdueInvoices.reduce((sum, t) => sum + Number(t.amount), 0);
+
+  const getDaysOverdue = (dueDate: string) => {
+    const due = new Date(dueDate);
+    const today = new Date();
+    const diff = Math.floor((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
+
+  const getReminderType = (daysOverdue: number): 'gentle' | 'firm' | 'final' => {
+    if (daysOverdue < 7) return 'gentle';
+    if (daysOverdue < 30) return 'firm';
+    return 'final';
+  };
+
+  const handleSendReminder = (incomeTransactionId: string, daysOverdue: number) => {
+    setSelectedInvoice(incomeTransactionId);
+    const reminderType = getReminderType(daysOverdue);
+    sendReminder({ incomeTransactionId, reminderType });
+  };
+
+  if (pendingInvoices.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-success" />
+            All Invoices Paid
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            You have no pending or overdue invoices. Great work!
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            {overdueInvoices.length > 0 ? (
+              <AlertCircle className="h-5 w-5 text-destructive" />
+            ) : (
+              <Clock className="h-5 w-5 text-warning" />
+            )}
+            Invoice Tracker
+          </span>
+          {overdueInvoices.length > 0 && (
+            <Badge variant="destructive">
+              {formatCurrency(totalOverdue)} overdue
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {pendingInvoices.map((invoice) => {
+          const daysOverdue = invoice.due_date ? getDaysOverdue(invoice.due_date) : 0;
+          const isOverdue = daysOverdue > 0;
+
+          return (
+            <div
+              key={invoice.id}
+              className="flex items-center justify-between p-4 border rounded-lg"
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-medium">
+                    {invoice.client_name || "Unnamed Client"}
+                  </span>
+                  {invoice.invoice_number && (
+                    <Badge variant="outline">#{invoice.invoice_number}</Badge>
+                  )}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {formatCurrency(Number(invoice.amount))} • Due:{" "}
+                  {invoice.due_date ? formatDate(invoice.due_date) : "No due date"}
+                  {isOverdue && (
+                    <span className="text-destructive font-medium ml-2">
+                      ({daysOverdue} day{daysOverdue > 1 ? "s" : ""} overdue)
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant={isOverdue ? "destructive" : "secondary"}>
+                  {invoice.payment_status}
+                </Badge>
+                {invoice.client_email && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleSendReminder(invoice.id, daysOverdue)}
+                    disabled={isSending && selectedInvoice === invoice.id}
+                  >
+                    {isSending && selectedInvoice === invoice.id
+                      ? "Sending..."
+                      : "Send Reminder"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+};

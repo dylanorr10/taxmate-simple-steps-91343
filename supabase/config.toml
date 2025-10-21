@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.hmrc-submit-vat]
 verify_jwt = true
+
+[functions.send-payment-reminder]
+verify_jwt = true

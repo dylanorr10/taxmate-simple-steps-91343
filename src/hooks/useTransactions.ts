@@ -11,6 +11,11 @@ export interface Transaction {
   vat_rate: number;
   created_at: string;
   updated_at: string;
+  client_name?: string | null;
+  client_email?: string | null;
+  invoice_number?: string | null;
+  due_date?: string | null;
+  payment_status?: 'paid' | 'pending' | 'overdue' | null;
 }
 
 export const useIncomeTransactions = () => {
@@ -34,7 +39,17 @@ export const useIncomeTransactions = () => {
   });
 
   const addIncome = useMutation({
-    mutationFn: async (income: { amount: number; description?: string; transaction_date?: string; vat_rate?: number }) => {
+    mutationFn: async (income: { 
+      amount: number; 
+      description?: string; 
+      transaction_date?: string; 
+      vat_rate?: number;
+      client_name?: string;
+      client_email?: string;
+      invoice_number?: string;
+      due_date?: string;
+      payment_status?: 'paid' | 'pending' | 'overdue';
+    }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
@@ -46,6 +61,11 @@ export const useIncomeTransactions = () => {
           description: income.description || null,
           transaction_date: income.transaction_date || new Date().toISOString().split('T')[0],
           vat_rate: income.vat_rate || 20,
+          client_name: income.client_name || null,
+          client_email: income.client_email || null,
+          invoice_number: income.invoice_number || null,
+          due_date: income.due_date || null,
+          payment_status: income.payment_status || 'paid',
         })
         .select()
         .single();

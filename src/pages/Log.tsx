@@ -27,6 +27,11 @@ import { useStreak } from "@/hooks/useStreak";
 const Log = () => {
   const [cashAmount, setCashAmount] = useState("");
   const [cashDescription, setCashDescription] = useState("");
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState<'paid' | 'pending' | 'overdue'>('paid');
   const [expenseAmount, setExpenseAmount] = useState("");
   const [expenseDescription, setExpenseDescription] = useState("");
   const [editingVatFor, setEditingVatFor] = useState<string | null>(null);
@@ -58,6 +63,11 @@ const Log = () => {
     addIncome({
       amount,
       description: cashDescription || "Cash sale",
+      client_name: clientName || null,
+      client_email: clientEmail || null,
+      invoice_number: invoiceNumber || null,
+      due_date: dueDate || null,
+      payment_status: paymentStatus,
     });
     setCelebration({ 
       message: "Income logged!", 
@@ -66,6 +76,11 @@ const Log = () => {
     updateStreak();
     setCashAmount("");
     setCashDescription("");
+    setClientName("");
+    setClientEmail("");
+    setInvoiceNumber("");
+    setDueDate("");
+    setPaymentStatus('paid');
   };
 
   const handleSaveExpense = () => {
@@ -389,24 +404,42 @@ const Log = () => {
             <Card className="p-6 shadow-card border border-success/20 bg-gradient-to-br from-success/5 to-success/10">
               <h2 className="font-semibold text-lg mb-4 flex items-center gap-2 text-foreground">
                 <ShoppingCart className="w-5 h-5 text-success" />
-                Quick Cash Sale
+                Log Income / Invoice
               </h2>
               <div className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Amount
-                  </Label>
-                  <Input
-                    type="number"
-                    placeholder="Enter amount (£)"
-                    value={cashAmount}
-                    onChange={(e) => setCashAmount(e.target.value)}
-                    className="text-lg"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Amount *
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="£0.00"
+                      value={cashAmount}
+                      onChange={(e) => setCashAmount(e.target.value)}
+                      className="text-lg"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Payment Status
+                    </Label>
+                    <Select value={paymentStatus} onValueChange={(value: any) => setPaymentStatus(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="paid">Paid</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="overdue">Overdue</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
+                
                 <div>
                   <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Description (optional)
+                    Description
                   </Label>
                   <Input
                     type="text"
@@ -415,6 +448,64 @@ const Log = () => {
                     onChange={(e) => setCashDescription(e.target.value)}
                   />
                 </div>
+                
+                <div className="border-t pt-4 space-y-3">
+                  <Label className="text-sm font-semibold text-foreground">Invoice Details (optional)</Label>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">
+                        Client Name
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder="Client name"
+                        value={clientName}
+                        onChange={(e) => setClientName(e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">
+                        Invoice #
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder="INV-001"
+                        value={invoiceNumber}
+                        onChange={(e) => setInvoiceNumber(e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">
+                        Client Email
+                      </Label>
+                      <Input
+                        type="email"
+                        placeholder="client@email.com"
+                        value={clientEmail}
+                        onChange={(e) => setClientEmail(e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">
+                        Due Date
+                      </Label>
+                      <Input
+                        type="date"
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
+                        className="text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
                 <Button 
                   onClick={handleSaveCash} 
                   className="w-full gap-2"
