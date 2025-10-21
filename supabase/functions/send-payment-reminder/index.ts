@@ -1,8 +1,45 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.74.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+// Simple Resend implementation
+class Resend {
+  private apiKey: string;
+  
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
+  }
+  
+  async send(options: {
+    from: string;
+    to: string[];
+    subject: string;
+    html: string;
+  }) {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(options),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Resend API error: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return { data, error: null };
+  }
+  
+  get emails() {
+    return {
+      send: this.send.bind(this)
+    };
+  }
+}
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY") || "");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
