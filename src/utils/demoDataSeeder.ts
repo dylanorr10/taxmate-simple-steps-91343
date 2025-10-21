@@ -5,8 +5,13 @@ export const generateDemoData = async (userId: string, businessType: string) => 
   const today = new Date();
   const threeMonthsAgo = subMonths(today, 3);
   
-  // Generate income transactions (2-4 per month, realistic amounts)
+  // Generate income transactions (2-4 per month, realistic amounts with invoice data)
   const incomeTransactions = [];
+  let invoiceCounter = 1;
+  
+  // Payment status distribution: 60% paid, 20% pending, 20% overdue
+  const statusDistribution = ['paid', 'paid', 'paid', 'pending', 'overdue'];
+  
   for (let i = 0; i < 3; i++) {
     const monthStart = addMonths(threeMonthsAgo, i);
     const transactionsThisMonth = 2 + Math.floor(Math.random() * 3); // 2-4 transactions
@@ -18,13 +23,43 @@ export const generateDemoData = async (userId: string, businessType: string) => 
         ? 400 + Math.random() * 800 // £400-£1200 for transport
         : 1000 + Math.random() * 4000; // £1000-£5000 for others
       
+      const transactionDate = addDays(monthStart, 5 + j * 7);
+      const clientData = getClientData(businessType, j);
+      const paymentStatus = statusDistribution[j % statusDistribution.length];
+      
+      // Calculate due date based on payment status
+      let dueDate: Date;
+      if (paymentStatus === 'paid') {
+        dueDate = addDays(transactionDate, 30); // 30 days payment terms
+      } else if (paymentStatus === 'pending') {
+        dueDate = addDays(today, 7 + Math.floor(Math.random() * 7)); // 7-14 days in future
+      } else {
+        // Overdue - create specific scenarios for testing
+        if (invoiceCounter === 1) {
+          dueDate = addDays(today, -3); // 3 days overdue (gentle)
+        } else if (invoiceCounter === 2) {
+          dueDate = addDays(today, -12); // 12 days overdue (firm)
+        } else if (invoiceCounter === 3) {
+          dueDate = addDays(today, -35); // 35 days overdue (final)
+        } else {
+          dueDate = addDays(today, -(5 + Math.floor(Math.random() * 25))); // 5-30 days ago
+        }
+      }
+      
       incomeTransactions.push({
         user_id: userId,
         amount: Math.round(amount * 100) / 100,
         description: getIncomeDescription(businessType, j),
-        transaction_date: addDays(monthStart, 5 + j * 7).toISOString().split('T')[0],
-        vat_rate: 20.00
+        transaction_date: transactionDate.toISOString().split('T')[0],
+        vat_rate: 20.00,
+        client_name: clientData.name,
+        client_email: clientData.email,
+        invoice_number: `INV-${String(invoiceCounter).padStart(3, '0')}`,
+        due_date: dueDate.toISOString().split('T')[0],
+        payment_status: paymentStatus
       });
+      
+      invoiceCounter++;
     }
   }
   
@@ -79,6 +114,50 @@ const getIncomeDescription = (businessType: string, index: number): string => {
   };
   
   const options = descriptions[businessType as keyof typeof descriptions] || descriptions.other;
+  return options[index % options.length];
+};
+
+const getClientData = (businessType: string, index: number): { name: string; email: string } => {
+  const clients = {
+    trades: [
+      { name: 'Riverside Property Management', email: 'accounts@riverside-pm.co.uk' },
+      { name: 'Green Valley Homes', email: 'billing@greenvalley.com' },
+      { name: 'Oak Construction Ltd', email: 'finance@oakconstruction.co.uk' },
+      { name: 'Premier Estates', email: 'payments@premierestates.com' }
+    ],
+    creative: [
+      { name: 'StartupCo', email: 'billing@startupco.io' },
+      { name: 'Digital Dynamics Agency', email: 'accounts@digitaldynamics.com' },
+      { name: 'Brand Builders Ltd', email: 'finance@brandbuilders.co.uk' },
+      { name: 'Creative Solutions', email: 'payments@creativesolutions.com' }
+    ],
+    professional: [
+      { name: 'Johnson & Associates', email: 'accounts@johnson-assoc.co.uk' },
+      { name: 'Riverside Consulting', email: 'billing@riversideconsult.com' },
+      { name: 'Summit Advisory Group', email: 'finance@summitadvisory.co.uk' },
+      { name: 'Nexus Professional Services', email: 'payments@nexuspro.com' }
+    ],
+    health: [
+      { name: 'Wellness Studio', email: 'admin@wellnessstudio.co.uk' },
+      { name: 'Peak Performance Gym', email: 'accounts@peakperformance.com' },
+      { name: 'Vitality Health Center', email: 'billing@vitalityhealth.co.uk' },
+      { name: 'Active Life Sports', email: 'finance@activelifesports.com' }
+    ],
+    transport: [
+      { name: 'Swift Logistics', email: 'accounts@swiftlogistics.co.uk' },
+      { name: 'Metro Deliveries Ltd', email: 'billing@metrodeliveries.com' },
+      { name: 'Express Courier Services', email: 'finance@expresscourier.co.uk' },
+      { name: 'Prime Transport Group', email: 'payments@primetransport.com' }
+    ],
+    other: [
+      { name: 'General Business Ltd', email: 'accounts@generalbiz.co.uk' },
+      { name: 'Professional Services Inc', email: 'billing@profservices.com' },
+      { name: 'Enterprise Solutions', email: 'finance@enterprisesolutions.co.uk' },
+      { name: 'Business Partners Group', email: 'payments@bizpartners.com' }
+    ]
+  };
+  
+  const options = clients[businessType as keyof typeof clients] || clients.other;
   return options[index % options.length];
 };
 
