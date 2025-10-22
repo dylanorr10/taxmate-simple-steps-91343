@@ -150,11 +150,6 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
-            {/* Cash Flow Forecast */}
-            <div className="animate-fade-in">
-              <CashFlowForecast />
-            </div>
-            
             {/* Hero: Financial Summary */}
             <Card className="p-6 shadow-card hover-lift animate-fade-in">
               {/* Hero Profit Display */}
@@ -207,8 +202,13 @@ const Dashboard = () => {
           <InvoiceTracker />
         </div>
 
+        {/* Cash Flow Forecast */}
+        <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <CashFlowForecast />
+        </div>
+
         {/* MTD Compliance */}
-        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "150ms" }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <div className="text-sm text-muted-foreground mb-1">
@@ -260,7 +260,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Tax Savings Card */}
-        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "200ms" }}>
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "250ms" }}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex-1">
               <div className="text-sm text-muted-foreground mb-2">
@@ -293,7 +293,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Recent Activity */}
-        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "300ms" }}>
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "350ms" }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <div className="text-xs text-muted-foreground mb-1">Recent activity</div>
