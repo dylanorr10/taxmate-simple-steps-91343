@@ -26,6 +26,7 @@ import { useStreak } from "@/hooks/useStreak";
 import { InvoiceTracker } from "@/components/InvoiceTracker";
 import { ReceiptCapture } from "@/components/ReceiptCapture";
 import { BulkActions } from "@/components/BulkActions";
+import { CashFlowForecast } from "@/components/CashFlowForecast";
 
 const Log = () => {
   const [cashAmount, setCashAmount] = useState("");
@@ -182,6 +183,9 @@ const Log = () => {
             Review bank transactions or add manual entries
           </p>
         </div>
+
+        {/* Cash Flow Forecast */}
+        <CashFlowForecast />
 
         <Tabs defaultValue="bank" className="w-full">
           <TabsList className="grid w-full grid-cols-3">

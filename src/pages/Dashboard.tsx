@@ -31,7 +31,6 @@ import { SurpriseTip } from "@/components/SurpriseTip";
 import { QuickAddFab } from "@/components/QuickAddFab";
 import { ExpandableSection } from "@/components/ExpandableSection";
 import { InvoiceTracker } from "@/components/InvoiceTracker";
-import { CashFlowForecast } from "@/components/CashFlowForecast";
 import { ExpenseAlert } from "@/components/ExpenseAlert";
 
 const Dashboard = () => {
@@ -202,13 +201,8 @@ const Dashboard = () => {
           <InvoiceTracker />
         </div>
 
-        {/* Cash Flow Forecast */}
-        <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-          <CashFlowForecast />
-        </div>
-
         {/* MTD Compliance */}
-        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "150ms" }}>
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "100ms" }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <div className="text-sm text-muted-foreground mb-1">
@@ -260,7 +254,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Tax Savings Card */}
-        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "250ms" }}>
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "200ms" }}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex-1">
               <div className="text-sm text-muted-foreground mb-2">
@@ -293,7 +287,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Recent Activity */}
-        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "350ms" }}>
+        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "300ms" }}>
           <div className="flex items-center justify-between mb-4">
             <div>
               <div className="text-xs text-muted-foreground mb-1">Recent activity</div>
