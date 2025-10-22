@@ -24,6 +24,8 @@ import { HelpTooltip } from "@/components/HelpTooltip";
 import { MicroCelebration } from "@/components/MicroCelebration";
 import { useStreak } from "@/hooks/useStreak";
 import { InvoiceTracker } from "@/components/InvoiceTracker";
+import { ReceiptCapture } from "@/components/ReceiptCapture";
+import { BulkActions } from "@/components/BulkActions";
 
 const Log = () => {
   const [cashAmount, setCashAmount] = useState("");
@@ -35,8 +37,10 @@ const Log = () => {
   const [paymentStatus, setPaymentStatus] = useState<'paid' | 'pending' | 'overdue'>('paid');
   const [expenseAmount, setExpenseAmount] = useState("");
   const [expenseDescription, setExpenseDescription] = useState("");
+  const [expenseReceiptUrl, setExpenseReceiptUrl] = useState<string | null>(null);
   const [editingVatFor, setEditingVatFor] = useState<string | null>(null);
   const [celebration, setCelebration] = useState<{ message: string; amount?: number } | null>(null);
+  const [selectedTransactions, setSelectedTransactions] = useState<string[]>([]);
   
   const { transactions: incomeTransactions, isLoading: incomeLoading, addIncome, isAdding: isAddingIncome, deleteIncome } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: expenseLoading, addExpense, isAdding: isAddingExpense, deleteExpense } = useExpenseTransactions();
@@ -92,6 +96,7 @@ const Log = () => {
     addExpense({
       amount,
       description: expenseDescription || "Expense",
+      receipt_url: expenseReceiptUrl,
     });
     setCelebration({ 
       message: "Expense saved!", 
@@ -100,6 +105,7 @@ const Log = () => {
     updateStreak();
     setExpenseAmount("");
     setExpenseDescription("");
+    setExpenseReceiptUrl(null);
   };
 
   const handleRecategorize = async (transaction: any, type: 'income' | 'expense') => {
@@ -117,6 +123,39 @@ const Log = () => {
       newVatRate,
     });
     setEditingVatFor(null);
+  };
+
+  const handleBulkCategorize = (category: string) => {
+    if (selectedTransactions.length === 0) return;
+    
+    selectedTransactions.forEach(txId => {
+      const transaction = transactions.find(t => t.id === txId);
+      if (transaction && category !== 'ignore') {
+        handleRecategorize(transaction, category as 'income' | 'expense');
+      }
+    });
+    
+    setSelectedTransactions([]);
+    toast.success(`${selectedTransactions.length} transactions categorized as ${category}`);
+  };
+
+  const handleBulkSetVAT = (rate: number) => {
+    if (selectedTransactions.length === 0) return;
+    
+    selectedTransactions.forEach(txId => {
+      handleUpdateVAT(txId, rate);
+    });
+    
+    setSelectedTransactions([]);
+    toast.success(`VAT rate set to ${rate}% for ${selectedTransactions.length} transactions`);
+  };
+
+  const toggleTransactionSelection = (txId: string) => {
+    setSelectedTransactions(prev => 
+      prev.includes(txId) 
+        ? prev.filter(id => id !== txId)
+        : [...prev, txId]
+    );
   };
 
   const allTransactions = [
@@ -224,7 +263,17 @@ const Log = () => {
                     All your bank transactions are automatically categorized based on amount:
                     Money in = Income (20% VAT) • Money out = Expense (20% VAT)
                   </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    💡 Tip: Select multiple transactions to categorize or update VAT rates in bulk
+                  </p>
                 </Card>
+                
+                <BulkActions
+                  selectedCount={selectedTransactions.length}
+                  onCategorize={handleBulkCategorize}
+                  onSetVAT={handleBulkSetVAT}
+                  onClearSelection={() => setSelectedTransactions([])}
+                />
 
                 <div className="grid grid-cols-2 gap-4">
                   <Card className="p-4">
@@ -389,7 +438,15 @@ const Log = () => {
                     onChange={(e) => setExpenseDescription(e.target.value)}
                   />
                 </div>
-                <Button 
+                
+                <div>
+                  <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                    Receipt (optional)
+                  </Label>
+                  <ReceiptCapture onReceiptUploaded={setExpenseReceiptUrl} />
+                </div>
+                
+                <Button
                   onClick={handleSaveExpense} 
                   className="w-full gap-2"
                   disabled={isAddingExpense || !expenseAmount || parseFloat(expenseAmount) <= 0}

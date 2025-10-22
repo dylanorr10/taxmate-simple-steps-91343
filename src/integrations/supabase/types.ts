@@ -67,6 +67,79 @@ export type Database = {
           },
         ]
       }
+      cash_flow_forecasts: {
+        Row: {
+          confidence_score: number
+          created_at: string
+          forecast_month: string
+          id: string
+          predicted_expenses: number
+          predicted_income: number
+          predicted_net: number
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number
+          created_at?: string
+          forecast_month: string
+          id?: string
+          predicted_expenses?: number
+          predicted_income?: number
+          predicted_net?: number
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number
+          created_at?: string
+          forecast_month?: string
+          id?: string
+          predicted_expenses?: number
+          predicted_income?: number
+          predicted_net?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_flow_forecasts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_tips_shown: {
         Row: {
           dismissed: boolean | null
@@ -100,6 +173,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          receipt_url: string | null
           transaction_date: string
           updated_at: string
           user_id: string
@@ -110,6 +184,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          receipt_url?: string | null
           transaction_date: string
           updated_at?: string
           user_id: string
@@ -120,6 +195,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          receipt_url?: string | null
           transaction_date?: string
           updated_at?: string
           user_id?: string
@@ -618,10 +694,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_waitlist_count: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      get_waitlist_count: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never

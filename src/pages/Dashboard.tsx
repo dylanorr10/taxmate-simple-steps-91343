@@ -31,6 +31,8 @@ import { SurpriseTip } from "@/components/SurpriseTip";
 import { QuickAddFab } from "@/components/QuickAddFab";
 import { ExpandableSection } from "@/components/ExpandableSection";
 import { InvoiceTracker } from "@/components/InvoiceTracker";
+import { CashFlowForecast } from "@/components/CashFlowForecast";
+import { ExpenseAlert } from "@/components/ExpenseAlert";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -139,6 +141,8 @@ const Dashboard = () => {
         </div>
       </header>
 
+      <ExpenseAlert />
+      
       <main className="max-w-md mx-auto p-4 space-y-6 pb-28">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -146,6 +150,11 @@ const Dashboard = () => {
           </div>
         ) : (
           <>
+            {/* Cash Flow Forecast */}
+            <div className="animate-fade-in">
+              <CashFlowForecast />
+            </div>
+            
             {/* Hero: Financial Summary */}
             <Card className="p-6 shadow-card hover-lift animate-fade-in">
               {/* Hero Profit Display */}

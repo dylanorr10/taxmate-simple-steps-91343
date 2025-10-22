@@ -11,6 +11,7 @@ export interface Transaction {
   vat_rate: number;
   created_at: string;
   updated_at: string;
+  receipt_url?: string | null;
   client_name?: string | null;
   client_email?: string | null;
   invoice_number?: string | null;
@@ -131,7 +132,7 @@ export const useExpenseTransactions = () => {
   });
 
   const addExpense = useMutation({
-    mutationFn: async (expense: { amount: number; description?: string; transaction_date?: string; vat_rate?: number }) => {
+    mutationFn: async (expense: { amount: number; description?: string; transaction_date?: string; vat_rate?: number; receipt_url?: string | null }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
@@ -143,6 +144,7 @@ export const useExpenseTransactions = () => {
           description: expense.description || null,
           transaction_date: expense.transaction_date || new Date().toISOString().split('T')[0],
           vat_rate: expense.vat_rate || 20,
+          receipt_url: expense.receipt_url || null,
         })
         .select()
         .single();
