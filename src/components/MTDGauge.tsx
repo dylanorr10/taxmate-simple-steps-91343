@@ -1,4 +1,10 @@
 import { useEffect, useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ExpandableSection } from "./ExpandableSection";
+import { HelpTooltip } from "./HelpTooltip";
 
 interface MTDGaugeProps {
   score: number;
@@ -6,40 +12,14 @@ interface MTDGaugeProps {
 
 const MTDGauge = ({ score }: MTDGaugeProps) => {
   const [animatedScore, setAnimatedScore] = useState(0);
-  const [previousScore, setPreviousScore] = useState(0);
-  const [showChange, setShowChange] = useState(false);
 
   useEffect(() => {
-    if (animatedScore !== 0 && score !== animatedScore) {
-      setPreviousScore(animatedScore);
-      setShowChange(true);
-      
-      const changeTimer = setTimeout(() => {
-        setShowChange(false);
-      }, 2000);
-      
-      const timer = setTimeout(() => {
-        setAnimatedScore(score);
-      }, 300);
-      
-      return () => {
-        clearTimeout(timer);
-        clearTimeout(changeTimer);
-      };
-    } else if (animatedScore === 0) {
+    const timer = setTimeout(() => {
       setAnimatedScore(score);
-      setPreviousScore(score);
-    }
-  }, [score, animatedScore]);
-
-  const circumference = 2 * Math.PI * 70;
-  const offset = circumference - (animatedScore / 100) * circumference;
-
-  const getColor = () => {
-    if (score >= 80) return "#22c55e";
-    if (score >= 50) return "#f59e0b";
-    return "#ef4444";
-  };
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [score]);
 
   const getMessage = () => {
     if (score >= 80) return "Looking brilliant! 🎉";
@@ -48,47 +28,62 @@ const MTDGauge = ({ score }: MTDGaugeProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative w-40 h-40">
-        <svg className="transform -rotate-90 w-40 h-40">
-          <circle
-            cx="80"
-            cy="80"
-            r="70"
-            stroke="currentColor"
-            strokeWidth="12"
-            fill="none"
-            className="text-muted"
-          />
-          <circle
-            cx="80"
-            cy="80"
-            r="70"
-            stroke={getColor()}
-            strokeWidth="12"
-            fill="none"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            strokeLinecap="round"
-            className="transition-all duration-1000 ease-out"
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-4xl font-bold" style={{ color: getColor() }}>
-            {animatedScore}%
+    <Card className="p-6 shadow-card hover-lift">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <div className="text-sm text-muted-foreground mb-1">
+            <HelpTooltip
+              term="MTD Readiness"
+              explanation="Making Tax Digital (MTD) is HMRC's requirement to keep digital tax records and submit VAT returns using compatible software. Your readiness score shows how well your records meet these requirements."
+              icon="📊"
+              tooltipId="mtd"
+            />
           </div>
-          {showChange && previousScore !== animatedScore && (
-            <div className={`text-xs font-semibold mt-1 animate-in fade-in slide-in-from-bottom-2 ${
-              animatedScore > previousScore ? 'text-success' : 'text-warning'
-            }`}>
-              {animatedScore > previousScore ? '↗' : '↘'} {Math.abs(animatedScore - previousScore)}%
-            </div>
-          )}
-          <div className="text-xs text-muted-foreground mt-1">MTD Ready</div>
+          <div className="font-bold text-2xl">{animatedScore}% Ready</div>
+        </div>
+        <div className="text-right">
+          <div className="text-xs text-muted-foreground mb-1">Next submission</div>
+          <div className="text-base font-bold text-foreground">6 weeks</div>
         </div>
       </div>
-      <p className="text-sm font-medium text-foreground mt-4">{getMessage()}</p>
-    </div>
+      
+      <div className="h-4 w-full bg-muted rounded-full overflow-hidden mb-4">
+        <div 
+          className="h-4 rounded-full bg-gradient-to-r from-accent to-success transition-all duration-1000 ease-out" 
+          style={{ width: `${animatedScore}%` }}
+        />
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-foreground">{getMessage()}</p>
+        {score >= 80 && (
+          <div className="flex items-center gap-2 text-success">
+            <CheckCircle className="w-5 h-5" />
+            <span className="font-semibold text-sm">All set!</span>
+          </div>
+        )}
+        {score < 80 && (
+          <Link to="/settings">
+            <Button size="sm" variant="outline">
+              Complete Setup
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      <ExpandableSection title="What is MTD readiness?">
+        <p className="leading-relaxed mb-3">
+          Making Tax Digital (MTD) requires you to keep digital records and submit VAT returns 
+          using compatible software. Your readiness score reflects:
+        </p>
+        <ul className="list-disc list-inside space-y-1 ml-2">
+          <li>Complete business details</li>
+          <li>HMRC connection status</li>
+          <li>VAT registration</li>
+          <li>Transaction categorization</li>
+        </ul>
+      </ExpandableSection>
+    </Card>
   );
 };
 

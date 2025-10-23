@@ -32,13 +32,12 @@ import { QuickAddFab } from "@/components/QuickAddFab";
 import { ExpandableSection } from "@/components/ExpandableSection";
 import { InvoiceTracker } from "@/components/InvoiceTracker";
 import { ExpenseAlert } from "@/components/ExpenseAlert";
+import MTDGauge from "@/components/MTDGauge";
 
 const Dashboard = () => {
   const { toast } = useToast();
   const [expenseExpanded, setExpenseExpanded] = useState(false);
   const [modalContent, setModalContent] = useState<string | null>(null);
-  const [mtdReadyPct, setMtdReadyPct] = useState(78);
-  const [mtdIssuesCount, setMtdIssuesCount] = useState(3);
   const [showLessonModal, setShowLessonModal] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
   
@@ -82,22 +81,6 @@ const Dashboard = () => {
     const last = arr[arr.length - 1];
     if (avg === 0) return 0;
     return Math.round(((last - avg) / avg) * 100);
-  };
-
-  const handleFixMtd = () => {
-    setModalContent("mtd-fix");
-  };
-
-  const handleAutoFix = () => {
-    const improvement = Math.min(22, 100 - mtdReadyPct);
-    setMtdReadyPct(Math.min(100, mtdReadyPct + improvement));
-    setMtdIssuesCount(0);
-    setModalContent(null);
-    
-    toast({
-      title: "✅ All Issues Fixed!",
-      description: `Fixed ${mtdIssuesCount} issues - MTD readiness now at ${Math.min(100, mtdReadyPct + improvement)}%`,
-    });
   };
 
   const handleQuickAction = (action: string) => {
@@ -202,56 +185,9 @@ const Dashboard = () => {
         </div>
 
         {/* MTD Compliance */}
-        <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "100ms" }}>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <div className="text-sm text-muted-foreground mb-1">
-                <HelpTooltip
-                  term="MTD Readiness"
-                  explanation="Making Tax Digital (MTD) is HMRC's requirement to keep digital tax records and submit VAT returns using compatible software. Your readiness score shows how well your records meet these requirements."
-                  icon="📊"
-                  tooltipId="mtd"
-                />
-              </div>
-              <div className="font-bold text-2xl">{mtdReadiness}% Ready</div>
-            </div>
-            <div className="text-right">
-              <div className="text-xs text-muted-foreground mb-1">Next submission</div>
-              <div className="text-base font-bold text-foreground">6 weeks</div>
-            </div>
-          </div>
-          <div className="h-4 w-full bg-muted rounded-full overflow-hidden">
-            <div 
-              className="h-4 rounded-full bg-gradient-to-r from-accent to-success transition-all duration-500 ease-out" 
-              style={{ width: `${mtdReadiness}%` }}
-            ></div>
-          </div>
-          <div className="mt-4 flex items-center gap-3">
-            {mtdIssuesCount > 0 ? (
-              <Button onClick={handleFixMtd} className="bg-warning hover:bg-warning/90 text-warning-foreground tap-feedback">
-                Fix {mtdIssuesCount} issues
-              </Button>
-            ) : (
-              <div className="flex items-center gap-2 text-success">
-                <CheckCircle className="w-5 h-5" />
-                <span className="font-semibold">All set!</span>
-              </div>
-            )}
-          </div>
-          
-          <ExpandableSection title="What is MTD readiness?">
-            <p className="leading-relaxed mb-3">
-              Making Tax Digital (MTD) requires you to keep digital records and submit VAT returns 
-              using compatible software. Your readiness score reflects:
-            </p>
-            <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>Complete business details</li>
-              <li>HMRC connection status</li>
-              <li>VAT registration</li>
-              <li>Transaction categorization</li>
-            </ul>
-          </ExpandableSection>
-        </Card>
+        <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <MTDGauge score={mtdReadiness} />
+        </div>
 
         {/* Tax Savings Card */}
         <Card className="p-6 shadow-card hover-lift animate-fade-in" style={{ animationDelay: "200ms" }}>
