@@ -3,7 +3,7 @@ import { addMonths, subMonths, startOfMonth, addDays } from "date-fns";
 
 export const generateDemoData = async (userId: string, businessType: string) => {
   const today = new Date();
-  const threeMonthsAgo = subMonths(today, 3);
+  const threeMonthsAgo = subMonths(today, 2); // Changed to 2 to include current month
   
   // Generate income transactions (2-4 per month, realistic amounts with invoice data)
   const incomeTransactions = [];
@@ -12,6 +12,7 @@ export const generateDemoData = async (userId: string, businessType: string) => 
   // Payment status distribution: 60% paid, 20% pending, 20% overdue
   const statusDistribution = ['paid', 'paid', 'paid', 'pending', 'overdue'];
   
+  // Generate for 3 months including current month (November)
   for (let i = 0; i < 3; i++) {
     const monthStart = addMonths(threeMonthsAgo, i);
     const transactionsThisMonth = 2 + Math.floor(Math.random() * 3); // 2-4 transactions
@@ -65,6 +66,7 @@ export const generateDemoData = async (userId: string, businessType: string) => 
   
   // Generate expense transactions (5-8 per month, varied categories)
   const expenseTransactions = [];
+  // Generate for 3 months including current month (November)
   for (let i = 0; i < 3; i++) {
     const monthStart = addMonths(threeMonthsAgo, i);
     const transactionsThisMonth = 5 + Math.floor(Math.random() * 4); // 5-8 transactions
