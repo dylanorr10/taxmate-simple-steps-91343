@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation, Presentation } from "lucide-react";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation, Presentation, Sparkles } from "lucide-react";
 import NavigationCustomizer from "@/components/NavigationCustomizer";
 import BottomNav from "@/components/BottomNav";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useProfile } from "@/hooks/useProfile";
 import { useHMRCConnection } from "@/hooks/useHMRCConnection";
 import { useTrueLayerConnection } from "@/hooks/useTrueLayerConnection";
+import { generateDemoData } from "@/utils/demoDataSeeder";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 
@@ -82,8 +83,38 @@ const SettingsPage = () => {
     });
   };
 
+  const [isGeneratingDemo, setIsGeneratingDemo] = useState(false);
+
   const handleToggleDemoMode = async (enabled: boolean) => {
     updateProfile({ demo_mode: enabled });
+  };
+
+  const handleRegenerateDemoData = async () => {
+    if (!profile) return;
+    
+    setIsGeneratingDemo(true);
+    try {
+      // Delete existing transactions
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      await supabase.from('income_transactions').delete().eq('user_id', user.id);
+      await supabase.from('expense_transactions').delete().eq('user_id', user.id);
+
+      // Generate new demo data
+      const result = await generateDemoData(user.id, profile.business_type || 'other');
+      
+      if (result.success) {
+        toast.success("Demo data regenerated! Refresh the dashboard to see changes.");
+      } else {
+        throw new Error("Failed to generate demo data");
+      }
+    } catch (error) {
+      console.error('Error regenerating demo data:', error);
+      toast.error("Failed to regenerate demo data");
+    } finally {
+      setIsGeneratingDemo(false);
+    }
   };
 
   const navItems = [
@@ -306,9 +337,32 @@ const SettingsPage = () => {
               />
             </div>
             {profile?.demo_mode && (
-              <div className="mt-4 p-3 bg-accent/10 border border-accent/20 rounded-lg">
-                <p className="text-xs text-muted-foreground">
-                  ✨ Demo mode is active. HMRC and bank connections will appear connected with sample data.
+              <div className="mt-4 space-y-3">
+                <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg">
+                  <p className="text-xs text-muted-foreground">
+                    ✨ Demo mode is active. HMRC and bank connections will appear connected with sample data.
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleRegenerateDemoData}
+                  disabled={isGeneratingDemo}
+                  variant="outline"
+                  className="w-full"
+                >
+                  {isGeneratingDemo ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Regenerating...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Regenerate Demo Data
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Generate fresh sample transactions for your demo presentation
                 </p>
               </div>
             )}
