@@ -37,6 +37,7 @@ export const LessonQuickLink = ({ lessonId, linkText = "Learn more" }: LessonQui
         content={lesson.content}
         emoji={lesson.icon}
         lessonId={lessonId}
+        quiz={lesson.quiz}
       />
     </>
   );

@@ -6,6 +6,14 @@ export interface TooltipContent {
   relatedLessonId?: string;
 }
 
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+}
+
 export interface LessonContent {
   id: string;
   title: string;
@@ -14,6 +22,7 @@ export interface LessonContent {
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   duration: string;
   icon?: string;
+  quiz?: QuizQuestion[];
 }
 
 export const tooltips: TooltipContent[] = [
@@ -124,6 +133,29 @@ Don't confuse profit with cash in the bank. You might have £10,000 in your acco
 
 **Tax you'll pay:**
 As a sole trader, you'll typically pay around 30% of your profit in Income Tax and National Insurance (rates vary based on your total income).`,
+    quiz: [
+      {
+        id: 'profit-q1',
+        question: 'If you earned £50,000 and had £15,000 in expenses, what is your profit?',
+        options: ['£50,000', '£35,000', '£15,000', '£65,000'],
+        correctAnswer: 1,
+        explanation: 'Profit = Income - Expenses. So £50,000 - £15,000 = £35,000. This £35,000 is what you pay tax on.'
+      },
+      {
+        id: 'profit-q2',
+        question: 'What percentage of profit should you typically set aside for tax as a sole trader?',
+        options: ['10%', '20%', '30%', '50%'],
+        correctAnswer: 2,
+        explanation: 'As a sole trader, you should typically set aside about 30% of your profit for Income Tax and National Insurance combined.'
+      },
+      {
+        id: 'profit-q3',
+        question: 'True or False: You pay tax on your total income, not your profit.',
+        options: ['True', 'False'],
+        correctAnswer: 1,
+        explanation: 'False! You pay tax on your PROFIT (income minus expenses), not your total income. This is why claiming legitimate expenses is so important.'
+      }
+    ]
   },
   {
     id: 'claiming-expenses',
@@ -157,6 +189,46 @@ Save ALL receipts for at least 6 years. HMRC can ask to see them during an inves
 
 **The Tax Saving:**
 For every £100 you claim in expenses, you save roughly £30 in tax (assuming typical sole trader rates).`,
+    quiz: [
+      {
+        id: 'expenses-q1',
+        question: 'Which of these expenses can you claim for your business?',
+        options: [
+          'Taking a client out for lunch',
+          'Parking fine you got while at a client meeting',
+          'Professional subscription to an industry magazine',
+          'Personal Netflix subscription'
+        ],
+        correctAnswer: 2,
+        explanation: 'Professional subscriptions are allowable. Client entertainment (meals/drinks), fines, and personal expenses cannot be claimed.'
+      },
+      {
+        id: 'expenses-q2',
+        question: 'Your home office takes up 15% of your house. You can claim:',
+        options: [
+          '15% of your mortgage payment',
+          '15% of your rent or mortgage interest',
+          '100% of your utility bills',
+          'Nothing - you can\'t claim home office expenses'
+        ],
+        correctAnswer: 1,
+        explanation: 'You can claim 15% of your rent or mortgage INTEREST (not capital repayment), plus 15% of utilities like heating and electricity.'
+      },
+      {
+        id: 'expenses-q3',
+        question: 'If you claim £100 in legitimate expenses, approximately how much tax do you save?',
+        options: ['£10', '£20', '£30', '£100'],
+        correctAnswer: 2,
+        explanation: 'You typically save about 30% in combined Income Tax and National Insurance. So claiming £100 in expenses saves you roughly £30 in tax.'
+      },
+      {
+        id: 'expenses-q4',
+        question: 'How long should you keep receipts for business expenses?',
+        options: ['1 year', '3 years', '6 years', 'Forever'],
+        correctAnswer: 2,
+        explanation: 'HMRC requires you to keep business records and receipts for at least 6 years from the end of the tax year they relate to.'
+      }
+    ]
   },
   {
     id: 'vat-explained',
@@ -194,6 +266,29 @@ Submit quarterly returns showing:
 
 **Flat Rate Scheme:**
 Simpler option for small businesses - charge normal VAT but pay HMRC a fixed percentage of your turnover.`,
+    quiz: [
+      {
+        id: 'vat-q1',
+        question: 'At what turnover threshold MUST you register for VAT?',
+        options: ['£50,000', '£85,000', '£90,000', '£100,000'],
+        correctAnswer: 2,
+        explanation: 'From April 2024, you must register for VAT once your turnover exceeds £90,000 in a 12-month period.'
+      },
+      {
+        id: 'vat-q2',
+        question: 'You sell £1,000 + VAT and buy supplies for £400 + VAT. How much VAT do you owe HMRC?',
+        options: ['£80', '£120', '£200', '£280'],
+        correctAnswer: 1,
+        explanation: 'Output VAT (sales): £1,000 × 20% = £200. Input VAT (purchases): £400 × 20% = £80. You owe £200 - £80 = £120.'
+      },
+      {
+        id: 'vat-q3',
+        question: 'Which VAT rate applies to most goods and services?',
+        options: ['0% (Zero rate)', '5% (Reduced rate)', '20% (Standard rate)', '15% (Special rate)'],
+        correctAnswer: 2,
+        explanation: 'The standard VAT rate of 20% applies to most goods and services in the UK.'
+      }
+    ]
   },
   {
     id: 'using-rules',
