@@ -9,13 +9,20 @@ import { lessons } from "@/data/learningContent";
 import { useLearningProgress } from "@/hooks/useLearningProgress";
 import BottomNav from "@/components/BottomNav";
 import { useBusinessProfile } from "@/hooks/useBusinessProfile";
+import { InlineLesson } from "@/components/InlineLesson";
 
 const LearningHub = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const { progress, isLoading: progressLoading } = useLearningProgress();
+  const [selectedLesson, setSelectedLesson] = useState<typeof lessons[0] | null>(null);
+  const { progress, isLoading: progressLoading, startLesson } = useLearningProgress();
   const { data: businessProfile } = useBusinessProfile();
+
+  const handleOpenLesson = (lesson: typeof lessons[0]) => {
+    setSelectedLesson(lesson);
+    startLesson(lesson.id);
+  };
 
   // Get unique categories
   const categories = useMemo(() => {
@@ -101,6 +108,7 @@ const LearningHub = () => {
     return (
       <Card
         key={lesson.id}
+        onClick={() => handleOpenLesson(lesson)}
         className="p-4 hover:shadow-md transition-all cursor-pointer hover:border-primary/50 group"
       >
         <div className="flex items-start gap-4">
@@ -141,7 +149,15 @@ const LearningHub = () => {
             )}
 
             <div className="flex items-center justify-between mt-2">
-              <Button variant="ghost" size="sm" className="h-8 px-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 px-3"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenLesson(lesson);
+                }}
+              >
                 {isCompleted ? 'Review' : progressPercent > 0 ? 'Continue' : 'Start Learning'}
                 <Play className="w-3 h-3 ml-2" />
               </Button>
@@ -321,6 +337,18 @@ const LearningHub = () => {
       </div>
 
       <BottomNav />
+      
+      {selectedLesson && (
+        <InlineLesson
+          isOpen={!!selectedLesson}
+          onClose={() => setSelectedLesson(null)}
+          title={selectedLesson.title}
+          content={selectedLesson.content}
+          emoji={selectedLesson.icon}
+          lessonId={selectedLesson.id}
+          quiz={selectedLesson.quiz}
+        />
+      )}
     </div>
   );
 };
