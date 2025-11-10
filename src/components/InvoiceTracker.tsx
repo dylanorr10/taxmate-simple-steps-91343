@@ -2,14 +2,16 @@ import { useIncomeTransactions } from "@/hooks/useTransactions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Clock, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { AlertCircle, Clock, CheckCircle, Search, X } from "lucide-react";
 import { formatCurrency, formatDate } from "@/utils/transactionHelpers";
 import { usePaymentReminders } from "@/hooks/usePaymentReminders";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 export const InvoiceTracker = () => {
   const { transactions } = useIncomeTransactions();
   const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { sendReminder, isSending } = usePaymentReminders(selectedInvoice || undefined);
 
   // Filter for pending/overdue invoices
@@ -26,6 +28,16 @@ export const InvoiceTracker = () => {
   });
 
   const totalOverdue = overdueInvoices.reduce((sum, t) => sum + Number(t.amount), 0);
+
+  // Filter invoices based on search
+  const filteredInvoices = useMemo(() => {
+    if (!searchQuery) return pendingInvoices;
+    const query = searchQuery.toLowerCase();
+    return pendingInvoices.filter(invoice => 
+      invoice.client_name?.toLowerCase().includes(query) ||
+      invoice.invoice_number?.toLowerCase().includes(query)
+    );
+  }, [pendingInvoices, searchQuery]);
 
   const getDaysOverdue = (dueDate: string) => {
     const due = new Date(dueDate);
@@ -84,7 +96,40 @@ export const InvoiceTracker = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {pendingInvoices.map((invoice) => {
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by client or invoice number..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-9"
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              onClick={() => setSearchQuery("")}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        {searchQuery && (
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredInvoices.length} of {pendingInvoices.length} invoices
+          </p>
+        )}
+
+        {filteredInvoices.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No invoices found</p>
+            <p className="text-sm mt-1">Try adjusting your search</p>
+          </div>
+        ) : (
+          filteredInvoices.map((invoice) => {
           const daysOverdue = invoice.due_date ? getDaysOverdue(invoice.due_date) : 0;
           const isOverdue = daysOverdue > 0;
 
@@ -131,7 +176,8 @@ export const InvoiceTracker = () => {
               </div>
             </div>
           );
-        })}
+          })
+        )}
       </CardContent>
     </Card>
   );

@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Navigation, Circle, Square, Car, MapPin, Calendar, PoundSterling, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Navigation, Circle, Square, Car, MapPin, Calendar, PoundSterling, ChevronRight, Search, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,8 @@ const Mileage = () => {
   const { toast } = useToast();
   const [isTracking, setIsTracking] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [tripTypeFilter, setTripTypeFilter] = useState<'all' | 'business' | 'personal'>('all');
   const [trips, setTrips] = useState<Trip[]>([
     {
       id: '1',
@@ -81,6 +83,27 @@ const Mileage = () => {
     const now = new Date();
     return tripDate.getMonth() === now.getMonth() && tripDate.getFullYear() === now.getFullYear();
   }).reduce((sum, trip) => sum + trip.distance, 0);
+
+  // Filter trips based on search and filters
+  const filteredTrips = useMemo(() => {
+    return trips.filter(trip => {
+      // Filter by search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          trip.from.toLowerCase().includes(query) ||
+          trip.to.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
+      
+      // Filter by trip type
+      if (tripTypeFilter !== 'all' && trip.type !== tripTypeFilter) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [trips, searchQuery, tripTypeFilter]);
 
   const handleStartTracking = () => {
     if (!navigator.geolocation) {
@@ -253,7 +276,66 @@ const Mileage = () => {
             <CardDescription>Your logged journeys</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            {trips.map((trip) => (
+            {/* Search and Filters */}
+            <div className="space-y-3 pb-3 border-b">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search locations..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-9"
+                />
+                {searchQuery && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                    onClick={() => setSearchQuery("")}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              
+              <div className="flex gap-2">
+                <Badge
+                  variant={tripTypeFilter === 'all' ? 'default' : 'outline'}
+                  className="cursor-pointer"
+                  onClick={() => setTripTypeFilter('all')}
+                >
+                  All
+                </Badge>
+                <Badge
+                  variant={tripTypeFilter === 'business' ? 'default' : 'outline'}
+                  className="cursor-pointer"
+                  onClick={() => setTripTypeFilter('business')}
+                >
+                  Business
+                </Badge>
+                <Badge
+                  variant={tripTypeFilter === 'personal' ? 'outline' : 'outline'}
+                  className="cursor-pointer"
+                  onClick={() => setTripTypeFilter('personal')}
+                >
+                  Personal
+                </Badge>
+              </div>
+              
+              {(searchQuery || tripTypeFilter !== 'all') && (
+                <p className="text-sm text-muted-foreground">
+                  Showing {filteredTrips.length} of {trips.length} trips
+                </p>
+              )}
+            </div>
+
+            {filteredTrips.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>No trips found</p>
+                <p className="text-sm mt-1">Try adjusting your search or filters</p>
+              </div>
+            ) : (
+              filteredTrips.map((trip) => (
               <div 
                 key={trip.id}
                 className="flex items-start gap-3 p-3 rounded-lg border bg-card/50 hover:bg-accent/50 transition-colors cursor-pointer"
@@ -296,7 +378,8 @@ const Mileage = () => {
                   </div>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
 

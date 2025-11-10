@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,8 @@ import {
   Loader2,
   AlertCircle,
   Edit,
+  Search,
+  X,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -42,6 +44,7 @@ const Log = () => {
   const [editingVatFor, setEditingVatFor] = useState<string | null>(null);
   const [celebration, setCelebration] = useState<{ message: string; amount?: number } | null>(null);
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   
   const { transactions: incomeTransactions, isLoading: incomeLoading, addIncome, isAdding: isAddingIncome, deleteIncome } = useIncomeTransactions();
   const { transactions: expenseTransactions, isLoading: expenseLoading, addExpense, isAdding: isAddingExpense, deleteExpense } = useExpenseTransactions();
@@ -165,6 +168,33 @@ const Log = () => {
   ].sort((a, b) => new Date(b.transaction_date).getTime() - new Date(a.transaction_date).getTime())
     .slice(0, 10);
 
+  // Filter bank transactions based on search
+  const filteredIncomeTransactions = useMemo(() => {
+    return categorizedTransactions
+      .filter(t => t.mapping_type === 'income' && t.amount > 0)
+      .filter(t => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+          t.merchant_name?.toLowerCase().includes(query) ||
+          t.description?.toLowerCase().includes(query)
+        );
+      });
+  }, [categorizedTransactions, searchQuery]);
+
+  const filteredExpenseTransactions = useMemo(() => {
+    return categorizedTransactions
+      .filter(t => t.mapping_type === 'expense' && t.amount < 0)
+      .filter(t => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+          t.merchant_name?.toLowerCase().includes(query) ||
+          t.description?.toLowerCase().includes(query)
+        );
+      });
+  }, [categorizedTransactions, searchQuery]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-24">
       {celebration && (
@@ -279,6 +309,33 @@ const Log = () => {
                   onClearSelection={() => setSelectedTransactions([])}
                 />
 
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search transactions..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 pr-9"
+                  />
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+
+                {searchQuery && (
+                  <p className="text-sm text-muted-foreground">
+                    Showing {filteredIncomeTransactions.length + filteredExpenseTransactions.length} of {categorizedTransactions.filter(t => t.mapping_type === 'income' || t.mapping_type === 'expense').length} transactions
+                  </p>
+                )}
+
                 <div className="grid grid-cols-2 gap-4">
                   <Card className="p-4">
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
@@ -287,8 +344,7 @@ const Log = () => {
                     </h4>
                     <ScrollArea className="h-[400px]">
                       <div className="space-y-2 pr-4">
-                        {categorizedTransactions
-                          .filter(t => t.mapping_type === 'income' && t.amount > 0)
+                        {filteredIncomeTransactions
                           .slice(0, 10)
                           .map(tx => (
                             <div key={tx.id} className="p-3 bg-success/5 border border-success/20 rounded-lg">
@@ -349,8 +405,7 @@ const Log = () => {
                     </h4>
                     <ScrollArea className="h-[400px]">
                       <div className="space-y-2 pr-4">
-                        {categorizedTransactions
-                          .filter(t => t.mapping_type === 'expense' && t.amount < 0)
+                        {filteredExpenseTransactions
                           .slice(0, 10)
                           .map(tx => (
                             <div key={tx.id} className="p-3 bg-warning/5 border border-warning/20 rounded-lg">
