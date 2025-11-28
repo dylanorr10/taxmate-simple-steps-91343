@@ -196,7 +196,7 @@ const Log = () => {
   }, [categorizedTransactions, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-24 lg:pb-8">
       {celebration && (
         <MicroCelebration
           message={celebration.message}
@@ -204,12 +204,12 @@ const Log = () => {
           onComplete={() => setCelebration(null)}
         />
       )}
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-6xl mx-auto px-4 lg:px-8 py-6 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
             Money Management
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 lg:text-lg">
             Review bank transactions or add manual entries
           </p>
         </div>

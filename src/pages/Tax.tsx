@@ -98,13 +98,13 @@ const Tax = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-24">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted pb-24 lg:pb-8">
+      <div className="max-w-4xl mx-auto">
         {/* Sticky Header */}
-        <div className="sticky top-0 z-20 bg-card/95 backdrop-blur-sm border-b border-border px-4 py-4 shadow-sm">
+        <div className="sticky top-0 z-20 bg-card/95 backdrop-blur-sm border-b border-border px-4 lg:px-8 py-4 shadow-sm">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
+              <h1 className="text-xl lg:text-2xl font-bold text-foreground flex items-center gap-2">
                 Making Tax Digital
                 <TooltipProvider>
                   <Tooltip>
@@ -135,7 +135,7 @@ const Tax = () => {
           </div>
         </div>
 
-        <div className="px-4 py-6 space-y-6">
+        <div className="px-4 lg:px-8 py-6 space-y-6">
           {/* Progress Tracker */}
           <Card className="p-5 shadow-card border border-border">
             <h2 className="text-sm font-semibold text-muted-foreground mb-4">YOUR PROGRESS</h2>

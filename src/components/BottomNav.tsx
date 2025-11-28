@@ -18,8 +18,8 @@ const BottomNav = () => {
     .slice(0, 4); // Enforce max 4 items
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50 shadow-lg">
-      <div className="max-w-md mx-auto flex justify-around items-center h-16">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border z-50 shadow-lg lg:hidden">
+      <div className="max-w-md mx-auto flex justify-around items-center h-16 safe-area-inset-bottom">
         {navItems.map((item) => {
           const Icon = Icons[item!.icon as keyof typeof Icons] as React.ComponentType<any>;
           const isActive = location.pathname === item!.path;
