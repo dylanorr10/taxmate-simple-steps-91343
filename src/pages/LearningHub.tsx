@@ -169,12 +169,12 @@ const LearningHub = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
-      <div className="max-w-2xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24 lg:pb-8">
+      <div className="max-w-6xl mx-auto px-4 lg:px-8 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Learning Hub</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">Learning Hub</h1>
+          <p className="text-muted-foreground lg:text-lg">
             Build your tax knowledge at your own pace
           </p>
         </div>
@@ -311,27 +311,27 @@ const LearningHub = () => {
               </Button>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredLessons.map(lesson => renderLessonCard(lesson))}
             </div>
           )}
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{completedCount}</div>
-            <div className="text-xs text-muted-foreground">Completed</div>
+        <div className="grid grid-cols-3 gap-3 lg:gap-6">
+          <Card className="p-4 lg:p-6 text-center">
+            <div className="text-2xl lg:text-3xl font-bold text-primary">{completedCount}</div>
+            <div className="text-xs lg:text-sm text-muted-foreground">Completed</div>
           </Card>
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-accent">{inProgressLessons.length}</div>
-            <div className="text-xs text-muted-foreground">In Progress</div>
+          <Card className="p-4 lg:p-6 text-center">
+            <div className="text-2xl lg:text-3xl font-bold text-accent">{inProgressLessons.length}</div>
+            <div className="text-xs lg:text-sm text-muted-foreground">In Progress</div>
           </Card>
-          <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-muted-foreground">
+          <Card className="p-4 lg:p-6 text-center">
+            <div className="text-2xl lg:text-3xl font-bold text-muted-foreground">
               {lessons.length - completedCount - inProgressLessons.length}
             </div>
-            <div className="text-xs text-muted-foreground">Not Started</div>
+            <div className="text-xs lg:text-sm text-muted-foreground">Not Started</div>
           </Card>
         </div>
       </div>

@@ -124,9 +124,9 @@ const SettingsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-20">
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">Settings</h1>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-20 lg:pb-8">
+      <div className="max-w-4xl mx-auto px-4 lg:px-8 py-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-6">Settings</h1>
         
         {/* Business Profile Section */}
         <div className="mb-6">
