@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getDefaultNavItems } from "@/data/navigationConfig";
-import { generateDemoData } from "@/utils/demoDataSeeder";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -61,15 +60,12 @@ const Onboarding = () => {
         experience_level,
         nav_items: defaultNavItems,
         profile_complete: true,
-        demo_mode: true // Enable demo mode by default for new users
+        demo_mode: false
       }).eq('id', user.id);
-
-      // Generate demo data for realistic presentation
-      await generateDemoData(user.id, formData.businessType);
 
       toast({
         title: "Welcome aboard! 🎉",
-        description: "We've added some sample data to help you explore"
+        description: "Your account is ready. Start by adding your first transaction."
       });
 
       navigate("/dashboard");
