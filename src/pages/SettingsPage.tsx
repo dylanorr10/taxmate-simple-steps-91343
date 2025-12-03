@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation, Presentation, Sparkles } from "lucide-react";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation, Presentation, Sparkles, CreditCard, Crown } from "lucide-react";
 import NavigationCustomizer from "@/components/NavigationCustomizer";
 import BottomNav from "@/components/BottomNav";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -13,15 +13,18 @@ import { toast } from "sonner";
 import { useProfile } from "@/hooks/useProfile";
 import { useHMRCConnection } from "@/hooks/useHMRCConnection";
 import { useTrueLayerConnection } from "@/hooks/useTrueLayerConnection";
+import { useSubscription } from "@/hooks/useSubscription";
 import { generateDemoData } from "@/utils/demoDataSeeder";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { SUBSCRIPTION_TIERS } from "@/config/subscriptionTiers";
 
 const SettingsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, isLoading: profileLoading, updateProfile, isUpdating } = useProfile();
   const { isConnected, isLoading: hmrcLoading, initiateConnection, refetch } = useHMRCConnection();
+  const { tier, isSubscribed, subscriptionEnd, isLoading: subLoading, refreshSubscription } = useSubscription();
   const { 
     connections, 
     isLoading: trueLayerLoading, 
@@ -35,6 +38,7 @@ const SettingsPage = () => {
   
   const [businessName, setBusinessName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
+  const [isOpeningPortal, setIsOpeningPortal] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -117,6 +121,36 @@ const SettingsPage = () => {
     }
   };
 
+  const handleManageSubscription = async () => {
+    setIsOpeningPortal(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please sign in to manage subscription");
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Portal error:', error);
+      toast.error("Failed to open subscription portal");
+    } finally {
+      setIsOpeningPortal(false);
+    }
+  };
+
+  const currentTierConfig = tier !== 'free' ? SUBSCRIPTION_TIERS[tier] : null;
+
   const navItems = [
     { path: "/dashboard", label: "Home", icon: Home },
     { path: "/tax", label: "Tax", icon: FileText },
@@ -128,6 +162,77 @@ const SettingsPage = () => {
       <div className="max-w-4xl mx-auto px-4 lg:px-8 py-6">
         <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-6">Settings</h1>
         
+        {/* Subscription Section */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Subscription
+          </h2>
+          <Card className="p-6">
+            {subLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : isSubscribed && currentTierConfig ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Crown className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">{currentTierConfig.name} Plan</p>
+                      <p className="text-sm text-muted-foreground">
+                        £{currentTierConfig.price}/month
+                      </p>
+                    </div>
+                  </div>
+                  <CheckCircle2 className="w-6 h-6 text-success" />
+                </div>
+                {subscriptionEnd && (
+                  <p className="text-sm text-muted-foreground">
+                    Renews on {format(new Date(subscriptionEnd), 'PPP')}
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleManageSubscription}
+                    disabled={isOpeningPortal}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    {isOpeningPortal ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Opening...
+                      </>
+                    ) : (
+                      "Manage Subscription"
+                    )}
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/pricing')}
+                    variant="outline"
+                  >
+                    View Plans
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <CreditCard className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                <p className="font-semibold text-foreground mb-1">No active subscription</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Upgrade to unlock bank sync, AI assistant, and HMRC integration
+                </p>
+                <Button onClick={() => navigate('/pricing')}>
+                  View Plans
+                </Button>
+              </div>
+            )}
+          </Card>
+        </div>
+
         {/* Business Profile Section */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
