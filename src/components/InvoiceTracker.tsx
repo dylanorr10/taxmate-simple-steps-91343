@@ -289,26 +289,29 @@ export const InvoiceTracker = () => {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="ghost"
                         onClick={() => handleMarkAsPaid(invoice.id)}
                         disabled={isUpdatingStatus}
-                        className="text-success border-success/30 hover:bg-success/10"
+                        className="h-8 px-2 text-success hover:text-success hover:bg-success/10"
                       >
-                        <Check className="h-4 w-4 mr-1" />
-                        Paid
+                        <Check className="h-4 w-4" />
+                        <span className="hidden sm:inline ml-1">Paid</span>
                       </Button>
                       {invoice.client_email && (
                         <Button
                           size="sm"
-                          variant={isOverdue ? "destructive" : "secondary"}
+                          variant="ghost"
                           onClick={() => handleSendReminder(invoice.id, daysOverdue)}
                           disabled={isSending && selectedInvoice === invoice.id}
+                          className={`h-8 px-2 ${isOverdue ? "text-destructive hover:text-destructive hover:bg-destructive/10" : "text-muted-foreground hover:text-foreground"}`}
                         >
-                          <Mail className="h-4 w-4 mr-1" />
-                          {isSending && selectedInvoice === invoice.id ? "..." : "Chase"}
+                          <Mail className="h-4 w-4" />
+                          <span className="hidden sm:inline ml-1">
+                            {isSending && selectedInvoice === invoice.id ? "..." : "Chase"}
+                          </span>
                         </Button>
                       )}
                     </div>
