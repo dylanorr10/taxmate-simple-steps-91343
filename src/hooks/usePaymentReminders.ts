@@ -35,7 +35,6 @@ export const usePaymentReminders = (incomeTransactionId?: string) => {
       if (error) throw error;
       return data as PaymentReminder[];
     },
-    enabled: !!incomeTransactionId,
   });
 
   const sendReminder = useMutation({
@@ -78,10 +77,15 @@ export const usePaymentReminders = (incomeTransactionId?: string) => {
     },
   });
 
+  const getLastReminderForInvoice = (invoiceId: string) => {
+    return reminders.find((r) => r.income_transaction_id === invoiceId);
+  };
+
   return {
     reminders,
     isLoading,
     sendReminder: sendReminder.mutate,
     isSending: sendReminder.isPending,
+    getLastReminderForInvoice,
   };
 };
