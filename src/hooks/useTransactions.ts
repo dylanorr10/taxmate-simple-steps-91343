@@ -101,6 +101,24 @@ export const useIncomeTransactions = () => {
     },
   });
 
+  const updatePaymentStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase
+        .from("income_transactions")
+        .update({ payment_status: status })
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["income-transactions"] });
+      toast.success("Payment status updated");
+    },
+    onError: (error) => {
+      toast.error(`Failed to update status: ${error.message}`);
+    },
+  });
+
   return {
     transactions,
     isLoading,
@@ -108,6 +126,8 @@ export const useIncomeTransactions = () => {
     isAdding: addIncome.isPending,
     deleteIncome: deleteIncome.mutate,
     isDeleting: deleteIncome.isPending,
+    updatePaymentStatus: updatePaymentStatus.mutate,
+    isUpdatingStatus: updatePaymentStatus.isPending,
   };
 };
 
