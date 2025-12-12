@@ -53,26 +53,27 @@ const Landing = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: App Preview - Video */}
-            <div className="relative order-2 lg:order-1">
-              <div className="bg-white rounded-xl shadow-2xl p-2 transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500 overflow-hidden">
+            <div className="relative order-2 lg:order-1 flex justify-center">
+              <div className="bg-white/10 rounded-2xl p-1.5 shadow-2xl transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500 overflow-hidden max-w-[280px]">
                 <video 
                   autoPlay 
                   loop 
                   muted 
                   playsInline
-                  className="w-full rounded-lg"
+                  className="w-full rounded-xl"
+                  style={{ imageRendering: 'crisp-edges' }}
                 >
                   <source src="/videos/preview.mov" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
               {/* Streak badge */}
-              <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground rounded-xl px-4 py-3 shadow-lg transform rotate-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold">45</span>
-                  <Flame className="h-5 w-5" />
+              <div className="absolute -top-2 -right-2 lg:right-16 bg-primary text-primary-foreground rounded-xl px-3 py-2 shadow-lg transform rotate-6">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xl font-bold">45</span>
+                  <Flame className="h-4 w-4" />
                 </div>
-                <span className="text-xs">Day Streak</span>
+                <span className="text-[10px]">Day Streak</span>
               </div>
             </div>
 
