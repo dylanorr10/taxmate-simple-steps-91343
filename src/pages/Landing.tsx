@@ -52,34 +52,19 @@ const Landing = () => {
         
         <div className="container mx-auto max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: App Preview */}
+            {/* Left: App Preview - Video */}
             <div className="relative order-2 lg:order-1">
-              <div className="bg-white rounded-xl shadow-2xl p-4 transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
-                <div className="bg-background rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-3 h-3 rounded-full bg-destructive" />
-                    <div className="w-3 h-3 rounded-full bg-warning" />
-                    <div className="w-3 h-3 rounded-full bg-success" />
-                    <span className="ml-2 text-xs text-muted-foreground">Reelin Dashboard</span>
-                  </div>
-                  <div className="flex gap-4 mb-4">
-                    <div className="bg-success-light rounded-lg px-3 py-2 flex items-center gap-2">
-                      <span className="text-success font-bold">62</span>
-                      <span className="text-xs text-muted-foreground">Lessons Done</span>
-                    </div>
-                    <div className="bg-primary-light rounded-lg px-3 py-2 flex items-center gap-2">
-                      <span className="text-primary font-bold">47</span>
-                      <span className="text-xs text-muted-foreground">Quiz Score</span>
-                    </div>
-                  </div>
-                  <div className="bg-card rounded-lg p-4 border">
-                    <h4 className="font-semibold text-foreground mb-2">Bookkeeping Fundamentals</h4>
-                    <div className="w-full bg-muted rounded-full h-2 mb-2">
-                      <div className="bg-primary h-2 rounded-full w-[80%]" />
-                    </div>
-                    <span className="text-xs text-muted-foreground">80% complete</span>
-                  </div>
-                </div>
+              <div className="bg-white rounded-xl shadow-2xl p-2 transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500 overflow-hidden">
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  className="w-full rounded-lg"
+                >
+                  <source src="/videos/preview.mov" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
               {/* Streak badge */}
               <div className="absolute -top-4 -right-4 bg-primary text-primary-foreground rounded-xl px-4 py-3 shadow-lg transform rotate-6">
