@@ -31,13 +31,22 @@ const Landing = () => {
             <img src="/logo.jpg" alt="Reelin" className="h-8 w-8 rounded-full" />
             <span className="text-xl font-bold text-primary">Reelin</span>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate("/waitlist")}
-            className="border-primary/30 text-primary hover:bg-primary/10"
-          >
-            Join Waitlist
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate("/auth")}
+              className="text-white/80 hover:text-primary hover:bg-white/5"
+            >
+              Sign In
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/waitlist")}
+              className="border-primary/30 text-primary hover:bg-primary/10"
+            >
+              Join Waitlist
+            </Button>
+          </div>
         </div>
       </header>
 
