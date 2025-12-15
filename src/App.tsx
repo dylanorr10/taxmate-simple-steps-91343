@@ -8,30 +8,24 @@ import Landing from "./pages/Landing";
 import Waitlist from "./pages/Waitlist";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
-
-// Launch mode: only show landing, waitlist, and legal pages
-// Set to false when ready to open the full app
-const LAUNCH_MODE = false;
+import Welcome from "./pages/Welcome";
+import Onboarding from "./pages/Onboarding";
+import Dashboard from "./pages/Dashboard";
+import Tax from "./pages/Tax";
+import SettingsPage from "./pages/SettingsPage";
+import LearningHub from "./pages/LearningHub";
+import Glossary from "./pages/Glossary";
+import Log from "./pages/Log";
+import Mileage from "./pages/Mileage";
+import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import Chat from "./pages/Chat";
+import Install from "./pages/Install";
+import Pricing from "./pages/Pricing";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import { FloatingChatButton } from "@/components/FloatingChatButton";
 
 const queryClient = new QueryClient();
-
-// Lazy load app pages only when not in launch mode
-const Welcome = LAUNCH_MODE ? () => null : require("./pages/Welcome").default;
-const Onboarding = LAUNCH_MODE ? () => null : require("./pages/Onboarding").default;
-const Dashboard = LAUNCH_MODE ? () => null : require("./pages/Dashboard").default;
-const Tax = LAUNCH_MODE ? () => null : require("./pages/Tax").default;
-const SettingsPage = LAUNCH_MODE ? () => null : require("./pages/SettingsPage").default;
-const LearningHub = LAUNCH_MODE ? () => null : require("./pages/LearningHub").default;
-const Glossary = LAUNCH_MODE ? () => null : require("./pages/Glossary").default;
-const Log = LAUNCH_MODE ? () => null : require("./pages/Log").default;
-const Mileage = LAUNCH_MODE ? () => null : require("./pages/Mileage").default;
-const NotFound = LAUNCH_MODE ? () => null : require("./pages/NotFound").default;
-const Auth = LAUNCH_MODE ? () => null : require("./pages/Auth").default;
-const Chat = LAUNCH_MODE ? () => null : require("./pages/Chat").default;
-const Install = LAUNCH_MODE ? () => null : require("./pages/Install").default;
-const Pricing = LAUNCH_MODE ? () => null : require("./pages/Pricing").default;
-const ProtectedRoute = LAUNCH_MODE ? ({ children }: { children: React.ReactNode }) => <>{children}</> : require("@/components/ProtectedRoute").default;
-const FloatingChatButton = LAUNCH_MODE ? () => null : require("@/components/FloatingChatButton").FloatingChatButton;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -40,39 +34,27 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          {!LAUNCH_MODE && <FloatingChatButton />}
+          <FloatingChatButton />
           <Routes>
-            {LAUNCH_MODE ? (
-              // Launch mode routes - only landing, waitlist, and legal pages
-              <>
-                <Route path="/" element={<Landing />} />
-                <Route path="/waitlist" element={<Waitlist />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </>
-            ) : (
-              // Full app routes
-              <>
-                <Route path="/" element={<Navigate to="/auth" replace />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/install" element={<Install />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
-                <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/log" element={<ProtectedRoute><Log /></ProtectedRoute>} />
-                <Route path="/learn" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
-                <Route path="/mileage" element={<ProtectedRoute><Mileage /></ProtectedRoute>} />
-                <Route path="/tax" element={<ProtectedRoute><Tax /></ProtectedRoute>} />
-                <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-                <Route path="/glossary" element={<ProtectedRoute><Glossary /></ProtectedRoute>} />
-                <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-                <Route path="*" element={<NotFound />} />
-              </>
-            )}
+            <Route path="/" element={<Navigate to="/auth" replace />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/install" element={<Install />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/waitlist" element={<Waitlist />} />
+            <Route path="/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
+            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/log" element={<ProtectedRoute><Log /></ProtectedRoute>} />
+            <Route path="/learn" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
+            <Route path="/mileage" element={<ProtectedRoute><Mileage /></ProtectedRoute>} />
+            <Route path="/tax" element={<ProtectedRoute><Tax /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/glossary" element={<ProtectedRoute><Glossary /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
