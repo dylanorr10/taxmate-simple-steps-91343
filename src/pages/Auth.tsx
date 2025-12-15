@@ -7,11 +7,41 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { z } from "zod";
+import { generateDemoData } from "@/utils/demoDataSeeder";
 
 const authSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
+
+// Demo accounts that get auto-seeded data
+const DEMO_EMAILS = ["kal@reelin.uk"];
+
+const setupDemoAccount = async (userId: string, email: string) => {
+  // Check if user already has transactions
+  const { data: existingIncome } = await supabase
+    .from('income_transactions')
+    .select('id')
+    .eq('user_id', userId)
+    .limit(1);
+  
+  // If no transactions exist, seed demo data
+  if (!existingIncome || existingIncome.length === 0) {
+    console.log('Seeding demo data for demo account:', email);
+    await generateDemoData(userId, 'professional');
+  }
+  
+  // Ensure profile is complete so they skip onboarding
+  await supabase
+    .from('profiles')
+    .update({ 
+      profile_complete: true,
+      business_name: 'Demo Business',
+      business_type: 'professional',
+      experience_level: 'intermediate'
+    })
+    .eq('id', userId);
+};
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -20,42 +50,42 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const handleAuthSuccess = async (session: any) => {
+    const userEmail = session.user.email?.toLowerCase();
+    const isDemoAccount = DEMO_EMAILS.includes(userEmail);
+    
+    if (isDemoAccount) {
+      // Setup demo account with seeded data
+      await setupDemoAccount(session.user.id, userEmail);
+      navigate("/dashboard");
+    } else {
+      // Check if profile is complete for regular users
+      const { data } = await supabase
+        .from('profiles')
+        .select('profile_complete')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (data?.profile_complete) {
+        navigate("/dashboard");
+      } else {
+        navigate("/welcome");
+      }
+    }
+  };
+
   useEffect(() => {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        // Check if profile is complete before redirecting
-        supabase
-          .from('profiles')
-          .select('profile_complete')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data }) => {
-            if (data?.profile_complete) {
-              navigate("/dashboard");
-            } else {
-              navigate("/welcome");
-            }
-          });
+        handleAuthSuccess(session);
       }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === 'SIGNED_IN') {
-        // Check if profile is complete
-        supabase
-          .from('profiles')
-          .select('profile_complete')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data }) => {
-            if (data?.profile_complete) {
-              navigate("/dashboard");
-            } else {
-              navigate("/welcome");
-            }
-          });
+        handleAuthSuccess(session);
       }
     });
 
