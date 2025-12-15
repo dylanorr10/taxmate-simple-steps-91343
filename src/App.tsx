@@ -11,7 +11,7 @@ import Privacy from "./pages/Privacy";
 
 // Launch mode: only show landing, waitlist, and legal pages
 // Set to false when ready to open the full app
-const LAUNCH_MODE = true;
+const LAUNCH_MODE = false;
 
 const queryClient = new QueryClient();
 
