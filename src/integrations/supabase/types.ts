@@ -305,6 +305,51 @@ export type Database = {
         }
         Relationships: []
       }
+      lessons: {
+        Row: {
+          category: string
+          content: Json
+          created_at: string
+          difficulty: string
+          duration: number
+          emoji: string
+          id: string
+          lesson_type: string | null
+          order_index: number
+          quiz_required: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content: Json
+          created_at?: string
+          difficulty: string
+          duration: number
+          emoji: string
+          id?: string
+          lesson_type?: string | null
+          order_index: number
+          quiz_required?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: Json
+          created_at?: string
+          difficulty?: string
+          duration?: number
+          emoji?: string
+          id?: string
+          lesson_type?: string | null
+          order_index?: number
+          quiz_required?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_reminders: {
         Row: {
           created_at: string
@@ -571,6 +616,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_progress: {
+        Row: {
+          bookmarked: boolean | null
+          completed_at: string | null
+          completion_rate: number | null
+          created_at: string
+          id: string
+          lesson_id: string
+          mastery_level: number | null
+          notes: string | null
+          quiz_attempts: number | null
+          quiz_score: number | null
+          started_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bookmarked?: boolean | null
+          completed_at?: string | null
+          completion_rate?: number | null
+          created_at?: string
+          id?: string
+          lesson_id: string
+          mastery_level?: number | null
+          notes?: string | null
+          quiz_attempts?: number | null
+          quiz_score?: number | null
+          started_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bookmarked?: boolean | null
+          completed_at?: string | null
+          completion_rate?: number | null
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          mastery_level?: number | null
+          notes?: string | null
+          quiz_attempts?: number | null
+          quiz_score?: number | null
+          started_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_streaks: {
         Row: {
