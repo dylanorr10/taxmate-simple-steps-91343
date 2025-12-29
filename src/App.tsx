@@ -13,8 +13,7 @@ import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Tax from "./pages/Tax";
 import SettingsPage from "./pages/SettingsPage";
-import LearningHub from "./pages/LearningHub";
-import Curriculum from "./pages/Curriculum";
+import Learn from "./pages/Learn";
 import LessonPage from "./pages/LessonPage";
 import Glossary from "./pages/Glossary";
 import Log from "./pages/Log";
@@ -50,8 +49,7 @@ const App = () => (
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/log" element={<ProtectedRoute><Log /></ProtectedRoute>} />
-            <Route path="/learn" element={<ProtectedRoute><LearningHub /></ProtectedRoute>} />
-            <Route path="/curriculum" element={<ProtectedRoute><Curriculum /></ProtectedRoute>} />
+            <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
             <Route path="/lesson/:id" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
             <Route path="/mileage" element={<ProtectedRoute><Mileage /></ProtectedRoute>} />
             <Route path="/tax" element={<ProtectedRoute><Tax /></ProtectedRoute>} />
