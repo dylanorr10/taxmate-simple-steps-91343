@@ -305,6 +305,45 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_paths: {
+        Row: {
+          color: string
+          created_at: string
+          description: string
+          difficulty: string
+          emoji: string
+          id: string
+          lesson_ids: string[]
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description: string
+          difficulty?: string
+          emoji: string
+          id?: string
+          lesson_ids?: string[]
+          order_index?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string
+          difficulty?: string
+          emoji?: string
+          id?: string
+          lesson_ids?: string[]
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           category: string
@@ -616,6 +655,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_path_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_lesson_index: number
+          id: string
+          path_id: string
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_lesson_index?: number
+          id?: string
+          path_id: string
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_lesson_index?: number
+          id?: string
+          path_id?: string
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_path_progress_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_progress: {
         Row: {
