@@ -356,6 +356,9 @@ export type Database = {
           lesson_type: string | null
           order_index: number
           quiz_required: boolean | null
+          seasonal_month: number | null
+          seasonal_priority: boolean | null
+          seasonal_year: number | null
           title: string
           updated_at: string
         }
@@ -370,6 +373,9 @@ export type Database = {
           lesson_type?: string | null
           order_index: number
           quiz_required?: boolean | null
+          seasonal_month?: number | null
+          seasonal_priority?: boolean | null
+          seasonal_year?: number | null
           title: string
           updated_at?: string
         }
@@ -384,6 +390,9 @@ export type Database = {
           lesson_type?: string | null
           order_index?: number
           quiz_required?: boolean | null
+          seasonal_month?: number | null
+          seasonal_priority?: boolean | null
+          seasonal_year?: number | null
           title?: string
           updated_at?: string
         }
