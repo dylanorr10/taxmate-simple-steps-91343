@@ -5,17 +5,20 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, BookOpen, Trophy, Target, Loader2, Award, Play, TrendingUp, Route } from "lucide-react";
+import { Search, BookOpen, Trophy, Target, Loader2, Award, Play, TrendingUp, Route, Calendar } from "lucide-react";
 import { useLessons, useUserProgress } from "@/hooks/useLessons";
 import { LessonCard } from "@/components/learning/LessonCard";
 import { LearningPathCard } from "@/components/learning/LearningPathCard";
 import { LearningPathJourney } from "@/components/learning/LearningPathJourney";
+import { SeasonalLessonBanner } from "@/components/learning/SeasonalLessonBanner";
 import BottomNav from "@/components/BottomNav";
 import DesktopNav from "@/components/DesktopNav";
 import { useProfile } from "@/hooks/useProfile";
 import { useLearningPaths, useUserPathProgress, useStartPath } from "@/hooks/useLearningPaths";
+
 const CATEGORIES = [
   "All",
+  "Seasonal",
   "Getting Started",
   "Tax",
   "Expenses",
@@ -25,6 +28,7 @@ const CATEGORIES = [
   "Compliance",
   "Payroll",
   "Admin",
+  "Planning",
 ];
 
 const DIFFICULTIES = ["All", "Beginner", "Intermediate", "Advanced"];
@@ -63,7 +67,9 @@ const Learn = () => {
     if (!lessons) return [];
     return lessons.filter(lesson => {
       const matchesSearch = lesson.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === "All" || lesson.category === selectedCategory;
+      // For "Seasonal" category, filter by lesson_type
+      const matchesCategory = selectedCategory === "All" || 
+        (selectedCategory === "Seasonal" ? (lesson as any).lesson_type === 'seasonal' : lesson.category === selectedCategory);
       const matchesDifficulty = selectedDifficulty === "All" || lesson.difficulty === selectedDifficulty;
       return matchesSearch && matchesCategory && matchesDifficulty;
     });
@@ -144,6 +150,13 @@ const Learn = () => {
             />
           </div>
         </Card>
+
+        {/* Seasonal Focus Banner */}
+        <div className="mb-6">
+          <SeasonalLessonBanner 
+            onLessonClick={(lessonId) => navigate(`/lesson/${lessonId}`)} 
+          />
+        </div>
 
         {/* View Mode Toggle */}
         <div className="flex gap-2 mb-6">
