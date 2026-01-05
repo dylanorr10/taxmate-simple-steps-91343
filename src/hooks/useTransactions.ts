@@ -17,6 +17,10 @@ export interface Transaction {
   invoice_number?: string | null;
   due_date?: string | null;
   payment_status?: 'paid' | 'pending' | 'overdue' | null;
+  // HMRC MTD fields
+  hmrc_category_id?: string | null;
+  disallowable_amount?: number;
+  disallowable_reason?: string | null;
 }
 
 export const useIncomeTransactions = () => {
@@ -50,6 +54,7 @@ export const useIncomeTransactions = () => {
       invoice_number?: string;
       due_date?: string;
       payment_status?: 'paid' | 'pending' | 'overdue';
+      hmrc_category_id?: string;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
@@ -67,6 +72,7 @@ export const useIncomeTransactions = () => {
           invoice_number: income.invoice_number || null,
           due_date: income.due_date || null,
           payment_status: income.payment_status || 'paid',
+          hmrc_category_id: income.hmrc_category_id || null,
         })
         .select()
         .single();
@@ -152,7 +158,16 @@ export const useExpenseTransactions = () => {
   });
 
   const addExpense = useMutation({
-    mutationFn: async (expense: { amount: number; description?: string; transaction_date?: string; vat_rate?: number; receipt_url?: string | null }) => {
+    mutationFn: async (expense: { 
+      amount: number; 
+      description?: string; 
+      transaction_date?: string; 
+      vat_rate?: number; 
+      receipt_url?: string | null;
+      hmrc_category_id?: string;
+      disallowable_amount?: number;
+      disallowable_reason?: string;
+    }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
@@ -165,6 +180,9 @@ export const useExpenseTransactions = () => {
           transaction_date: expense.transaction_date || new Date().toISOString().split('T')[0],
           vat_rate: expense.vat_rate || 20,
           receipt_url: expense.receipt_url || null,
+          hmrc_category_id: expense.hmrc_category_id || null,
+          disallowable_amount: expense.disallowable_amount || 0,
+          disallowable_reason: expense.disallowable_reason || null,
         })
         .select()
         .single();
