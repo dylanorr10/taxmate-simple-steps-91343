@@ -29,6 +29,10 @@ import { InvoiceTracker } from "@/components/InvoiceTracker";
 import { ReceiptCapture } from "@/components/ReceiptCapture";
 import { BulkActions } from "@/components/BulkActions";
 import { CashFlowForecast } from "@/components/CashFlowForecast";
+import { HMRCCategoryPicker } from "@/components/HMRCCategoryPicker";
+import { BusinessUseSlider } from "@/components/BusinessUseSlider";
+import { Badge } from "@/components/ui/badge";
+import { useHMRCCategories, HMRCCategory } from "@/hooks/useHMRCCategories";
 
 const Log = () => {
   const [cashAmount, setCashAmount] = useState("");
@@ -38,9 +42,15 @@ const Log = () => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [paymentStatus, setPaymentStatus] = useState<'paid' | 'pending' | 'overdue'>('paid');
+  const [incomeCategoryId, setIncomeCategoryId] = useState<string | null>(null);
+  
   const [expenseAmount, setExpenseAmount] = useState("");
   const [expenseDescription, setExpenseDescription] = useState("");
   const [expenseReceiptUrl, setExpenseReceiptUrl] = useState<string | null>(null);
+  const [expenseCategoryId, setExpenseCategoryId] = useState<string | null>(null);
+  const [businessUsePercent, setBusinessUsePercent] = useState(100);
+  const [disallowableAmount, setDisallowableAmount] = useState(0);
+  
   const [editingVatFor, setEditingVatFor] = useState<string | null>(null);
   const [celebration, setCelebration] = useState<{ message: string; amount?: number } | null>(null);
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>([]);
@@ -57,6 +67,7 @@ const Log = () => {
     recategorizeTransaction,
     isRecategorizing,
   } = useBankTransactions();
+  const { getCategoryById } = useHMRCCategories();
   
   const { updateStreak } = useStreak();
 
@@ -77,6 +88,7 @@ const Log = () => {
       invoice_number: invoiceNumber || null,
       due_date: dueDate || null,
       payment_status: paymentStatus,
+      hmrc_category_id: incomeCategoryId || undefined,
     });
     setCelebration({ 
       message: "Income logged!", 
@@ -90,6 +102,7 @@ const Log = () => {
     setInvoiceNumber("");
     setDueDate("");
     setPaymentStatus('paid');
+    setIncomeCategoryId(null);
   };
 
   const handleSaveExpense = () => {
@@ -97,10 +110,17 @@ const Log = () => {
       return;
     }
     const amount = parseFloat(expenseAmount);
+    const disallowableReason = businessUsePercent < 100 
+      ? `Personal use portion (${100 - businessUsePercent}%)`
+      : undefined;
+    
     addExpense({
       amount,
       description: expenseDescription || "Expense",
       receipt_url: expenseReceiptUrl,
+      hmrc_category_id: expenseCategoryId || undefined,
+      disallowable_amount: disallowableAmount,
+      disallowable_reason: disallowableReason,
     });
     setCelebration({ 
       message: "Expense saved!", 
@@ -110,6 +130,9 @@ const Log = () => {
     setExpenseAmount("");
     setExpenseDescription("");
     setExpenseReceiptUrl(null);
+    setExpenseCategoryId(null);
+    setBusinessUsePercent(100);
+    setDisallowableAmount(0);
   };
 
   const handleRecategorize = async (transaction: any, type: 'income' | 'expense') => {
@@ -474,18 +497,43 @@ const Log = () => {
                 Log Expense
               </h2>
               <div className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Amount
-                  </Label>
-                  <Input
-                    type="number"
-                    placeholder="Enter amount (£)"
-                    value={expenseAmount}
-                    onChange={(e) => setExpenseAmount(e.target.value)}
-                    className="text-lg"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Amount *
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="£0.00"
+                      value={expenseAmount}
+                      onChange={(e) => {
+                        setExpenseAmount(e.target.value);
+                        // Recalculate disallowable when amount changes
+                        const amt = parseFloat(e.target.value) || 0;
+                        setDisallowableAmount(amt * ((100 - businessUsePercent) / 100));
+                      }}
+                      className="text-lg"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground mb-2 block flex items-center gap-1">
+                      Category
+                      <HelpTooltip
+                        term="HMRC Category"
+                        explanation="Choose the HMRC-compliant category for this expense. This maps to the SA103F form for your Self Assessment."
+                        icon="📋"
+                        tooltipId="hmrc-expense-category"
+                      />
+                    </Label>
+                    <HMRCCategoryPicker
+                      type="expense"
+                      value={expenseCategoryId}
+                      onChange={(id) => setExpenseCategoryId(id)}
+                      placeholder="Select category..."
+                    />
+                  </div>
                 </div>
+
                 <div>
                   <Label className="text-sm font-medium text-muted-foreground mb-2 block">
                     Description (optional)
@@ -497,6 +545,20 @@ const Log = () => {
                     onChange={(e) => setExpenseDescription(e.target.value)}
                   />
                 </div>
+
+                {/* Business Use Slider - only show if amount entered */}
+                {expenseAmount && parseFloat(expenseAmount) > 0 && (
+                  <div className="border-t pt-4">
+                    <BusinessUseSlider
+                      amount={parseFloat(expenseAmount) || 0}
+                      businessUsePercent={businessUsePercent}
+                      onChange={(percent, disallowable) => {
+                        setBusinessUsePercent(percent);
+                        setDisallowableAmount(disallowable);
+                      }}
+                    />
+                  </div>
+                )}
                 
                 <div>
                   <Label className="text-sm font-medium text-muted-foreground mb-2 block">
@@ -554,17 +616,36 @@ const Log = () => {
                     </Select>
                   </div>
                 </div>
-                
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Description
-                  </Label>
-                  <Input
-                    type="text"
-                    placeholder="e.g. Job for Paul's Garage"
-                    value={cashDescription}
-                    onChange={(e) => setCashDescription(e.target.value)}
-                  />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                      Description
+                    </Label>
+                    <Input
+                      type="text"
+                      placeholder="e.g. Job for Paul's Garage"
+                      value={cashDescription}
+                      onChange={(e) => setCashDescription(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground mb-2 block flex items-center gap-1">
+                      Category
+                      <HelpTooltip
+                        term="HMRC Category"
+                        explanation="Choose the HMRC-compliant category for this income. This maps to the SA103F form for your Self Assessment."
+                        icon="📋"
+                        tooltipId="hmrc-income-category"
+                      />
+                    </Label>
+                    <HMRCCategoryPicker
+                      type="income"
+                      value={incomeCategoryId}
+                      onChange={(id) => setIncomeCategoryId(id)}
+                      placeholder="Select category..."
+                    />
+                  </div>
                 </div>
                 
                 <div className="border-t pt-4 space-y-3">
@@ -669,9 +750,19 @@ const Log = () => {
                           <span className="font-medium text-foreground">
                             {transaction.description}
                           </span>
+                          {transaction.hmrc_category_id && (
+                            <Badge variant="secondary" className="text-xs">
+                              {getCategoryById(transaction.hmrc_category_id)?.display_name || 'Categorized'}
+                            </Badge>
+                          )}
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          {formatDate(transaction.transaction_date)}
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span>{formatDate(transaction.transaction_date)}</span>
+                          {transaction.type === 'expense' && (transaction.disallowable_amount ?? 0) > 0 && (
+                            <Badge variant="outline" className="text-xs text-warning border-warning/30">
+                              £{(transaction.disallowable_amount ?? 0).toFixed(2)} personal use
+                            </Badge>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3">

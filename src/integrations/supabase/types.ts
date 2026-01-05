@@ -172,6 +172,9 @@ export type Database = {
           amount: number
           created_at: string
           description: string | null
+          disallowable_amount: number
+          disallowable_reason: string | null
+          hmrc_category_id: string | null
           id: string
           receipt_url: string | null
           transaction_date: string
@@ -183,6 +186,9 @@ export type Database = {
           amount: number
           created_at?: string
           description?: string | null
+          disallowable_amount?: number
+          disallowable_reason?: string | null
+          hmrc_category_id?: string | null
           id?: string
           receipt_url?: string | null
           transaction_date: string
@@ -194,12 +200,56 @@ export type Database = {
           amount?: number
           created_at?: string
           description?: string | null
+          disallowable_amount?: number
+          disallowable_reason?: string | null
+          hmrc_category_id?: string | null
           id?: string
           receipt_url?: string | null
           transaction_date?: string
           updated_at?: string
           user_id?: string
           vat_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_transactions_hmrc_category_id_fkey"
+            columns: ["hmrc_category_id"]
+            isOneToOne: false
+            referencedRelation: "hmrc_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hmrc_categories: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          display_name: string
+          icon: string | null
+          id: string
+          order_index: number
+          type: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          display_name: string
+          icon?: string | null
+          id?: string
+          order_index?: number
+          type: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          icon?: string | null
+          id?: string
+          order_index?: number
+          type?: string
         }
         Relationships: []
       }
@@ -265,6 +315,7 @@ export type Database = {
           created_at: string
           description: string | null
           due_date: string | null
+          hmrc_category_id: string | null
           id: string
           invoice_number: string | null
           payment_status: string | null
@@ -280,6 +331,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_date?: string | null
+          hmrc_category_id?: string | null
           id?: string
           invoice_number?: string | null
           payment_status?: string | null
@@ -295,6 +347,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_date?: string | null
+          hmrc_category_id?: string | null
           id?: string
           invoice_number?: string | null
           payment_status?: string | null
@@ -303,7 +356,15 @@ export type Database = {
           user_id?: string
           vat_rate?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "income_transactions_hmrc_category_id_fkey"
+            columns: ["hmrc_category_id"]
+            isOneToOne: false
+            referencedRelation: "hmrc_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       learning_paths: {
         Row: {
