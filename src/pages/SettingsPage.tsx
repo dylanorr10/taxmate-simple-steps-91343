@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation, Presentation, Sparkles, CreditCard, Crown } from "lucide-react";
+import { Home, FileText, Settings, BookOpen, MessageCircle, HelpCircle, Phone, Palette, LogOut, Building2, CheckCircle2, XCircle, Loader2, Landmark, RefreshCw, Trash2, Navigation, Presentation, Sparkles, CreditCard, Crown, CalendarDays } from "lucide-react";
 import NavigationCustomizer from "@/components/NavigationCustomizer";
 import BottomNav from "@/components/BottomNav";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -396,6 +397,89 @@ const SettingsPage = () => {
                 )}
               </div>
             )}
+          </Card>
+        </div>
+
+        {/* Tax Period Preferences */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <CalendarDays className="w-5 h-5" />
+            Tax Period Settings
+          </h2>
+          <Card className="p-6 space-y-6">
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Quarter Preference</Label>
+              <p className="text-sm text-muted-foreground">
+                Choose how your quarterly submission periods are calculated
+              </p>
+              <RadioGroup
+                value={profile?.quarter_preference || 'calendar'}
+                onValueChange={(value) => updateProfile({ quarter_preference: value })}
+                className="grid gap-3"
+              >
+                <Label
+                  htmlFor="calendar"
+                  className="flex items-start gap-3 p-4 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors [&:has(:checked)]:border-primary [&:has(:checked)]:bg-primary/5"
+                >
+                  <RadioGroupItem value="calendar" id="calendar" className="mt-1" />
+                  <div>
+                    <p className="font-medium text-foreground">Calendar Quarters</p>
+                    <p className="text-sm text-muted-foreground">
+                      Jan-Mar, Apr-Jun, Jul-Sep, Oct-Dec (Recommended)
+                    </p>
+                  </div>
+                </Label>
+                <Label
+                  htmlFor="tax_year"
+                  className="flex items-start gap-3 p-4 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors [&:has(:checked)]:border-primary [&:has(:checked)]:bg-primary/5"
+                >
+                  <RadioGroupItem value="tax_year" id="tax_year" className="mt-1" />
+                  <div>
+                    <p className="font-medium text-foreground">Tax Year Quarters</p>
+                    <p className="text-sm text-muted-foreground">
+                      6 Apr-5 Jul, 6 Jul-5 Oct, 6 Oct-5 Jan, 6 Jan-5 Apr
+                    </p>
+                  </div>
+                </Label>
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3 pt-4 border-t border-border">
+              <Label className="text-base font-medium">Accounting Basis</Label>
+              <p className="text-sm text-muted-foreground">
+                Determines when income and expenses are recognised
+              </p>
+              <RadioGroup
+                value={profile?.accounting_basis || 'cash'}
+                onValueChange={(value) => updateProfile({ accounting_basis: value })}
+                className="grid gap-3"
+              >
+                <Label
+                  htmlFor="cash"
+                  className="flex items-start gap-3 p-4 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors [&:has(:checked)]:border-primary [&:has(:checked)]:bg-primary/5"
+                >
+                  <RadioGroupItem value="cash" id="cash" className="mt-1" />
+                  <div>
+                    <p className="font-medium text-foreground">Cash Basis</p>
+                    <p className="text-sm text-muted-foreground">
+                      Record income when received, expenses when paid (Simpler)
+                    </p>
+                  </div>
+                </Label>
+                <Label
+                  htmlFor="accruals"
+                  className="flex items-start gap-3 p-4 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors [&:has(:checked)]:border-primary [&:has(:checked)]:bg-primary/5"
+                >
+                  <RadioGroupItem value="accruals" id="accruals" className="mt-1" />
+                  <div>
+                    <p className="font-medium text-foreground">Accruals Basis</p>
+                    <p className="text-sm text-muted-foreground">
+                      Record income when invoiced, expenses when incurred
+                    </p>
+                  </div>
+                </Label>
+              </RadioGroup>
+            </div>
           </Card>
         </div>
 
