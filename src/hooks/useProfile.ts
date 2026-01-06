@@ -12,6 +12,8 @@ export interface Profile {
   nav_items: string[] | null;
   profile_complete: boolean | null;
   demo_mode: boolean | null;
+  quarter_preference: string | null;
+  accounting_basis: string | null;
   created_at: string;
   updated_at: string;
 }

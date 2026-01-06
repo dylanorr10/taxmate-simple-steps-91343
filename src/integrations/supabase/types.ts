@@ -499,6 +499,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          accounting_basis: string | null
           business_name: string | null
           business_type: string | null
           created_at: string
@@ -507,11 +508,13 @@ export type Database = {
           id: string
           nav_items: Json | null
           profile_complete: boolean | null
+          quarter_preference: string | null
           updated_at: string
           vat_number: string | null
           vat_registered: boolean | null
         }
         Insert: {
+          accounting_basis?: string | null
           business_name?: string | null
           business_type?: string | null
           created_at?: string
@@ -520,11 +523,13 @@ export type Database = {
           id: string
           nav_items?: Json | null
           profile_complete?: boolean | null
+          quarter_preference?: string | null
           updated_at?: string
           vat_number?: string | null
           vat_registered?: boolean | null
         }
         Update: {
+          accounting_basis?: string | null
           business_name?: string | null
           business_type?: string | null
           created_at?: string
@@ -533,11 +538,71 @@ export type Database = {
           id?: string
           nav_items?: Json | null
           profile_complete?: boolean | null
+          quarter_preference?: string | null
           updated_at?: string
           vat_number?: string | null
           vat_registered?: boolean | null
         }
         Relationships: []
+      }
+      tax_periods: {
+        Row: {
+          created_at: string
+          deadline_date: string
+          end_date: string
+          id: string
+          period_key: string
+          quarter_number: number
+          start_date: string
+          status: string
+          submitted_at: string | null
+          tax_year: number
+          total_expenses: number | null
+          total_income: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deadline_date: string
+          end_date: string
+          id?: string
+          period_key: string
+          quarter_number: number
+          start_date: string
+          status?: string
+          submitted_at?: string | null
+          tax_year: number
+          total_expenses?: number | null
+          total_income?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deadline_date?: string
+          end_date?: string
+          id?: string
+          period_key?: string
+          quarter_number?: number
+          start_date?: string
+          status?: string
+          submitted_at?: string | null
+          tax_year?: number
+          total_expenses?: number | null
+          total_income?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_periods_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tooltip_interactions: {
         Row: {

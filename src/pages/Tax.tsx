@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Info,
   CheckCircle,
@@ -11,6 +12,8 @@ import {
   Download,
   Shield,
   ArrowRight,
+  FileText,
+  CalendarDays,
 } from "lucide-react";
 import {
   Tooltip,
@@ -19,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import BottomNav from "@/components/BottomNav";
+import { QuarterlyDashboard } from "@/components/QuarterlyDashboard";
 import { useIncomeTransactions, useExpenseTransactions } from "@/hooks/useTransactions";
 import { useVATCalculations } from "@/hooks/useVATCalculations";
 import { useVATSubmissions } from "@/hooks/useVATSubmissions";
@@ -113,14 +117,14 @@ const Tax = () => {
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-sm max-w-xs">
-                        MTD is HMRC's digital VAT submission system
+                        MTD is HMRC's digital tax submission system
                       </p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Apr–Jun 2025 • Due <span className="font-semibold text-warning">7 Aug 2025</span>
+                Quarterly submissions & VAT returns
               </p>
             </div>
             {profile?.demo_mode ? (
@@ -136,6 +140,24 @@ const Tax = () => {
         </div>
 
         <div className="px-4 lg:px-8 py-6 space-y-6">
+          {/* Tabs for Quarterly vs VAT */}
+          <Tabs defaultValue="quarterly" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="quarterly" className="flex items-center gap-2">
+                <CalendarDays className="w-4 h-4" />
+                Income Tax (ITSA)
+              </TabsTrigger>
+              <TabsTrigger value="vat" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                VAT Return
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="quarterly" className="mt-6">
+              <QuarterlyDashboard />
+            </TabsContent>
+            
+            <TabsContent value="vat" className="mt-6 space-y-6">
           {/* Progress Tracker */}
           <Card className="p-5 shadow-card border border-border">
             <h2 className="text-sm font-semibold text-muted-foreground mb-4">YOUR PROGRESS</h2>
@@ -426,6 +448,8 @@ const Tax = () => {
               </>
             )}
           </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 
