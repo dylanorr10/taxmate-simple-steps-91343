@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Navigation, Circle, Square, Car, MapPin, Calendar, PoundSterling, ChevronRight, Search, X } from 'lucide-react';
+import { ArrowLeft, Navigation, Circle, Square, Car, MapPin, Calendar, PoundSterling, ChevronRight, Search, X, Trash2, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -17,87 +16,56 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import BottomNav from '@/components/BottomNav';
-
-interface Trip {
-  id: string;
-  date: string;
-  distance: number;
-  type: 'business' | 'personal';
-  from: string;
-  to: string;
-  deduction: number;
-}
-
-const HMRC_RATE = 0.45; // 45p per mile for first 10,000 miles
+import { useMileageTrips, calculateDeduction } from '@/hooks/useMileageTrips';
+import { toast } from 'sonner';
 
 const Mileage = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    trips,
+    isLoading,
+    addTrip,
+    isAdding,
+    deleteTrip,
+    isDeleting,
+    businessMiles,
+    totalDeductions,
+    thisMonthMiles,
+    ytdBusinessMiles,
+    currentRate,
+    milesUntilRateChange,
+    HMRC_RATE_FIRST_10K,
+    HMRC_RATE_AFTER_10K,
+    THRESHOLD_MILES,
+  } = useMileageTrips();
+
   const [isTracking, setIsTracking] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [tripTypeFilter, setTripTypeFilter] = useState<'all' | 'business' | 'personal'>('all');
-  const [trips, setTrips] = useState<Trip[]>([
-    {
-      id: '1',
-      date: '2025-10-06',
-      distance: 24.5,
-      type: 'business',
-      from: 'Office',
-      to: 'Client Meeting - Central London',
-      deduction: 11.03
-    },
-    {
-      id: '2',
-      date: '2025-10-05',
-      distance: 18.2,
-      type: 'business',
-      from: 'Home',
-      to: 'Supplier Visit',
-      deduction: 8.19
-    },
-    {
-      id: '3',
-      date: '2025-10-04',
-      distance: 42.0,
-      type: 'personal',
-      from: 'Home',
-      to: 'Shopping',
-      deduction: 0
-    }
-  ]);
 
   const [newTrip, setNewTrip] = useState({
     distance: '',
-    type: 'business',
+    type: 'business' as 'business' | 'personal',
     from: '',
-    to: ''
+    to: '',
+    purpose: '',
+    date: new Date().toISOString().split('T')[0],
   });
-
-  // Calculate stats
-  const totalMiles = trips.reduce((sum, trip) => sum + trip.distance, 0);
-  const businessMiles = trips.filter(t => t.type === 'business').reduce((sum, trip) => sum + trip.distance, 0);
-  const totalDeductions = trips.filter(t => t.type === 'business').reduce((sum, trip) => sum + trip.deduction, 0);
-  const thisMonthMiles = trips.filter(t => {
-    const tripDate = new Date(t.date);
-    const now = new Date();
-    return tripDate.getMonth() === now.getMonth() && tripDate.getFullYear() === now.getFullYear();
-  }).reduce((sum, trip) => sum + trip.distance, 0);
 
   // Filter trips based on search and filters
   const filteredTrips = useMemo(() => {
     return trips.filter(trip => {
-      // Filter by search query
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesSearch = 
-          trip.from.toLowerCase().includes(query) ||
-          trip.to.toLowerCase().includes(query);
+          (trip.origin?.toLowerCase().includes(query)) ||
+          (trip.destination?.toLowerCase().includes(query)) ||
+          (trip.purpose?.toLowerCase().includes(query));
         if (!matchesSearch) return false;
       }
       
-      // Filter by trip type
-      if (tripTypeFilter !== 'all' && trip.type !== tripTypeFilter) {
+      if (tripTypeFilter !== 'all' && trip.trip_type !== tripTypeFilter) {
         return false;
       }
       
@@ -107,62 +75,69 @@ const Mileage = () => {
 
   const handleStartTracking = () => {
     if (!navigator.geolocation) {
-      toast({
-        title: "GPS not available",
-        description: "Your device doesn't support GPS tracking.",
-        variant: "destructive"
-      });
+      toast.error("Your device doesn't support GPS tracking.");
       return;
     }
 
     setIsTracking(true);
-    toast({
-      title: "Tracking started",
-      description: "Recording your journey...",
-    });
+    toast.info("Recording your journey...");
   };
 
   const handleStopTracking = () => {
     setIsTracking(false);
     setShowAddModal(true);
-    toast({
-      title: "Journey complete",
-      description: "Add details to save this trip.",
-    });
+    toast.info("Add details to save this trip.");
   };
 
   const handleAddTrip = () => {
     if (!newTrip.distance || !newTrip.from || !newTrip.to) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all fields.",
-        variant: "destructive"
-      });
+      toast.error("Please fill in all required fields.");
       return;
     }
 
     const distance = parseFloat(newTrip.distance);
-    const deduction = newTrip.type === 'business' ? distance * HMRC_RATE : 0;
+    if (isNaN(distance) || distance <= 0) {
+      toast.error("Please enter a valid distance.");
+      return;
+    }
 
-    const trip: Trip = {
-      id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
-      distance,
-      type: newTrip.type as 'business' | 'personal',
-      from: newTrip.from,
-      to: newTrip.to,
-      deduction
-    };
+    addTrip({
+      trip_date: newTrip.date,
+      distance_miles: distance,
+      trip_type: newTrip.type,
+      origin: newTrip.from,
+      destination: newTrip.to,
+      purpose: newTrip.purpose || undefined,
+    });
 
-    setTrips([trip, ...trips]);
     setShowAddModal(false);
-    setNewTrip({ distance: '', type: 'business', from: '', to: '' });
-    
-    toast({
-      title: "Trip saved",
-      description: `Added ${distance} miles${newTrip.type === 'business' ? ` (£${deduction.toFixed(2)} deduction)` : ''}`,
+    setNewTrip({ 
+      distance: '', 
+      type: 'business', 
+      from: '', 
+      to: '', 
+      purpose: '',
+      date: new Date().toISOString().split('T')[0],
     });
   };
+
+  const handleDeleteTrip = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    deleteTrip(id);
+  };
+
+  // Calculate preview deduction for new trip
+  const previewDeduction = newTrip.type === 'business' && newTrip.distance
+    ? calculateDeduction(parseFloat(newTrip.distance || '0'), ytdBusinessMiles)
+    : 0;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -200,16 +175,37 @@ const Mileage = () => {
           </Card>
         </div>
 
-        {/* This Month Progress */}
+        {/* YTD Progress & Rate Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Tax Year Progress</CardTitle>
+            <CardDescription>
+              {ytdBusinessMiles.toFixed(0)} / {THRESHOLD_MILES.toLocaleString()} miles at {(HMRC_RATE_FIRST_10K * 100).toFixed(0)}p rate
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Progress value={(ytdBusinessMiles / THRESHOLD_MILES) * 100} className="h-2" />
+            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+              <span>Current rate: {(currentRate * 100).toFixed(0)}p/mile</span>
+              {milesUntilRateChange > 0 ? (
+                <span>{milesUntilRateChange.toFixed(0)} miles until {(HMRC_RATE_AFTER_10K * 100).toFixed(0)}p rate</span>
+              ) : (
+                <span className="text-amber-600">Now at reduced rate</span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* This Month */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">This Month</CardTitle>
             <CardDescription>{thisMonthMiles.toFixed(1)} miles tracked</CardDescription>
           </CardHeader>
           <CardContent>
-            <Progress value={(thisMonthMiles / 1000) * 100} className="h-2" />
+            <Progress value={(thisMonthMiles / 500) * 100} className="h-2" />
             <p className="text-xs text-muted-foreground mt-2">
-              £{(thisMonthMiles * HMRC_RATE).toFixed(2)} in potential deductions
+              £{(thisMonthMiles * currentRate).toFixed(2)} in potential deductions
             </p>
           </CardContent>
         </Card>
@@ -314,7 +310,7 @@ const Mileage = () => {
                   Business
                 </Badge>
                 <Badge
-                  variant={tripTypeFilter === 'personal' ? 'outline' : 'outline'}
+                  variant={tripTypeFilter === 'personal' ? 'default' : 'outline'}
                   className="cursor-pointer"
                   onClick={() => setTripTypeFilter('personal')}
                 >
@@ -331,53 +327,72 @@ const Mileage = () => {
 
             {filteredTrips.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
+                <Car className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p>No trips found</p>
-                <p className="text-sm mt-1">Try adjusting your search or filters</p>
+                <p className="text-sm mt-1">
+                  {trips.length === 0 ? 'Start tracking to log your first trip' : 'Try adjusting your search or filters'}
+                </p>
               </div>
             ) : (
               filteredTrips.map((trip) => (
-              <div 
-                key={trip.id}
-                className="flex items-start gap-3 p-3 rounded-lg border bg-card/50 hover:bg-accent/50 transition-colors cursor-pointer"
-              >
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Car className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm font-medium text-foreground truncate">
-                          {trip.from}
-                        </span>
+                <div 
+                  key={trip.id}
+                  className="flex items-start gap-3 p-3 rounded-lg border bg-card/50 hover:bg-accent/50 transition-colors group"
+                >
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Car className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium text-foreground truncate">
+                            {trip.origin || 'Unknown'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <ChevronRight className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground truncate">
+                            {trip.destination || 'Unknown'}
+                          </span>
+                        </div>
+                        {trip.purpose && (
+                          <p className="text-xs text-muted-foreground mt-1 truncate">
+                            {trip.purpose}
+                          </p>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <ChevronRight className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground truncate">
-                          {trip.to}
-                        </span>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={trip.trip_type === 'business' ? 'default' : 'secondary'} className="flex-shrink-0">
+                          {trip.trip_type}
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => handleDeleteTrip(trip.id, e)}
+                          disabled={isDeleting}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     </div>
-                    <Badge variant={trip.type === 'business' ? 'default' : 'secondary'} className="flex-shrink-0">
-                      {trip.type}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(trip.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                    </span>
-                    <span>{trip.distance} mi</span>
-                    {trip.type === 'business' && (
-                      <span className="flex items-center gap-1 text-primary">
-                        <PoundSterling className="h-3 w-3" />
-                        {trip.deduction.toFixed(2)}
+                    <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(trip.trip_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                       </span>
-                    )}
+                      <span>{Number(trip.distance_miles).toFixed(1)} mi</span>
+                      {trip.trip_type === 'business' && (
+                        <span className="flex items-center gap-1 text-primary">
+                          <PoundSterling className="h-3 w-3" />
+                          {Number(trip.calculated_deduction).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
               ))
             )}
           </CardContent>
@@ -391,10 +406,11 @@ const Mileage = () => {
                 <PoundSterling className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <h4 className="text-sm font-medium text-foreground">HMRC Approved Rates</h4>
-                <p className="text-xs text-muted-foreground mt-1">
-                  45p per mile for the first 10,000 miles, then 25p per mile thereafter
-                </p>
+                <h4 className="text-sm font-medium text-foreground">HMRC Simplified Expense Rates</h4>
+                <ul className="text-xs text-muted-foreground mt-1 space-y-1">
+                  <li>• First 10,000 business miles: <strong>45p per mile</strong></li>
+                  <li>• Over 10,000 business miles: <strong>25p per mile</strong></li>
+                </ul>
               </div>
             </div>
           </CardContent>
@@ -409,12 +425,21 @@ const Mileage = () => {
           <DialogHeader>
             <DialogTitle>Add Journey</DialogTitle>
             <DialogDescription>
-              Enter your trip details
+              Enter your trip details for MTD record keeping
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label htmlFor="from">From</Label>
+              <Label htmlFor="date">Date</Label>
+              <Input
+                id="date"
+                type="date"
+                value={newTrip.date}
+                onChange={(e) => setNewTrip({ ...newTrip, date: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="from">From *</Label>
               <Input
                 id="from"
                 placeholder="Starting location"
@@ -423,7 +448,7 @@ const Mileage = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="to">To</Label>
+              <Label htmlFor="to">To *</Label>
               <Input
                 id="to"
                 placeholder="Destination"
@@ -432,7 +457,7 @@ const Mileage = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="distance">Distance (miles)</Label>
+              <Label htmlFor="distance">Distance (miles) *</Label>
               <Input
                 id="distance"
                 type="number"
@@ -443,8 +468,20 @@ const Mileage = () => {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="purpose">Purpose (optional)</Label>
+              <Input
+                id="purpose"
+                placeholder="e.g. Client meeting, Site visit"
+                value={newTrip.purpose}
+                onChange={(e) => setNewTrip({ ...newTrip, purpose: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
               <Label>Trip Type</Label>
-              <RadioGroup value={newTrip.type} onValueChange={(value) => setNewTrip({ ...newTrip, type: value })}>
+              <RadioGroup 
+                value={newTrip.type} 
+                onValueChange={(value: 'business' | 'personal') => setNewTrip({ ...newTrip, type: value })}
+              >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="business" id="business" />
                   <Label htmlFor="business" className="font-normal">Business (tax deductible)</Label>
@@ -459,16 +496,35 @@ const Mileage = () => {
               <div className="p-3 bg-primary/10 rounded-lg">
                 <p className="text-sm text-muted-foreground">Estimated deduction</p>
                 <p className="text-lg font-semibold text-primary">
-                  £{(parseFloat(newTrip.distance || '0') * HMRC_RATE).toFixed(2)}
+                  £{previewDeduction.toFixed(2)}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  at {(currentRate * 100).toFixed(0)}p/mile (YTD: {ytdBusinessMiles.toFixed(0)} miles)
                 </p>
               </div>
             )}
             <div className="flex gap-3 pt-2">
-              <Button variant="outline" onClick={() => setShowAddModal(false)} className="flex-1">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAddModal(false)} 
+                className="flex-1"
+                disabled={isAdding}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleAddTrip} className="flex-1">
-                Save Trip
+              <Button 
+                onClick={handleAddTrip} 
+                className="flex-1"
+                disabled={isAdding}
+              >
+                {isAdding ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Trip'
+                )}
               </Button>
             </div>
           </div>
