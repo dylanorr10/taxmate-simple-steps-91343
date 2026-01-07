@@ -459,6 +459,59 @@ export type Database = {
         }
         Relationships: []
       }
+      mileage_trips: {
+        Row: {
+          calculated_deduction: number
+          created_at: string
+          destination: string | null
+          distance_miles: number
+          id: string
+          origin: string | null
+          purpose: string | null
+          tax_period_id: string | null
+          trip_date: string
+          trip_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calculated_deduction?: number
+          created_at?: string
+          destination?: string | null
+          distance_miles: number
+          id?: string
+          origin?: string | null
+          purpose?: string | null
+          tax_period_id?: string | null
+          trip_date?: string
+          trip_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calculated_deduction?: number
+          created_at?: string
+          destination?: string | null
+          distance_miles?: number
+          id?: string
+          origin?: string | null
+          purpose?: string | null
+          tax_period_id?: string | null
+          trip_date?: string
+          trip_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mileage_trips_tax_period_id_fkey"
+            columns: ["tax_period_id"]
+            isOneToOne: false
+            referencedRelation: "tax_periods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_reminders: {
         Row: {
           created_at: string
