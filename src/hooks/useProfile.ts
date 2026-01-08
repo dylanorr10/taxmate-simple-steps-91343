@@ -14,6 +14,8 @@ export interface Profile {
   demo_mode: boolean | null;
   quarter_preference: string | null;
   accounting_basis: string | null;
+  mileage_method: string | null;
+  home_office_method: string | null;
   created_at: string;
   updated_at: string;
 }

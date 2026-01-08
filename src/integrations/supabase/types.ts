@@ -307,6 +307,62 @@ export type Database = {
         }
         Relationships: []
       }
+      home_office_claims: {
+        Row: {
+          actual_costs: number | null
+          business_use_percent: number | null
+          calculated_deduction: number
+          claim_month: string
+          created_at: string
+          flat_rate_amount: number | null
+          hours_worked: number
+          id: string
+          method: string
+          notes: string | null
+          tax_period_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actual_costs?: number | null
+          business_use_percent?: number | null
+          calculated_deduction?: number
+          claim_month: string
+          created_at?: string
+          flat_rate_amount?: number | null
+          hours_worked?: number
+          id?: string
+          method?: string
+          notes?: string | null
+          tax_period_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actual_costs?: number | null
+          business_use_percent?: number | null
+          calculated_deduction?: number
+          claim_month?: string
+          created_at?: string
+          flat_rate_amount?: number | null
+          hours_worked?: number
+          id?: string
+          method?: string
+          notes?: string | null
+          tax_period_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "home_office_claims_tax_period_id_fkey"
+            columns: ["tax_period_id"]
+            isOneToOne: false
+            referencedRelation: "tax_periods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       income_transactions: {
         Row: {
           amount: number
@@ -558,7 +614,9 @@ export type Database = {
           created_at: string
           demo_mode: boolean | null
           experience_level: string | null
+          home_office_method: string | null
           id: string
+          mileage_method: string | null
           nav_items: Json | null
           profile_complete: boolean | null
           quarter_preference: string | null
@@ -573,7 +631,9 @@ export type Database = {
           created_at?: string
           demo_mode?: boolean | null
           experience_level?: string | null
+          home_office_method?: string | null
           id: string
+          mileage_method?: string | null
           nav_items?: Json | null
           profile_complete?: boolean | null
           quarter_preference?: string | null
@@ -588,7 +648,9 @@ export type Database = {
           created_at?: string
           demo_mode?: boolean | null
           experience_level?: string | null
+          home_office_method?: string | null
           id?: string
+          mileage_method?: string | null
           nav_items?: Json | null
           profile_complete?: boolean | null
           quarter_preference?: string | null
