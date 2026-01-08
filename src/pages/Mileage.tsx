@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Navigation, Circle, Square, Car, MapPin, Calendar, PoundSterling, ChevronRight, Search, X, Trash2, Loader2, Download, RotateCcw, Briefcase, Users, Wrench, Building2, Edit2, Check, ArrowRightLeft, TrendingUp } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, Navigation, Circle, Square, Car, MapPin, Calendar, PoundSterling, ChevronRight, Search, X, Trash2, Loader2, Download, RotateCcw, Briefcase, Users, Wrench, Building2, Edit2, Check, ArrowRightLeft, TrendingUp, Home } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import BottomNav from '@/components/BottomNav';
 import { useMileageTrips, calculateDeduction, MileageTrip } from '@/hooks/useMileageTrips';
+import { HomeOfficeCalculator } from '@/components/HomeOfficeCalculator';
 import { toast } from 'sonner';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
@@ -288,8 +290,8 @@ const Mileage = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-semibold text-foreground">Mileage Tracker</h1>
-            <p className="text-sm text-muted-foreground">Track and claim your journeys</p>
+            <h1 className="text-xl font-semibold text-foreground">Simplified Expenses</h1>
+            <p className="text-sm text-muted-foreground">HMRC flat rate deductions</p>
           </div>
           {trips.length > 0 && (
             <Button variant="outline" size="icon" onClick={handleExportCSV}>
@@ -300,27 +302,41 @@ const Mileage = () => {
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-6 space-y-6">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-2">
-                <Car className="h-5 w-5 text-primary" />
-                <span className="text-sm text-muted-foreground">Business miles</span>
-              </div>
-              <div className="text-3xl font-bold text-foreground mt-2">{businessMiles.toFixed(0)}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-2">
-                <PoundSterling className="h-5 w-5 text-emerald-600" />
-                <span className="text-sm text-muted-foreground">Tax savings</span>
-              </div>
-              <div className="text-3xl font-bold text-emerald-600 mt-2">£{totalDeductions.toFixed(2)}</div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Tabs for Mileage vs Home Office */}
+        <Tabs defaultValue="mileage" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="mileage" className="flex items-center gap-2">
+              <Car className="h-4 w-4" />
+              Mileage
+            </TabsTrigger>
+            <TabsTrigger value="home-office" className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              Home Office
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="mileage" className="mt-6 space-y-6">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-5 w-5 text-primary" />
+                    <span className="text-sm text-muted-foreground">Business miles</span>
+                  </div>
+                  <div className="text-3xl font-bold text-foreground mt-2">{businessMiles.toFixed(0)}</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-2">
+                    <PoundSterling className="h-5 w-5 text-emerald-600" />
+                    <span className="text-sm text-muted-foreground">Tax savings</span>
+                  </div>
+                  <div className="text-3xl font-bold text-emerald-600 mt-2">£{totalDeductions.toFixed(2)}</div>
+                </CardContent>
+              </Card>
+            </div>
 
         {/* Monthly Breakdown Chart */}
         {trips.length > 0 && (
@@ -629,6 +645,12 @@ const Mileage = () => {
             </div>
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="home-office" className="mt-6">
+            <HomeOfficeCalculator />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <BottomNav />
