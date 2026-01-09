@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,12 +10,14 @@ import {
   AlertTriangle, 
   ChevronRight,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  Sparkles
 } from 'lucide-react';
 import { useTaxPeriods, TaxPeriod } from '@/hooks/useTaxPeriods';
 import { format, differenceInDays, isPast } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { QuarterlyWizard } from './QuarterlyWizard';
 
 interface QuarterCardProps {
   period: TaxPeriod;
@@ -131,9 +133,10 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1"
+            className="flex-1 group"
             onClick={onReview}
           >
+            <Sparkles className="h-3 w-3 mr-1 group-hover:text-primary transition-colors" />
             Review
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
@@ -144,7 +147,7 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
               onClick={onSubmit}
               disabled={period.total_income === 0 && period.total_expenses === 0}
             >
-              Submit
+              Quick Submit
             </Button>
           )}
         </div>
@@ -154,6 +157,8 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
 };
 
 export const QuarterlyDashboard: React.FC = () => {
+  const [wizardPeriod, setWizardPeriod] = useState<TaxPeriod | null>(null);
+  
   const { 
     periods, 
     isLoading, 
@@ -187,12 +192,19 @@ export const QuarterlyDashboard: React.FC = () => {
   const overduePeriods = getOverduePeriods();
 
   const handleReview = (period: TaxPeriod) => {
-    toast.info(`Reviewing Q${period.quarter_number} - Navigate to Log to see transactions for this period`);
+    setWizardPeriod(period);
   };
 
   const handleSubmit = (period: TaxPeriod) => {
     submitPeriod(period.id);
     toast.success(`Q${period.quarter_number} marked as submitted`);
+  };
+
+  const handleWizardSubmit = () => {
+    if (wizardPeriod) {
+      submitPeriod(wizardPeriod.id);
+      toast.success(`Q${wizardPeriod.quarter_number} submitted successfully!`);
+    }
   };
 
   if (isLoading) {
@@ -323,6 +335,16 @@ export const QuarterlyDashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Quarterly Wizard Modal */}
+      {wizardPeriod && (
+        <QuarterlyWizard
+          period={wizardPeriod}
+          isOpen={!!wizardPeriod}
+          onClose={() => setWizardPeriod(null)}
+          onSubmit={handleWizardSubmit}
+        />
       )}
     </div>
   );
