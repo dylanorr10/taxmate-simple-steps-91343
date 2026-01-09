@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
+import { jsPDF } from 'jspdf';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +26,7 @@ import {
   ShieldCheck,
   XCircle,
   Eye,
+  Download,
 } from 'lucide-react';
 import { TaxPeriod } from '@/hooks/useTaxPeriods';
 import { useIncomeTransactions, useExpenseTransactions, Transaction } from '@/hooks/useTransactions';
@@ -248,6 +250,204 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
     }
     onSubmit();
     onClose();
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    let y = 20;
+
+    // Header
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Quarterly Tax Summary', margin, y);
+    y += 10;
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Q${period.quarter_number} ${period.tax_year}/${period.tax_year + 1}`, margin, y);
+    y += 6;
+    doc.setFontSize(10);
+    doc.text(`Period: ${format(new Date(period.start_date), 'd MMM yyyy')} - ${format(new Date(period.end_date), 'd MMM yyyy')}`, margin, y);
+    y += 6;
+    doc.text(`Generated: ${format(new Date(), 'd MMM yyyy HH:mm')}`, margin, y);
+    y += 15;
+
+    // Business info
+    if (profile?.business_name) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Business:', margin, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(profile.business_name, margin + 25, y);
+      y += 10;
+    }
+
+    // Divider
+    doc.setDrawColor(200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    // Financial Summary
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Financial Summary', margin, y);
+    y += 10;
+
+    doc.setFontSize(11);
+    const summaryData = [
+      ['Gross Income:', `£${totalIncome.toLocaleString('en-GB', { minimumFractionDigits: 2 })}`],
+      ['Total Expenses:', `£${totalExpenses.toLocaleString('en-GB', { minimumFractionDigits: 2 })}`],
+      ['Mileage Deductions:', `£${totalMileageDeduction.toFixed(2)}`],
+      ['Home Office Deductions:', `£${totalHomeOfficeDeduction.toFixed(2)}`],
+      ['Total Deductions:', `£${(totalMileageDeduction + totalHomeOfficeDeduction).toFixed(2)}`],
+    ];
+
+    doc.setFont('helvetica', 'normal');
+    summaryData.forEach(([label, value]) => {
+      doc.text(label, margin, y);
+      doc.text(value, pageWidth - margin - 40, y);
+      y += 7;
+    });
+
+    y += 3;
+    doc.setDrawColor(100);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Net Profit:', margin, y);
+    doc.text(`£${Math.abs(netProfit).toLocaleString('en-GB', { minimumFractionDigits: 2 })}${netProfit < 0 ? ' (Loss)' : ''}`, pageWidth - margin - 40, y);
+    y += 15;
+
+    // Income Transactions
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Income Transactions (${periodIncome.length})`, margin, y);
+    y += 8;
+
+    if (periodIncome.length > 0) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      const incomeToShow = periodIncome.slice(0, 15);
+      incomeToShow.forEach(t => {
+        const desc = (t.description || 'Untitled').substring(0, 40);
+        const date = format(new Date(t.transaction_date), 'dd/MM/yy');
+        const amount = `£${Number(t.amount).toLocaleString('en-GB', { minimumFractionDigits: 2 })}`;
+        doc.text(`${date} - ${desc}`, margin, y);
+        doc.text(amount, pageWidth - margin - 25, y);
+        y += 5;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+      });
+      if (periodIncome.length > 15) {
+        doc.text(`... and ${periodIncome.length - 15} more transactions`, margin, y);
+        y += 5;
+      }
+    } else {
+      doc.setFont('helvetica', 'italic');
+      doc.text('No income recorded', margin, y);
+      y += 5;
+    }
+    y += 10;
+
+    // Expense Transactions
+    if (y > 240) {
+      doc.addPage();
+      y = 20;
+    }
+
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Expense Transactions (${periodExpenses.length})`, margin, y);
+    y += 8;
+
+    if (periodExpenses.length > 0) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      const expensesToShow = periodExpenses.slice(0, 15);
+      expensesToShow.forEach(t => {
+        const desc = (t.description || 'Untitled').substring(0, 40);
+        const date = format(new Date(t.transaction_date), 'dd/MM/yy');
+        const amount = `£${Number(t.amount).toLocaleString('en-GB', { minimumFractionDigits: 2 })}`;
+        doc.text(`${date} - ${desc}`, margin, y);
+        doc.text(amount, pageWidth - margin - 25, y);
+        y += 5;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+      });
+      if (periodExpenses.length > 15) {
+        doc.text(`... and ${periodExpenses.length - 15} more transactions`, margin, y);
+        y += 5;
+      }
+    } else {
+      doc.setFont('helvetica', 'italic');
+      doc.text('No expenses recorded', margin, y);
+      y += 5;
+    }
+    y += 10;
+
+    // Mileage Summary
+    if (periodMileage.length > 0) {
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Mileage Deductions', margin, y);
+      y += 8;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const totalMiles = periodMileage.reduce((sum, t) => sum + Number(t.distance_miles), 0);
+      doc.text(`Total trips: ${periodMileage.length}`, margin, y);
+      y += 5;
+      doc.text(`Total miles: ${totalMiles.toFixed(1)}`, margin, y);
+      y += 5;
+      doc.text(`Deduction claimed: £${totalMileageDeduction.toFixed(2)}`, margin, y);
+      y += 10;
+    }
+
+    // Home Office Summary
+    if (periodHomeOffice.length > 0) {
+      if (y > 250) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Home Office Deductions', margin, y);
+      y += 8;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const totalHours = periodHomeOffice.reduce((sum, c) => sum + Number(c.hours_worked), 0);
+      doc.text(`Months claimed: ${periodHomeOffice.length}`, margin, y);
+      y += 5;
+      doc.text(`Total hours: ${totalHours}`, margin, y);
+      y += 5;
+      doc.text(`Deduction claimed: £${totalHomeOfficeDeduction.toFixed(2)}`, margin, y);
+      y += 15;
+    }
+
+    // Footer
+    if (y > 260) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(128);
+    doc.text('This document is for record keeping purposes only and does not constitute an official HMRC submission.', margin, y);
+
+    // Save
+    const filename = `quarterly-summary-Q${period.quarter_number}-${period.tax_year}.pdf`;
+    doc.save(filename);
+    toast.success('PDF downloaded successfully');
   };
 
   // Reset state when closing
@@ -609,10 +809,20 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
               </div>
             </div>
 
+            {/* Export Button */}
+            <Button 
+              variant="outline" 
+              onClick={handleExportPDF}
+              className="w-full"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF Summary
+            </Button>
+
             {/* Declaration */}
             <div className="p-4 bg-muted/30 rounded-lg border border-border">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                By submitting this quarterly update, I declare that the information provided is 
+                By submitting this quarterly update, I declare that the information provided is
                 complete and correct to the best of my knowledge. I understand that I may be 
                 liable to penalties if I give false information.
               </p>
