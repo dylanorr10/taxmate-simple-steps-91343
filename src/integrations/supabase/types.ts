@@ -167,6 +167,86 @@ export type Database = {
         }
         Relationships: []
       }
+      eops_submissions: {
+        Row: {
+          accounts_finalised: boolean | null
+          adjustments_reviewed: boolean | null
+          all_expenses_claimed: boolean | null
+          all_income_declared: boolean | null
+          created_at: string
+          hmrc_submission_id: string | null
+          id: string
+          net_profit: number
+          notes: string | null
+          personal_allowance: number | null
+          status: string
+          submission_receipt: string | null
+          submitted_at: string | null
+          tax_due: number
+          tax_year: number
+          taxable_profit: number
+          total_adjustments: number
+          total_expenses: number
+          total_income: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accounts_finalised?: boolean | null
+          adjustments_reviewed?: boolean | null
+          all_expenses_claimed?: boolean | null
+          all_income_declared?: boolean | null
+          created_at?: string
+          hmrc_submission_id?: string | null
+          id?: string
+          net_profit?: number
+          notes?: string | null
+          personal_allowance?: number | null
+          status?: string
+          submission_receipt?: string | null
+          submitted_at?: string | null
+          tax_due?: number
+          tax_year: number
+          taxable_profit?: number
+          total_adjustments?: number
+          total_expenses?: number
+          total_income?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accounts_finalised?: boolean | null
+          adjustments_reviewed?: boolean | null
+          all_expenses_claimed?: boolean | null
+          all_income_declared?: boolean | null
+          created_at?: string
+          hmrc_submission_id?: string | null
+          id?: string
+          net_profit?: number
+          notes?: string | null
+          personal_allowance?: number | null
+          status?: string
+          submission_receipt?: string | null
+          submitted_at?: string | null
+          tax_due?: number
+          tax_year?: number
+          taxable_profit?: number
+          total_adjustments?: number
+          total_expenses?: number
+          total_income?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eops_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expense_transactions: {
         Row: {
           amount: number
@@ -659,6 +739,65 @@ export type Database = {
           vat_registered?: boolean | null
         }
         Relationships: []
+      }
+      tax_adjustments: {
+        Row: {
+          adjustment_type: string
+          amount: number
+          asset_date: string | null
+          asset_name: string | null
+          asset_value: number | null
+          category: string
+          created_at: string
+          description: string
+          id: string
+          is_addition: boolean
+          notes: string | null
+          tax_year: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          adjustment_type: string
+          amount?: number
+          asset_date?: string | null
+          asset_name?: string | null
+          asset_value?: number | null
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          is_addition?: boolean
+          notes?: string | null
+          tax_year: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          adjustment_type?: string
+          amount?: number
+          asset_date?: string | null
+          asset_name?: string | null
+          asset_value?: number | null
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_addition?: boolean
+          notes?: string | null
+          tax_year?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_adjustments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tax_periods: {
         Row: {
