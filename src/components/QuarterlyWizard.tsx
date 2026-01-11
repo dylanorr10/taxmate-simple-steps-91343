@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { TaxPeriod } from '@/hooks/useTaxPeriods';
 import { useIncomeTransactions, useExpenseTransactions, Transaction } from '@/hooks/useTransactions';
+import { EditableTransactionRow } from './EditableTransactionRow';
 import { useMileageTrips } from '@/hooks/useMileageTrips';
 import { useHomeOfficeClaims } from '@/hooks/useHomeOfficeClaims';
 import { useProfile } from '@/hooks/useProfile';
@@ -76,8 +77,8 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
   const [reviewedExpenses, setReviewedExpenses] = useState(false);
   const [reviewedDeductions, setReviewedDeductions] = useState(false);
 
-  const { transactions: allIncomeTransactions } = useIncomeTransactions();
-  const { transactions: allExpenseTransactions } = useExpenseTransactions();
+  const { transactions: allIncomeTransactions, updateIncome, deleteIncome, isUpdating: isUpdatingIncome } = useIncomeTransactions();
+  const { transactions: allExpenseTransactions, updateExpense, deleteExpense, isUpdating: isUpdatingExpense } = useExpenseTransactions();
   const { trips } = useMileageTrips();
   const { claims } = useHomeOfficeClaims();
   const { profile } = useProfile();
@@ -463,6 +464,14 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
 
   const progressPercentage = (currentStep / WIZARD_STEPS.length) * 100;
 
+  const handleUpdateIncome = (id: string, updates: Partial<Transaction>) => {
+    updateIncome({ id, ...updates });
+  };
+
+  const handleUpdateExpense = (id: string, updates: Partial<Transaction>) => {
+    updateExpense({ id, ...updates });
+  };
+
   const renderTransactionList = (transactions: Transaction[], type: 'income' | 'expense') => {
     if (transactions.length === 0) {
       return (
@@ -481,33 +490,22 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
       );
     }
 
+    const handleUpdate = type === 'income' ? handleUpdateIncome : handleUpdateExpense;
+    const handleDelete = type === 'income' ? deleteIncome : deleteExpense;
+    const isUpdating = type === 'income' ? isUpdatingIncome : isUpdatingExpense;
+
     return (
       <ScrollArea className="h-[300px] pr-2">
         <div className="space-y-2">
           {transactions.map(t => (
-            <div 
+            <EditableTransactionRow
               key={t.id}
-              className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border"
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{t.description || 'Untitled'}</p>
-                <p className="text-xs text-muted-foreground">
-                  {format(new Date(t.transaction_date), 'd MMM yyyy')}
-                  {type === 'income' && t.client_name && ` • ${t.client_name}`}
-                </p>
-              </div>
-              <div className="text-right ml-3">
-                <p className={cn(
-                  "text-sm font-semibold",
-                  type === 'income' ? "text-success" : "text-destructive"
-                )}>
-                  {type === 'income' ? '+' : '-'}£{Number(t.amount).toLocaleString()}
-                </p>
-                {t.vat_rate > 0 && (
-                  <p className="text-xs text-muted-foreground">{t.vat_rate}% VAT</p>
-                )}
-              </div>
-            </div>
+              transaction={t}
+              type={type}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              isUpdating={isUpdating}
+            />
           ))}
         </div>
       </ScrollArea>
