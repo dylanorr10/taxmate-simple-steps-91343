@@ -31,6 +31,7 @@ import {
 import { TaxPeriod } from '@/hooks/useTaxPeriods';
 import { useIncomeTransactions, useExpenseTransactions, Transaction } from '@/hooks/useTransactions';
 import { EditableTransactionRow } from './EditableTransactionRow';
+import { AddTransactionInline } from './AddTransactionInline';
 import { useMileageTrips } from '@/hooks/useMileageTrips';
 import { useHomeOfficeClaims } from '@/hooks/useHomeOfficeClaims';
 import { useProfile } from '@/hooks/useProfile';
@@ -77,8 +78,8 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
   const [reviewedExpenses, setReviewedExpenses] = useState(false);
   const [reviewedDeductions, setReviewedDeductions] = useState(false);
 
-  const { transactions: allIncomeTransactions, updateIncome, deleteIncome, isUpdating: isUpdatingIncome } = useIncomeTransactions();
-  const { transactions: allExpenseTransactions, updateExpense, deleteExpense, isUpdating: isUpdatingExpense } = useExpenseTransactions();
+  const { transactions: allIncomeTransactions, updateIncome, deleteIncome, addIncome, isUpdating: isUpdatingIncome, isAdding: isAddingIncome } = useIncomeTransactions();
+  const { transactions: allExpenseTransactions, updateExpense, deleteExpense, addExpense, isUpdating: isUpdatingExpense, isAdding: isAddingExpense } = useExpenseTransactions();
   const { trips } = useMileageTrips();
   const { claims } = useHomeOfficeClaims();
   const { profile } = useProfile();
@@ -526,6 +527,14 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
                 <p className="text-sm text-muted-foreground">{periodIncome.length} transactions</p>
               </div>
             </div>
+            
+            <AddTransactionInline
+              type="income"
+              defaultDate={period.start_date}
+              onAdd={(data) => addIncome(data)}
+              isAdding={isAddingIncome}
+            />
+            
             {renderTransactionList(periodIncome, 'income')}
             {periodIncome.length > 0 && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -554,6 +563,14 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
                 <p className="text-sm text-muted-foreground">{periodExpenses.length} transactions</p>
               </div>
             </div>
+            
+            <AddTransactionInline
+              type="expense"
+              defaultDate={period.start_date}
+              onAdd={(data) => addExpense(data)}
+              isAdding={isAddingExpense}
+            />
+            
             {renderTransactionList(periodExpenses, 'expense')}
             {periodExpenses.length > 0 && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
