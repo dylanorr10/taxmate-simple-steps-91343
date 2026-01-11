@@ -11,13 +11,15 @@ import {
   ChevronRight,
   TrendingUp,
   TrendingDown,
-  Sparkles
+  Sparkles,
+  FileText
 } from 'lucide-react';
 import { useTaxPeriods, TaxPeriod } from '@/hooks/useTaxPeriods';
 import { format, differenceInDays, isPast } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { QuarterlyWizard } from './QuarterlyWizard';
+import { EOPSWizard } from './EOPSWizard';
 
 interface QuarterCardProps {
   period: TaxPeriod;
@@ -158,6 +160,7 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
 
 export const QuarterlyDashboard: React.FC = () => {
   const [wizardPeriod, setWizardPeriod] = useState<TaxPeriod | null>(null);
+  const [showEOPSWizard, setShowEOPSWizard] = useState(false);
   
   const { 
     periods, 
@@ -309,8 +312,17 @@ export const QuarterlyDashboard: React.FC = () => {
       {/* Year Summary */}
       {periods && periods.length > 0 && (
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Year-to-Date Summary</CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={() => setShowEOPSWizard(true)}
+            >
+              <FileText className="h-4 w-4" />
+              Year-End Review
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4 text-center">
@@ -346,6 +358,12 @@ export const QuarterlyDashboard: React.FC = () => {
           onSubmit={handleWizardSubmit}
         />
       )}
+
+      {/* EOPS Year-End Wizard Modal */}
+      <EOPSWizard
+        open={showEOPSWizard}
+        onOpenChange={setShowEOPSWizard}
+      />
     </div>
   );
 };
