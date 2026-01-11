@@ -89,6 +89,36 @@ export const useIncomeTransactions = () => {
     },
   });
 
+  const updateIncome = useMutation({
+    mutationFn: async ({ id, ...updates }: { 
+      id: string;
+      amount?: number; 
+      description?: string; 
+      transaction_date?: string; 
+      vat_rate?: number;
+      client_name?: string;
+      client_email?: string;
+      invoice_number?: string;
+      due_date?: string;
+      payment_status?: 'paid' | 'pending' | 'overdue';
+      hmrc_category_id?: string;
+    }) => {
+      const { error } = await supabase
+        .from("income_transactions")
+        .update(updates)
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["income-transactions"] });
+      toast.success("Income updated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to update income: ${error.message}`);
+    },
+  });
+
   const deleteIncome = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -130,6 +160,8 @@ export const useIncomeTransactions = () => {
     isLoading,
     addIncome: addIncome.mutate,
     isAdding: addIncome.isPending,
+    updateIncome: updateIncome.mutate,
+    isUpdating: updateIncome.isPending,
     deleteIncome: deleteIncome.mutate,
     isDeleting: deleteIncome.isPending,
     updatePaymentStatus: updatePaymentStatus.mutate,
@@ -199,6 +231,34 @@ export const useExpenseTransactions = () => {
     },
   });
 
+  const updateExpense = useMutation({
+    mutationFn: async ({ id, ...updates }: { 
+      id: string;
+      amount?: number; 
+      description?: string; 
+      transaction_date?: string; 
+      vat_rate?: number; 
+      receipt_url?: string | null;
+      hmrc_category_id?: string;
+      disallowable_amount?: number;
+      disallowable_reason?: string;
+    }) => {
+      const { error } = await supabase
+        .from("expense_transactions")
+        .update(updates)
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["expense-transactions"] });
+      toast.success("Expense updated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to update expense: ${error.message}`);
+    },
+  });
+
   const deleteExpense = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -222,6 +282,8 @@ export const useExpenseTransactions = () => {
     isLoading,
     addExpense: addExpense.mutate,
     isAdding: addExpense.isPending,
+    updateExpense: updateExpense.mutate,
+    isUpdating: updateExpense.isPending,
     deleteExpense: deleteExpense.mutate,
     isDeleting: deleteExpense.isPending,
   };
