@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { addDays, addMonths, format, isAfter, isBefore, startOfDay } from 'date-fns';
+import { toast } from 'sonner';
 
 export interface TaxPeriod {
   id: string;
@@ -17,6 +18,22 @@ export interface TaxPeriod {
   total_expenses: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface PeriodAmendment {
+  id: string;
+  user_id: string;
+  tax_period_id: string;
+  amendment_type: 'correction' | 'late_submission' | 'data_update';
+  reason: string | null;
+  previous_income: number;
+  previous_expenses: number;
+  new_income: number;
+  new_expenses: number;
+  income_difference: number;
+  expenses_difference: number;
+  created_at: string;
+  submitted_at: string | null;
 }
 
 // Get current UK tax year (starts 6th April)
@@ -224,6 +241,145 @@ export const useTaxPeriods = (taxYear?: number) => {
     },
   });
 
+  // Reopen a submitted period for amendment
+  const reopenPeriodForAmendment = useMutation({
+    mutationFn: async ({ periodId, reason }: { periodId: string; reason: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const period = periods?.find(p => p.id === periodId);
+      if (!period) throw new Error('Period not found');
+      if (period.status !== 'submitted' && period.status !== 'corrected') {
+        throw new Error('Only submitted periods can be amended');
+      }
+
+      // Create amendment record capturing the state before reopening
+      const { error: amendmentError } = await supabase
+        .from('period_amendments')
+        .insert({
+          user_id: user.id,
+          tax_period_id: periodId,
+          amendment_type: 'correction',
+          reason,
+          previous_income: period.total_income,
+          previous_expenses: period.total_expenses,
+          new_income: period.total_income,
+          new_expenses: period.total_expenses,
+          income_difference: 0,
+          expenses_difference: 0,
+        });
+
+      if (amendmentError) throw amendmentError;
+
+      // Update period status to draft so user can make changes
+      const { error: periodError } = await supabase
+        .from('tax_periods')
+        .update({ status: 'draft' })
+        .eq('id', periodId);
+
+      if (periodError) throw periodError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tax-periods'] });
+      queryClient.invalidateQueries({ queryKey: ['period-amendments'] });
+      toast.success('Period reopened for amendment');
+    },
+    onError: (error) => {
+      toast.error(`Failed to reopen period: ${error.message}`);
+    },
+  });
+
+  // Submit an amended period (marks it as corrected)
+  const submitAmendedPeriod = useMutation({
+    mutationFn: async (periodId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const period = periods?.find(p => p.id === periodId);
+      if (!period) throw new Error('Period not found');
+
+      // Get the most recent amendment for this period
+      const { data: amendments, error: fetchError } = await supabase
+        .from('period_amendments')
+        .select('*')
+        .eq('tax_period_id', periodId)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (fetchError) throw fetchError;
+
+      if (amendments && amendments.length > 0) {
+        const latestAmendment = amendments[0];
+        
+        // Update the amendment with final figures
+        const { error: updateError } = await supabase
+          .from('period_amendments')
+          .update({
+            new_income: period.total_income,
+            new_expenses: period.total_expenses,
+            income_difference: period.total_income - latestAmendment.previous_income,
+            expenses_difference: period.total_expenses - latestAmendment.previous_expenses,
+            submitted_at: new Date().toISOString(),
+          })
+          .eq('id', latestAmendment.id);
+
+        if (updateError) throw updateError;
+      }
+
+      // Mark period as corrected
+      const { error: periodError } = await supabase
+        .from('tax_periods')
+        .update({ 
+          status: 'corrected',
+          submitted_at: new Date().toISOString(),
+        })
+        .eq('id', periodId);
+
+      if (periodError) throw periodError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tax-periods'] });
+      queryClient.invalidateQueries({ queryKey: ['period-amendments'] });
+      toast.success('Amended period submitted successfully');
+    },
+    onError: (error) => {
+      toast.error(`Failed to submit amendment: ${error.message}`);
+    },
+  });
+
+  // Fetch amendment history for a period
+  const { data: amendments } = useQuery({
+    queryKey: ['period-amendments', currentTaxYear],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const periodIds = periods?.map(p => p.id) || [];
+      if (periodIds.length === 0) return [];
+
+      const { data, error } = await supabase
+        .from('period_amendments')
+        .select('*')
+        .eq('user_id', user.id)
+        .in('tax_period_id', periodIds)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as PeriodAmendment[];
+    },
+    enabled: !!periods && periods.length > 0,
+  });
+
+  // Get amendments for a specific period
+  const getAmendmentsForPeriod = (periodId: string): PeriodAmendment[] => {
+    return amendments?.filter(a => a.tax_period_id === periodId) || [];
+  };
+
+  // Check if a period has been amended
+  const hasAmendments = (periodId: string): boolean => {
+    return (amendments?.filter(a => a.tax_period_id === periodId)?.length || 0) > 0;
+  };
+
   // Get current quarter
   const getCurrentQuarter = (): TaxPeriod | undefined => {
     if (!periods) return undefined;
@@ -242,7 +398,7 @@ export const useTaxPeriods = (taxYear?: number) => {
     const twoWeeksFromNow = addDays(today, 14);
     
     return periods.filter(p => {
-      if (p.status === 'submitted') return false;
+      if (p.status === 'submitted' || p.status === 'corrected') return false;
       const deadline = new Date(p.deadline_date);
       return !isBefore(deadline, today) && !isAfter(deadline, twoWeeksFromNow);
     });
@@ -254,7 +410,7 @@ export const useTaxPeriods = (taxYear?: number) => {
     const today = startOfDay(new Date());
     
     return periods.filter(p => {
-      if (p.status === 'submitted') return false;
+      if (p.status === 'submitted' || p.status === 'corrected') return false;
       const deadline = new Date(p.deadline_date);
       return isBefore(deadline, today);
     });
@@ -266,9 +422,16 @@ export const useTaxPeriods = (taxYear?: number) => {
     quarterPreference,
     accountingBasis,
     currentTaxYear,
+    amendments,
     initializeQuarters: initializeQuarters.mutate,
     updatePeriodTotals: updatePeriodTotals.mutate,
     submitPeriod: submitPeriod.mutate,
+    reopenPeriodForAmendment: reopenPeriodForAmendment.mutate,
+    isReopening: reopenPeriodForAmendment.isPending,
+    submitAmendedPeriod: submitAmendedPeriod.mutate,
+    isSubmittingAmendment: submitAmendedPeriod.isPending,
+    getAmendmentsForPeriod,
+    hasAmendments,
     getCurrentQuarter,
     getUpcomingDeadlines,
     getOverduePeriods,

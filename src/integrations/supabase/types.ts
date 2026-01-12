@@ -686,6 +686,62 @@ export type Database = {
           },
         ]
       }
+      period_amendments: {
+        Row: {
+          amendment_type: string
+          created_at: string
+          expenses_difference: number
+          id: string
+          income_difference: number
+          new_expenses: number
+          new_income: number
+          previous_expenses: number
+          previous_income: number
+          reason: string | null
+          submitted_at: string | null
+          tax_period_id: string
+          user_id: string
+        }
+        Insert: {
+          amendment_type: string
+          created_at?: string
+          expenses_difference?: number
+          id?: string
+          income_difference?: number
+          new_expenses?: number
+          new_income?: number
+          previous_expenses?: number
+          previous_income?: number
+          reason?: string | null
+          submitted_at?: string | null
+          tax_period_id: string
+          user_id: string
+        }
+        Update: {
+          amendment_type?: string
+          created_at?: string
+          expenses_difference?: number
+          id?: string
+          income_difference?: number
+          new_expenses?: number
+          new_income?: number
+          previous_expenses?: number
+          previous_income?: number
+          reason?: string | null
+          submitted_at?: string | null
+          tax_period_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "period_amendments_tax_period_id_fkey"
+            columns: ["tax_period_id"]
+            isOneToOne: false
+            referencedRelation: "tax_periods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           accounting_basis: string | null
