@@ -27,8 +27,10 @@ import {
   XCircle,
   Eye,
   Download,
+  Edit3,
+  History,
 } from 'lucide-react';
-import { TaxPeriod } from '@/hooks/useTaxPeriods';
+import { TaxPeriod, PeriodAmendment } from '@/hooks/useTaxPeriods';
 import { useIncomeTransactions, useExpenseTransactions, Transaction } from '@/hooks/useTransactions';
 import { EditableTransactionRow } from './EditableTransactionRow';
 import { AddTransactionInline } from './AddTransactionInline';
@@ -45,6 +47,10 @@ interface QuarterlyWizardProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
+  /** Optional: Pass when this is an amendment to a previously submitted period */
+  amendment?: PeriodAmendment;
+  /** Optional: Called when submitting an amended period instead of onSubmit */
+  onSubmitAmendment?: () => void;
 }
 
 interface ValidationItem {
@@ -70,7 +76,10 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  amendment,
+  onSubmitAmendment,
 }) => {
+  const isAmendment = !!amendment;
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [validationChecks, setValidationChecks] = useState<Record<string, boolean>>({});
@@ -128,6 +137,11 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
   const totalMileageDeduction = periodMileage.reduce((sum, t) => sum + Number(t.calculated_deduction), 0);
   const totalHomeOfficeDeduction = periodHomeOffice.reduce((sum, c) => sum + Number(c.calculated_deduction), 0);
   const netProfit = totalIncome - totalExpenses - totalMileageDeduction - totalHomeOfficeDeduction;
+
+  // Amendment calculations (cumulative corrections)
+  const incomeDifference = isAmendment ? totalIncome - (amendment?.previous_income || 0) : 0;
+  const expensesDifference = isAmendment ? totalExpenses - (amendment?.previous_expenses || 0) : 0;
+  const netDifference = incomeDifference - expensesDifference;
 
   // Calculate validation items
   const validationItems = useMemo((): ValidationItem[] => {
@@ -250,7 +264,12 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
       toast.error('Please complete all validation checks before submitting');
       return;
     }
-    onSubmit();
+    
+    if (isAmendment && onSubmitAmendment) {
+      onSubmitAmendment();
+    } else {
+      onSubmit();
+    }
     onClose();
   };
 
@@ -754,12 +773,91 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
       case 5:
         return (
           <div className="space-y-4">
+            {/* Amendment Notice */}
+            {isAmendment && (
+              <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                <div className="flex items-start gap-3">
+                  <Edit3 className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2">
+                    <p className="font-medium text-amber-700 dark:text-amber-500">Amendment Submission</p>
+                    <p className="text-sm text-muted-foreground">
+                      This is a correction to a previously submitted quarter. The cumulative differences will be reported to HMRC.
+                    </p>
+                    {amendment?.reason && (
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-medium">Reason:</span> {amendment.reason}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Cumulative Corrections (Amendment only) */}
+            {isAmendment && (
+              <Card className="border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-amber-500/10">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <ArrowRight className="h-4 w-4 text-amber-600" />
+                    Cumulative Corrections
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="p-2 bg-card rounded-lg">
+                      <p className="text-[10px] text-muted-foreground">Original Income</p>
+                      <p className="text-sm font-semibold">£{(amendment?.previous_income || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="p-2 bg-card rounded-lg flex items-center justify-center">
+                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="p-2 bg-card rounded-lg">
+                      <p className="text-[10px] text-muted-foreground">New Income</p>
+                      <p className="text-sm font-semibold text-success">£{totalIncome.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="p-2 bg-card rounded-lg">
+                      <p className="text-[10px] text-muted-foreground">Original Expenses</p>
+                      <p className="text-sm font-semibold">£{(amendment?.previous_expenses || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="p-2 bg-card rounded-lg flex items-center justify-center">
+                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="p-2 bg-card rounded-lg">
+                      <p className="text-[10px] text-muted-foreground">New Expenses</p>
+                      <p className="text-sm font-semibold text-destructive">£{totalExpenses.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-card rounded-lg border border-amber-500/20">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Net Difference</span>
+                      <span className={cn(
+                        "text-lg font-bold",
+                        netDifference >= 0 ? "text-success" : "text-destructive"
+                      )}>
+                        {netDifference >= 0 ? '+' : '-'}£{Math.abs(netDifference).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
+                      <span className={incomeDifference >= 0 ? "text-success" : "text-destructive"}>
+                        Income: {incomeDifference >= 0 ? '+' : ''}£{incomeDifference.toLocaleString()}
+                      </span>
+                      <span className={expensesDifference <= 0 ? "text-success" : "text-destructive"}>
+                        Expenses: {expensesDifference >= 0 ? '+' : ''}£{expensesDifference.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Final Summary */}
             <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <FileCheck className="h-5 w-5 text-primary" />
-                  Quarterly Summary
+                  {isAmendment ? 'Corrected Quarterly Summary' : 'Quarterly Summary'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -837,9 +935,9 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
             {/* Declaration */}
             <div className="p-4 bg-muted/30 rounded-lg border border-border">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                By submitting this quarterly update, I declare that the information provided is
-                complete and correct to the best of my knowledge. I understand that I may be 
-                liable to penalties if I give false information.
+                {isAmendment 
+                  ? 'By submitting this correction, I declare that the amended information provided is complete and correct to the best of my knowledge. I understand that I may be liable to penalties if I give false information.'
+                  : 'By submitting this quarterly update, I declare that the information provided is complete and correct to the best of my knowledge. I understand that I may be liable to penalties if I give false information.'}
               </p>
             </div>
           </div>
@@ -855,11 +953,21 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
       <DialogContent className="max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-primary" />
-            Q{period.quarter_number} {period.tax_year}/{period.tax_year + 1} Update
+            {isAmendment ? (
+              <>
+                <History className="h-5 w-5 text-amber-600" />
+                Q{period.quarter_number} Amendment
+              </>
+            ) : (
+              <>
+                <Calendar className="h-5 w-5 text-primary" />
+                Q{period.quarter_number} {period.tax_year}/{period.tax_year + 1} Update
+              </>
+            )}
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
             {format(new Date(period.start_date), 'd MMM')} - {format(new Date(period.end_date), 'd MMM yyyy')}
+            {isAmendment && ' • Correction'}
           </p>
         </DialogHeader>
 
@@ -935,10 +1043,15 @@ export const QuarterlyWizard: React.FC<QuarterlyWizardProps> = ({
             <Button 
               onClick={handleSubmit}
               disabled={!canSubmit}
-              className="flex-1 bg-success hover:bg-success/90"
+              className={cn(
+                "flex-1",
+                isAmendment 
+                  ? "bg-amber-600 hover:bg-amber-600/90" 
+                  : "bg-success hover:bg-success/90"
+              )}
             >
               <Send className="h-4 w-4 mr-2" />
-              Submit to HMRC
+              {isAmendment ? 'Submit Correction' : 'Submit to HMRC'}
             </Button>
           )}
         </div>

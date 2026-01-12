@@ -214,6 +214,7 @@ export const QuarterlyDashboard: React.FC = () => {
     submitPeriod,
     reopenPeriodForAmendment,
     isReopening,
+    submitAmendedPeriod,
     getAmendmentsForPeriod,
     hasAmendments,
     getCurrentQuarter,
@@ -255,6 +256,19 @@ export const QuarterlyDashboard: React.FC = () => {
       submitPeriod(wizardPeriod.id);
       toast.success(`Q${wizardPeriod.quarter_number} submitted successfully!`);
     }
+  };
+
+  const handleWizardAmendmentSubmit = () => {
+    if (wizardPeriod) {
+      submitAmendedPeriod(wizardPeriod.id);
+    }
+  };
+
+  // Get the most recent pending amendment for a period (used when opening wizard)
+  const getLatestPendingAmendment = (periodId: string) => {
+    const amendments = getAmendmentsForPeriod(periodId);
+    // Return the most recent amendment that hasn't been submitted yet
+    return amendments.find(a => !a.submitted_at);
   };
 
   const handleAmendClick = (period: TaxPeriod) => {
@@ -437,6 +451,8 @@ export const QuarterlyDashboard: React.FC = () => {
           isOpen={!!wizardPeriod}
           onClose={() => setWizardPeriod(null)}
           onSubmit={handleWizardSubmit}
+          amendment={getLatestPendingAmendment(wizardPeriod.id)}
+          onSubmitAmendment={handleWizardAmendmentSubmit}
         />
       )}
 
