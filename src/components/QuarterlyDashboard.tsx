@@ -3,6 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { 
   CalendarDays, 
   CheckCircle2, 
@@ -12,7 +22,9 @@ import {
   TrendingUp,
   TrendingDown,
   Sparkles,
-  FileText
+  FileText,
+  Edit3,
+  History
 } from 'lucide-react';
 import { useTaxPeriods, TaxPeriod } from '@/hooks/useTaxPeriods';
 import { format, differenceInDays, isPast } from 'date-fns';
@@ -20,25 +32,36 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { QuarterlyWizard } from './QuarterlyWizard';
 import { EOPSWizard } from './EOPSWizard';
+import { AmendmentHistoryCard } from './AmendmentHistoryCard';
 
 interface QuarterCardProps {
   period: TaxPeriod;
   isCurrent: boolean;
+  hasAmendments: boolean;
   onReview: () => void;
   onSubmit: () => void;
+  onAmend: () => void;
 }
 
-const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, onSubmit }) => {
+const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, hasAmendments, onReview, onSubmit, onAmend }) => {
   const deadline = new Date(period.deadline_date);
   const today = new Date();
   const daysUntilDeadline = differenceInDays(deadline, today);
-  const isOverdue = isPast(deadline) && period.status !== 'submitted';
-  const isApproaching = daysUntilDeadline <= 14 && daysUntilDeadline > 0;
+  const isOverdue = isPast(deadline) && period.status === 'draft';
+  const isApproaching = daysUntilDeadline <= 14 && daysUntilDeadline > 0 && period.status === 'draft';
   
   const profit = period.total_income - period.total_expenses;
   const progressToDeadline = Math.max(0, Math.min(100, ((30 - daysUntilDeadline) / 30) * 100));
 
   const getStatusBadge = () => {
+    if (period.status === 'corrected') {
+      return (
+        <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30 flex items-center gap-1">
+          <History className="h-3 w-3" />
+          Corrected
+        </Badge>
+      );
+    }
     if (period.status === 'submitted') {
       return <Badge className="bg-green-500/20 text-green-600 border-green-500/30">Submitted</Badge>;
     }
@@ -102,7 +125,7 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
           </div>
         </div>
 
-        {period.status !== 'submitted' && (
+        {period.status === 'draft' && (
           <div className="space-y-2">
             <div className="flex justify-between items-center text-xs">
               <span className="text-muted-foreground flex items-center gap-1">
@@ -131,6 +154,13 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
           </div>
         )}
 
+        {hasAmendments && (period.status === 'submitted' || period.status === 'corrected') && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <History className="h-3 w-3" />
+            <span>Has amendment history</span>
+          </div>
+        )}
+
         <div className="flex gap-2 pt-2">
           <Button 
             variant="outline" 
@@ -142,7 +172,7 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
             Review
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
-          {period.status !== 'submitted' && (
+          {period.status === 'draft' && (
             <Button 
               size="sm" 
               className="flex-1"
@@ -150,6 +180,17 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
               disabled={period.total_income === 0 && period.total_expenses === 0}
             >
               Quick Submit
+            </Button>
+          )}
+          {(period.status === 'submitted' || period.status === 'corrected') && (
+            <Button 
+              variant="outline"
+              size="sm" 
+              className="flex-1"
+              onClick={onAmend}
+            >
+              <Edit3 className="h-3 w-3 mr-1" />
+              Amend
             </Button>
           )}
         </div>
@@ -161,6 +202,8 @@ const QuarterCard: React.FC<QuarterCardProps> = ({ period, isCurrent, onReview, 
 export const QuarterlyDashboard: React.FC = () => {
   const [wizardPeriod, setWizardPeriod] = useState<TaxPeriod | null>(null);
   const [showEOPSWizard, setShowEOPSWizard] = useState(false);
+  const [amendPeriod, setAmendPeriod] = useState<TaxPeriod | null>(null);
+  const [amendReason, setAmendReason] = useState('');
   
   const { 
     periods, 
@@ -169,6 +212,10 @@ export const QuarterlyDashboard: React.FC = () => {
     initializeQuarters,
     updatePeriodTotals,
     submitPeriod,
+    reopenPeriodForAmendment,
+    isReopening,
+    getAmendmentsForPeriod,
+    hasAmendments,
     getCurrentQuarter,
     getUpcomingDeadlines,
     getOverduePeriods
@@ -207,6 +254,19 @@ export const QuarterlyDashboard: React.FC = () => {
     if (wizardPeriod) {
       submitPeriod(wizardPeriod.id);
       toast.success(`Q${wizardPeriod.quarter_number} submitted successfully!`);
+    }
+  };
+
+  const handleAmendClick = (period: TaxPeriod) => {
+    setAmendPeriod(period);
+    setAmendReason('');
+  };
+
+  const handleAmendConfirm = () => {
+    if (amendPeriod && amendReason.trim()) {
+      reopenPeriodForAmendment({ periodId: amendPeriod.id, reason: amendReason.trim() });
+      setAmendPeriod(null);
+      setAmendReason('');
     }
   };
 
@@ -290,7 +350,7 @@ export const QuarterlyDashboard: React.FC = () => {
             </CardTitle>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <CheckCircle2 className="h-4 w-4 text-green-500" />
-              {periods?.filter(p => p.status === 'submitted').length || 0}/4 submitted
+              {periods?.filter(p => p.status === 'submitted' || p.status === 'corrected').length || 0}/4 submitted
             </div>
           </div>
         </CardHeader>
@@ -301,13 +361,34 @@ export const QuarterlyDashboard: React.FC = () => {
                 key={period.id}
                 period={period}
                 isCurrent={currentQuarter?.id === period.id}
+                hasAmendments={hasAmendments(period.id)}
                 onReview={() => handleReview(period)}
                 onSubmit={() => handleSubmit(period)}
+                onAmend={() => handleAmendClick(period)}
               />
             ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Amendment History Section */}
+      {periods && periods.some(p => hasAmendments(p.id)) && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <History className="h-5 w-5" />
+            Amendment History
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {periods.filter(p => hasAmendments(p.id)).map(period => (
+              <AmendmentHistoryCard
+                key={period.id}
+                amendments={getAmendmentsForPeriod(period.id)}
+                quarterNumber={period.quarter_number}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Year Summary */}
       {periods && periods.length > 0 && (
@@ -364,6 +445,58 @@ export const QuarterlyDashboard: React.FC = () => {
         open={showEOPSWizard}
         onOpenChange={setShowEOPSWizard}
       />
+
+      {/* Amendment Confirmation Dialog */}
+      <Dialog open={!!amendPeriod} onOpenChange={(open) => !open && setAmendPeriod(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit3 className="h-5 w-5" />
+              Amend Q{amendPeriod?.quarter_number} Submission
+            </DialogTitle>
+            <DialogDescription>
+              You are about to reopen a submitted quarter for amendment. HMRC requires a reason for any corrections made after initial submission.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="amendment-reason">Reason for Amendment</Label>
+              <Input
+                id="amendment-reason"
+                placeholder="e.g., Missing invoice discovered, Expense incorrectly categorised..."
+                value={amendReason}
+                onChange={(e) => setAmendReason(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                This will be recorded for your audit trail.
+              </p>
+            </div>
+
+            {amendPeriod && (
+              <div className="p-3 bg-muted rounded-lg text-sm">
+                <p className="font-medium mb-1">Current figures for Q{amendPeriod.quarter_number}:</p>
+                <div className="flex gap-4">
+                  <span className="text-green-600">Income: £{amendPeriod.total_income.toLocaleString()}</span>
+                  <span className="text-red-600">Expenses: £{amendPeriod.total_expenses.toLocaleString()}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAmendPeriod(null)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAmendConfirm}
+              disabled={!amendReason.trim() || isReopening}
+            >
+              {isReopening ? 'Opening...' : 'Reopen for Amendment'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
