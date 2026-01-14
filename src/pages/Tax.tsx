@@ -55,14 +55,14 @@ const Tax = () => {
 
   // Calculate compliance factors for enhanced MTD readiness
   const complianceFactors = useMemo(() => {
-    const hasMileageTrips = mileageTrips.filter(t => t.trip_type === 'business').length > 0;
+    const hasMileageTrips = (mileageTrips || []).filter(t => t.trip_type === 'business').length > 0;
     
     const now = new Date();
-    const pastPeriods = taxPeriods.filter(p => new Date(p.deadline_date) < now);
+    const pastPeriods = (taxPeriods || []).filter(p => new Date(p.deadline_date) < now);
     const allQuartersSubmittedOnTime = pastPeriods.length === 0 || 
       pastPeriods.every(p => p.status === 'submitted' || p.status === 'corrected');
     
-    const hasYearEndAdjustments = taxAdjustments.length > 0;
+    const hasYearEndAdjustments = (taxAdjustments || []).length > 0;
     
     return {
       hasMileageTrips,
