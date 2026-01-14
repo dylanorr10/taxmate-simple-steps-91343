@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +29,9 @@ import { useVATSubmissions } from "@/hooks/useVATSubmissions";
 import { useProfile } from "@/hooks/useProfile";
 import { useHMRCConnection } from "@/hooks/useHMRCConnection";
 import { useHMRCSubmission } from "@/hooks/useHMRCSubmission";
+import { useMileageTrips } from "@/hooks/useMileageTrips";
+import { useTaxPeriods } from "@/hooks/useTaxPeriods";
+import { useTaxAdjustments } from "@/hooks/useTaxAdjustments";
 import { formatCurrency } from "@/utils/transactionHelpers";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -46,13 +49,36 @@ const Tax = () => {
   const { submissions, saveSubmission, isSaving } = useVATSubmissions();
   const { submitToHMRC, isSubmitting } = useHMRCSubmission();
 
+  const { trips: mileageTrips } = useMileageTrips();
+  const { periods: taxPeriods } = useTaxPeriods();
+  const { adjustments: taxAdjustments } = useTaxAdjustments();
+
+  // Calculate compliance factors for enhanced MTD readiness
+  const complianceFactors = useMemo(() => {
+    const hasMileageTrips = mileageTrips.filter(t => t.trip_type === 'business').length > 0;
+    
+    const now = new Date();
+    const pastPeriods = taxPeriods.filter(p => new Date(p.deadline_date) < now);
+    const allQuartersSubmittedOnTime = pastPeriods.length === 0 || 
+      pastPeriods.every(p => p.status === 'submitted' || p.status === 'corrected');
+    
+    const hasYearEndAdjustments = taxAdjustments.length > 0;
+    
+    return {
+      hasMileageTrips,
+      allQuartersSubmittedOnTime,
+      hasYearEndAdjustments,
+    };
+  }, [mileageTrips, taxPeriods, taxAdjustments]);
+
   // Calculate VAT
   const { boxes, tasks, hasErrors, mtdReadiness } = useVATCalculations(
     incomeTransactions,
     expenseTransactions,
     isConnected,
     !!profile?.vat_number,
-    !!profile?.business_name
+    !!profile?.business_name,
+    complianceFactors
   );
 
   const isLoading = isLoadingIncome || isLoadingExpenses || isLoadingProfile || isLoadingConnection;

@@ -20,12 +20,19 @@ export interface VATCalculationResult {
   mtdReadiness: number;
 }
 
+export interface MTDComplianceFactors {
+  hasMileageTrips: boolean;
+  allQuartersSubmittedOnTime: boolean;
+  hasYearEndAdjustments: boolean;
+}
+
 export const useVATCalculations = (
   incomeTransactions: Transaction[],
   expenseTransactions: Transaction[],
   hasHMRCConnection: boolean,
   hasVATNumber: boolean,
-  hasBusinessName: boolean
+  hasBusinessName: boolean,
+  complianceFactors?: MTDComplianceFactors
 ): VATCalculationResult => {
   return useMemo(() => {
     // Calculate VAT Box 1: VAT due on sales
@@ -100,13 +107,43 @@ export const useVATCalculations = (
 
     const hasErrors = !hasBusinessName || !hasVATNumber || !hasHMRCConnection;
 
-    // Calculate MTD readiness score
+    // Calculate enhanced MTD readiness score
+    // New scoring breakdown (total 100%):
+    // - Business name: 10%
+    // - VAT number: 10%
+    // - HMRC connection: 15%
+    // - HMRC categories assigned to all transactions: 15%
+    // - No uncategorized expenses: 10%
+    // - Mileage log complete: 5%
+    // - Quarterly submissions on time: 10%
+    // - Year-end adjustments reviewed: 5%
+    // - Has transactions: 10% each (income/expense)
+    
     let mtdReadiness = 0;
-    if (hasBusinessName) mtdReadiness += 25;
-    if (hasVATNumber) mtdReadiness += 25;
-    if (hasHMRCConnection) mtdReadiness += 30;
-    if (incomeTransactions.length > 0) mtdReadiness += 10;
-    if (expenseTransactions.length > 0) mtdReadiness += 10;
+    
+    // Core business setup (35%)
+    if (hasBusinessName) mtdReadiness += 10;
+    if (hasVATNumber) mtdReadiness += 10;
+    if (hasHMRCConnection) mtdReadiness += 15;
+    
+    // Transaction categorization (25%)
+    const allTransactions = [...incomeTransactions, ...expenseTransactions];
+    const allHaveHMRCCategories = allTransactions.length > 0 && 
+      allTransactions.every(t => t.hmrc_category_id != null);
+    if (allHaveHMRCCategories) mtdReadiness += 15;
+    
+    const noUncategorizedExpenses = expenseTransactions.length === 0 || 
+      expenseTransactions.every(t => t.description && t.description.trim() !== '');
+    if (noUncategorizedExpenses) mtdReadiness += 10;
+    
+    // Enhanced compliance factors (20%)
+    if (complianceFactors?.hasMileageTrips) mtdReadiness += 5;
+    if (complianceFactors?.allQuartersSubmittedOnTime) mtdReadiness += 10;
+    if (complianceFactors?.hasYearEndAdjustments) mtdReadiness += 5;
+    
+    // Has transactions (10%)
+    if (incomeTransactions.length > 0) mtdReadiness += 5;
+    if (expenseTransactions.length > 0) mtdReadiness += 5;
 
     return {
       boxes,
@@ -114,5 +151,5 @@ export const useVATCalculations = (
       hasErrors,
       mtdReadiness,
     };
-  }, [incomeTransactions, expenseTransactions, hasHMRCConnection, hasVATNumber, hasBusinessName]);
+  }, [incomeTransactions, expenseTransactions, hasHMRCConnection, hasVATNumber, hasBusinessName, complianceFactors]);
 };
