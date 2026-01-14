@@ -20,6 +20,9 @@ import { getMonthToDateTotal, getLastMonthsData, formatCurrency } from "@/utils/
 import { useVATCalculations } from "@/hooks/useVATCalculations";
 import { useProfile } from "@/hooks/useProfile";
 import { useHMRCConnection } from "@/hooks/useHMRCConnection";
+import { useMileageTrips } from "@/hooks/useMileageTrips";
+import { useTaxPeriods } from "@/hooks/useTaxPeriods";
+import { useTaxAdjustments } from "@/hooks/useTaxAdjustments";
 import { HelpTooltip } from "@/components/HelpTooltip";
 import { LessonQuickLink } from "@/components/LessonQuickLink";
 import { DailyTipToast } from "@/components/DailyTipToast";
@@ -47,13 +50,36 @@ const Dashboard = () => {
   const { transactions: expenseTransactions, isLoading: expenseLoading } = useExpenseTransactions();
   const { profile } = useProfile();
   const { isConnected } = useHMRCConnection();
+  const { trips: mileageTrips } = useMileageTrips();
+  const { periods: taxPeriods } = useTaxPeriods();
+  const { adjustments: taxAdjustments } = useTaxAdjustments();
+  
+  // Calculate compliance factors for enhanced MTD readiness
+  const complianceFactors = useMemo(() => {
+    const hasMileageTrips = mileageTrips.filter(t => t.trip_type === 'business').length > 0;
+    
+    // Check if all past quarters are submitted on time
+    const now = new Date();
+    const pastPeriods = taxPeriods.filter(p => new Date(p.deadline_date) < now);
+    const allQuartersSubmittedOnTime = pastPeriods.length === 0 || 
+      pastPeriods.every(p => p.status === 'submitted' || p.status === 'corrected');
+    
+    const hasYearEndAdjustments = taxAdjustments.length > 0;
+    
+    return {
+      hasMileageTrips,
+      allQuartersSubmittedOnTime,
+      hasYearEndAdjustments,
+    };
+  }, [mileageTrips, taxPeriods, taxAdjustments]);
   
   const { mtdReadiness } = useVATCalculations(
     incomeTransactions,
     expenseTransactions,
     isConnected,
     !!profile?.vat_number,
-    !!profile?.business_name
+    !!profile?.business_name,
+    complianceFactors
   );
 
   const incomeThisMonth = useMemo(() => getMonthToDateTotal(incomeTransactions), [incomeTransactions]);
