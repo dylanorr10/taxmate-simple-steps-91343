@@ -36,6 +36,7 @@ import { ExpandableSection } from "@/components/ExpandableSection";
 import { InvoiceTracker } from "@/components/InvoiceTracker";
 import { ExpenseAlert } from "@/components/ExpenseAlert";
 import MTDGauge from "@/components/MTDGauge";
+import { MtdComplianceChecklist } from "@/components/MtdComplianceChecklist";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -66,13 +67,24 @@ const Dashboard = () => {
     
     const hasYearEndAdjustments = (taxAdjustments || []).length > 0;
     
+    // Additional factors for checklist
+    const allTransactions = [...incomeTransactions, ...expenseTransactions];
+    const allHaveHMRCCategories = allTransactions.length > 0 && 
+      allTransactions.every(t => t.hmrc_category_id != null);
+    const noUncategorizedExpenses = expenseTransactions.length === 0 || 
+      expenseTransactions.every(t => t.description && t.description.trim() !== '');
+    
     return {
       hasMileageTrips,
       allQuartersSubmittedOnTime,
       hasYearEndAdjustments,
+      allHaveHMRCCategories,
+      noUncategorizedExpenses,
+      hasIncomeTransactions: incomeTransactions.length > 0,
+      hasExpenseTransactions: expenseTransactions.length > 0,
     };
-  }, [mileageTrips, taxPeriods, taxAdjustments]);
-  
+  }, [mileageTrips, taxPeriods, taxAdjustments, incomeTransactions, expenseTransactions]);
+
   const { mtdReadiness } = useVATCalculations(
     incomeTransactions,
     expenseTransactions,
@@ -249,9 +261,25 @@ const Dashboard = () => {
                   <InvoiceTracker />
                 </div>
 
-                {/* MTD Compliance */}
+                {/* MTD Compliance Gauge */}
                 <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
                   <MTDGauge score={mtdReadiness} />
+                </div>
+
+                {/* MTD Compliance Checklist */}
+                <div className="animate-fade-in" style={{ animationDelay: "150ms" }}>
+                  <MtdComplianceChecklist
+                    hasBusinessName={!!profile?.business_name}
+                    hasVATNumber={!!profile?.vat_number}
+                    hasHMRCConnection={isConnected}
+                    allHaveHMRCCategories={complianceFactors.allHaveHMRCCategories}
+                    noUncategorizedExpenses={complianceFactors.noUncategorizedExpenses}
+                    hasMileageTrips={complianceFactors.hasMileageTrips}
+                    allQuartersSubmittedOnTime={complianceFactors.allQuartersSubmittedOnTime}
+                    hasYearEndAdjustments={complianceFactors.hasYearEndAdjustments}
+                    hasIncomeTransactions={complianceFactors.hasIncomeTransactions}
+                    hasExpenseTransactions={complianceFactors.hasExpenseTransactions}
+                  />
                 </div>
 
                 {/* Recent Activity */}
