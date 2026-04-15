@@ -37,6 +37,7 @@ import { InvoiceTracker } from "@/components/InvoiceTracker";
 import { ExpenseAlert } from "@/components/ExpenseAlert";
 import MTDGauge from "@/components/MTDGauge";
 import { MtdComplianceChecklist } from "@/components/MtdComplianceChecklist";
+import MileageStatsCard from "@/components/MileageStatsCard";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -256,6 +257,14 @@ const Dashboard = () => {
 
               {/* Sidebar Column */}
               <div className="space-y-6">
+                {/* Mileage Stats - Driver-focused */}
+                <div className="animate-fade-in" style={{ animationDelay: "25ms" }}>
+                  <MileageStatsCard
+                    totalMiles={Math.round((mileageTrips || []).filter(t => t.trip_type === 'business').reduce((sum, t) => sum + Number(t.distance_miles), 0))}
+                    totalDeduction={Math.round((mileageTrips || []).filter(t => t.trip_type === 'business').reduce((sum, t) => sum + Number(t.calculated_deduction), 0))}
+                  />
+                </div>
+
                 {/* Invoice Tracker - Overdue Payments */}
                 <div className="animate-fade-in" style={{ animationDelay: "50ms" }}>
                   <InvoiceTracker />
