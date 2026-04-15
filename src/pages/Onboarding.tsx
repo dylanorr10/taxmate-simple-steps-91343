@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, CheckCircle, Sparkles } from "lucide-react";
+import { ChevronRight, CheckCircle, Sparkles, Car, Bike } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,7 @@ const Onboarding = () => {
     name: "",
     email: "",
     password: "",
-    businessType: "",
+    vehicleType: "",
     incomeEstimate: "",
     recordKeeping: "",
   });
@@ -39,7 +39,6 @@ const Onboarding = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Determine experience level and VAT registration from income
       let experience_level = 'beginner';
       let vat_registered = false;
       
@@ -50,12 +49,16 @@ const Onboarding = () => {
         experience_level = 'intermediate';
       }
 
-      // Get smart default navigation items based on business type and experience
-      const defaultNavItems = getDefaultNavItems(formData.businessType, experience_level);
+      // Retrieve selected platforms from Welcome page
+      const storedPlatforms = sessionStorage.getItem("selectedPlatforms");
+      const deliveryPlatforms = storedPlatforms ? JSON.parse(storedPlatforms) : [];
 
-      // Update profile with complete flag
+      const defaultNavItems = getDefaultNavItems('transport', experience_level);
+
       await supabase.from('profiles').update({
-        business_type: formData.businessType,
+        business_type: 'transport',
+        vehicle_type: formData.vehicleType,
+        delivery_platforms: deliveryPlatforms,
         vat_registered,
         experience_level,
         nav_items: defaultNavItems,
@@ -63,9 +66,11 @@ const Onboarding = () => {
         demo_mode: false
       }).eq('id', user.id);
 
+      sessionStorage.removeItem("selectedPlatforms");
+
       toast({
-        title: "Welcome aboard! 🎉",
-        description: "Your account is ready. Start by adding your first transaction."
+        title: "Welcome aboard! 🚗",
+        description: "Your driver account is ready. Start by logging your first trip."
       });
 
       navigate("/dashboard");
@@ -92,10 +97,10 @@ const Onboarding = () => {
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-3">
-            Welcome to Reelin 🎣
+            Welcome to Reelin 🚗
           </h1>
           <p className="text-lg text-muted-foreground mb-8">
-            Helping the self-employed reel-in their finances
+            Tax tracking built for delivery drivers
           </p>
         </div>
 
@@ -103,9 +108,9 @@ const Onboarding = () => {
           <div className="flex items-start space-x-3 bg-primary/5 p-4 rounded-xl border border-primary/10">
             <CheckCircle className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-foreground">Learn As You Go</p>
+              <p className="font-semibold text-foreground">Track Every Mile</p>
               <p className="text-sm text-muted-foreground">
-                We explain every tax term and rule in plain English - no confusing jargon
+                Log trips in seconds and see your tax deduction grow at 45p/mile
               </p>
             </div>
           </div>
@@ -113,9 +118,9 @@ const Onboarding = () => {
           <div className="flex items-start space-x-3 bg-accent/5 p-4 rounded-xl border border-accent/10">
             <CheckCircle className="w-6 h-6 text-accent flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-foreground">MTD Ready in Minutes</p>
+              <p className="font-semibold text-foreground">Snap Fuel Receipts</p>
               <p className="text-sm text-muted-foreground">
-                Get compliant with Making Tax Digital without the hassle
+                Photograph receipts at the pump — never lose a fuel claim again
               </p>
             </div>
           </div>
@@ -123,9 +128,9 @@ const Onboarding = () => {
           <div className="flex items-start space-x-3 bg-secondary/5 p-4 rounded-xl border border-secondary/10">
             <CheckCircle className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-foreground">Built for Sole Traders</p>
+              <p className="font-semibold text-foreground">MTD Ready by 2026</p>
               <p className="text-sm text-muted-foreground">
-                Designed specifically for sole traders and self-employed professionals
+                Stay compliant with Making Tax Digital — we handle the digital records
               </p>
             </div>
           </div>
@@ -170,7 +175,7 @@ const Onboarding = () => {
               type="text"
               value={formData.name}
               onChange={(e) => updateFormData("name", e.target.value)}
-              placeholder="e.g., Sarah Johnson"
+              placeholder="e.g., James"
               className="h-12 text-base"
             />
           </div>
@@ -187,7 +192,7 @@ const Onboarding = () => {
               className="h-12 text-base"
             />
             <p className="text-xs text-muted-foreground mt-1.5">
-              We'll send you important updates and reminders
+              We'll send you tax deadline reminders
             </p>
           </div>
 
@@ -206,23 +211,6 @@ const Onboarding = () => {
               At least 8 characters
             </p>
           </div>
-
-          <div className="bg-accent/5 border border-accent/10 rounded-xl p-4 mt-6">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-lg">💡</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground mb-1">
-                  Why we need this
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Your email helps us send deadline reminders and keep your
-                  account secure. We never spam.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -236,9 +224,7 @@ const Onboarding = () => {
           </button>
           <button
             onClick={handleNext}
-            disabled={
-              !formData.name || !formData.email || !formData.password
-            }
+            disabled={!formData.name || !formData.email || !formData.password}
             className="flex-1 bg-gradient-to-r from-primary to-accent text-white font-semibold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             <span>Continue</span>
@@ -249,45 +235,13 @@ const Onboarding = () => {
     </div>
   );
 
-  // Screen 2: Business Type
-  const BusinessTypeScreen = () => {
-    const businessTypes = [
-      {
-        id: "trades",
-        label: "Trades & Manual Work",
-        icon: "🔧",
-        examples: "Electrician, Plumber, Builder",
-      },
-      {
-        id: "creative",
-        label: "Creative & Tech",
-        icon: "💻",
-        examples: "Designer, Developer, Photographer",
-      },
-      {
-        id: "professional",
-        label: "Professional Services",
-        icon: "💼",
-        examples: "Consultant, Accountant, Tutor",
-      },
-      {
-        id: "health",
-        label: "Health & Beauty",
-        icon: "💆",
-        examples: "Trainer, Hairdresser, Therapist",
-      },
-      {
-        id: "transport",
-        label: "Transport & Delivery",
-        icon: "🚗",
-        examples: "Taxi, Courier, Delivery",
-      },
-      {
-        id: "other",
-        label: "Something Else",
-        icon: "✨",
-        examples: "Tell us what you do",
-      },
+  // Screen 2: Vehicle Type
+  const VehicleTypeScreen = () => {
+    const vehicleTypes = [
+      { id: "car", label: "Car", icon: "🚗", description: "Sedan, hatchback, SUV" },
+      { id: "van", label: "Van", icon: "🚐", description: "Transit, Sprinter, Berlingo" },
+      { id: "motorbike", label: "Motorbike", icon: "🏍️", description: "Motorcycle or scooter" },
+      { id: "ebike", label: "E-Bike / Bicycle", icon: "🚲", description: "Electric or pedal bike" },
     ];
 
     return (
@@ -295,40 +249,52 @@ const Onboarding = () => {
         <div className="flex-1 px-6 pt-6 overflow-y-auto">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              What do you do?
+              What do you deliver in?
             </h2>
             <p className="text-muted-foreground">
-              This helps us give you relevant tax tips
+              This affects how we calculate your mileage deductions
             </p>
           </div>
 
           <div className="space-y-3">
-            {businessTypes.map((type) => (
+            {vehicleTypes.map((type) => (
               <button
                 key={type.id}
-                onClick={() => updateFormData("businessType", type.id)}
+                onClick={() => updateFormData("vehicleType", type.id)}
                 className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                  formData.businessType === type.id
+                  formData.vehicleType === type.id
                     ? "border-accent bg-accent/5 shadow-md"
                     : "border-border hover:border-accent/50 bg-card"
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="text-2xl">{type.icon}</div>
+                  <div className="text-3xl">{type.icon}</div>
                   <div className="flex-1">
-                    <p className="font-semibold text-foreground">
-                      {type.label}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {type.examples}
-                    </p>
+                    <p className="font-semibold text-foreground">{type.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{type.description}</p>
                   </div>
-                  {formData.businessType === type.id && (
+                  {formData.vehicleType === type.id && (
                     <CheckCircle className="w-6 h-6 text-accent" />
                   )}
                 </div>
               </button>
             ))}
+          </div>
+
+          <div className="bg-accent/5 border border-accent/10 rounded-xl p-4 mt-6">
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-lg">💡</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground mb-1">
+                  Mileage rates
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Cars & vans: 45p/mile (first 10,000), then 25p/mile. Motorcycles: 24p/mile. Bicycles: 20p/mile.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -342,7 +308,7 @@ const Onboarding = () => {
             </button>
             <button
               onClick={handleNext}
-              disabled={!formData.businessType}
+              disabled={!formData.vehicleType}
               className="flex-1 bg-gradient-to-r from-primary to-accent text-white font-semibold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               <span>Continue</span>
@@ -357,43 +323,18 @@ const Onboarding = () => {
   // Screen 3: Income & Record Keeping
   const IncomeRecordsScreen = () => {
     const incomeRanges = [
-      {
-        id: "under20k",
-        label: "Under £20,000",
-        description: "MTD from April 2028",
-      },
-      {
-        id: "20to30k",
-        label: "£20,000 - £30,000",
-        description: "MTD from April 2028",
-      },
-      {
-        id: "30to50k",
-        label: "£30,000 - £50,000",
-        description: "MTD from April 2027",
-      },
-      {
-        id: "50to85k",
-        label: "£50,000 - £85,000",
-        description: "MTD from April 2026",
-      },
-      {
-        id: "over85k",
-        label: "Over £85,000",
-        description: "MTD from April 2026",
-      },
+      { id: "under20k", label: "Under £20,000", description: "MTD from April 2028" },
+      { id: "20to30k", label: "£20,000 - £30,000", description: "MTD from April 2028" },
+      { id: "30to50k", label: "£30,000 - £50,000", description: "MTD from April 2027" },
+      { id: "50to85k", label: "£50,000 - £85,000", description: "MTD from April 2026" },
+      { id: "over85k", label: "Over £85,000", description: "MTD from April 2026" },
     ];
 
     const recordMethods = [
-      { id: "paper", label: "Paper receipts & notebooks", icon: "📝" },
+      { id: "paper", label: "Paper receipts in a glovebox", icon: "📝" },
       { id: "spreadsheet", label: "Excel or Google Sheets", icon: "📊" },
       { id: "software", label: "Another accounting app", icon: "💻" },
-      { id: "mix", label: "A mix of methods", icon: "🔀" },
-      {
-        id: "nothing",
-        label: "Not tracking yet (no judgment!)",
-        icon: "🤷",
-      },
+      { id: "nothing", label: "Not tracking yet (no judgment!)", icon: "🤷" },
     ];
 
     return (
@@ -401,17 +342,17 @@ const Onboarding = () => {
         <div className="flex-1 px-6 pt-6 overflow-y-auto">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              Let's talk money
+              Let's talk earnings
             </h2>
             <p className="text-muted-foreground">
-              Don't worry, rough estimates are fine
+              Rough estimates are fine — this helps us set your MTD timeline
             </p>
           </div>
 
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-foreground mb-3">
-                What's your yearly income roughly?
+                What's your yearly income roughly? (across all platforms)
               </label>
               <div className="space-y-2">
                 {incomeRanges.map((range) => (
@@ -426,12 +367,8 @@ const Onboarding = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-semibold text-foreground">
-                          {range.label}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {range.description}
-                        </p>
+                        <p className="font-semibold text-foreground">{range.label}</p>
+                        <p className="text-xs text-muted-foreground">{range.description}</p>
                       </div>
                       {formData.incomeEstimate === range.id && (
                         <CheckCircle className="w-5 h-5 text-primary" />
@@ -459,9 +396,7 @@ const Onboarding = () => {
                   >
                     <div className="flex items-center space-x-3">
                       <span className="text-xl">{method.icon}</span>
-                      <p className="font-medium text-foreground flex-1">
-                        {method.label}
-                      </p>
+                      <p className="font-medium text-foreground flex-1">{method.label}</p>
                       {formData.recordKeeping === method.id && (
                         <CheckCircle className="w-5 h-5 text-accent" />
                       )}
@@ -483,9 +418,7 @@ const Onboarding = () => {
             </button>
             <button
               onClick={handleNext}
-              disabled={
-                !formData.incomeEstimate || !formData.recordKeeping
-              }
+              disabled={!formData.incomeEstimate || !formData.recordKeeping}
               className="flex-1 bg-gradient-to-r from-primary to-accent text-white font-semibold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               <span>Almost Done!</span>
@@ -497,7 +430,7 @@ const Onboarding = () => {
     );
   };
 
-  // Screen 4: Success & Next Steps
+  // Screen 4: Success
   const SuccessScreen = () => (
     <div className="flex flex-col h-full">
       <div className="flex-1 flex flex-col justify-center px-6 pb-8">
@@ -506,16 +439,16 @@ const Onboarding = () => {
             <CheckCircle className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-3">
-            You're all set, {formData.name?.split(" ")[0] || "there"}! 🎉
+            You're all set, {formData.name?.split(" ")[0] || "driver"}! 🚗
           </h1>
           <p className="text-lg text-muted-foreground">
-            Welcome to stress-free tax management
+            Your driver account is ready to go
           </p>
         </div>
 
         <div className="bg-gradient-to-br from-accent/5 to-primary/5 rounded-2xl p-6 mb-6 border-2 border-accent/10">
           <h3 className="font-bold text-foreground mb-4 text-lg">
-            Here's what happens next:
+            Here's what to do first:
           </h3>
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
@@ -523,11 +456,9 @@ const Onboarding = () => {
                 <span className="text-accent font-bold">1</span>
               </div>
               <div>
-                <p className="font-semibold text-foreground">
-                  Learn the basics
-                </p>
+                <p className="font-semibold text-foreground">Log your first trip</p>
                 <p className="text-sm text-muted-foreground">
-                  Quick tutorials explaining tax concepts in plain English
+                  Takes 5 seconds — start building your mileage deduction
                 </p>
               </div>
             </div>
@@ -537,11 +468,9 @@ const Onboarding = () => {
                 <span className="text-accent font-bold">2</span>
               </div>
               <div>
-                <p className="font-semibold text-foreground">
-                  Start tracking income
-                </p>
+                <p className="font-semibold text-foreground">Snap a fuel receipt</p>
                 <p className="text-sm text-muted-foreground">
-                  Record jobs and see your earnings grow
+                  Next time you fill up, photograph the receipt
                 </p>
               </div>
             </div>
@@ -551,11 +480,9 @@ const Onboarding = () => {
                 <span className="text-accent font-bold">3</span>
               </div>
               <div>
-                <p className="font-semibold text-foreground">
-                  Track your expenses
-                </p>
+                <p className="font-semibold text-foreground">Learn the basics</p>
                 <p className="text-sm text-muted-foreground">
-                  Snap receipts and log costs to maximize deductions
+                  5-minute lessons on what you can claim as a delivery driver
                 </p>
               </div>
             </div>
@@ -570,15 +497,11 @@ const Onboarding = () => {
                 Your MTD deadline reminder is set
               </p>
               <p className="text-sm text-muted-foreground">
-                We'll email you before submissions are due. No more surprises!
+                We'll remind you before quarterly submissions are due
               </p>
             </div>
           </div>
         </div>
-
-        <p className="text-center text-sm text-muted-foreground mb-6">
-          Need help? Our support team is here 7 days a week
-        </p>
       </div>
 
       <div className="px-6 pb-6">
@@ -596,14 +519,13 @@ const Onboarding = () => {
   const screens = [
     <WelcomeScreen key="welcome" />,
     <BasicInfoScreen key="basic" />,
-    <BusinessTypeScreen key="business" />,
+    <VehicleTypeScreen key="vehicle" />,
     <IncomeRecordsScreen key="income" />,
     <SuccessScreen key="success" />,
   ];
 
   return (
     <div className="max-w-md mx-auto bg-background min-h-screen flex flex-col shadow-2xl">
-      {/* Progress Bar */}
       {currentScreen > 0 && currentScreen < totalScreens && (
         <div className="px-6 pt-4 pb-3">
           <div className="flex items-center justify-between mb-2">
@@ -623,7 +545,6 @@ const Onboarding = () => {
         </div>
       )}
 
-      {/* Current Screen */}
       <div className="flex-1 overflow-hidden">{screens[currentScreen]}</div>
     </div>
   );
