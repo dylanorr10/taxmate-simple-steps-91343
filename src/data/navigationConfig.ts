@@ -67,9 +67,9 @@ export const availableNavItems: NavItem[] = [
 ];
 
 export const getDefaultNavItems = (businessType?: string, experienceLevel?: string): string[] => {
-  // Smart defaults based on business type and experience
-  if (businessType === 'delivery_driver') {
-    return ['dashboard', 'log', 'mileage', 'learn'];
+  // Transport/delivery drivers: mileage is second tab
+  if (businessType === 'transport' || businessType === 'delivery_driver') {
+    return ['dashboard', 'mileage', 'log', 'learn'];
   }
   if (businessType === 'creative' || businessType === 'content_creator') {
     return ['dashboard', 'log', 'tax', 'learn'];

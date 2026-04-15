@@ -603,6 +603,7 @@ export type Database = {
           distance_miles: number
           id: string
           origin: string | null
+          platform: string | null
           purpose: string | null
           tax_period_id: string | null
           trip_date: string
@@ -617,6 +618,7 @@ export type Database = {
           distance_miles: number
           id?: string
           origin?: string | null
+          platform?: string | null
           purpose?: string | null
           tax_period_id?: string | null
           trip_date?: string
@@ -631,6 +633,7 @@ export type Database = {
           distance_miles?: number
           id?: string
           origin?: string | null
+          platform?: string | null
           purpose?: string | null
           tax_period_id?: string | null
           trip_date?: string
@@ -748,6 +751,7 @@ export type Database = {
           business_name: string | null
           business_type: string | null
           created_at: string
+          delivery_platforms: string[] | null
           demo_mode: boolean | null
           experience_level: string | null
           home_office_method: string | null
@@ -759,12 +763,14 @@ export type Database = {
           updated_at: string
           vat_number: string | null
           vat_registered: boolean | null
+          vehicle_type: string | null
         }
         Insert: {
           accounting_basis?: string | null
           business_name?: string | null
           business_type?: string | null
           created_at?: string
+          delivery_platforms?: string[] | null
           demo_mode?: boolean | null
           experience_level?: string | null
           home_office_method?: string | null
@@ -776,12 +782,14 @@ export type Database = {
           updated_at?: string
           vat_number?: string | null
           vat_registered?: boolean | null
+          vehicle_type?: string | null
         }
         Update: {
           accounting_basis?: string | null
           business_name?: string | null
           business_type?: string | null
           created_at?: string
+          delivery_platforms?: string[] | null
           demo_mode?: boolean | null
           experience_level?: string | null
           home_office_method?: string | null
@@ -793,6 +801,7 @@ export type Database = {
           updated_at?: string
           vat_number?: string | null
           vat_registered?: boolean | null
+          vehicle_type?: string | null
         }
         Relationships: []
       }
