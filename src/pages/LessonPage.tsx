@@ -95,7 +95,7 @@ const LessonPage = () => {
   // Auto-save notes with debounce
   const debouncedSaveNotes = useCallback(
     (() => {
-      let timeout: NodeJS.Timeout;
+      let timeout: ReturnType<typeof setTimeout>;
       return (value: string) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
