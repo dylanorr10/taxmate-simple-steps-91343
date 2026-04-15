@@ -57,16 +57,18 @@ export const businessTypeConfig: Record<BusinessType, BusinessTypeConfig> = {
     quickRefCards: ['Treatment Pricing Guide', 'Appointment Income Tracker', 'Health & Beauty Expenses']
   },
   transport: {
-    priorityLessons: ['mileage-tracking', 'vehicle-expenses', 'vat-explained', 'claiming-expenses', 'ai-automation'],
-    hiddenLessons: ['home-office', 'copyright-basics'],
+    priorityLessons: ['mileage-tracking', 'vehicle-expenses', 'claiming-expenses', 'vat-explained', 'tax-planning'],
+    hiddenLessons: ['home-office', 'copyright-basics', 'cis-basics'],
     customExamples: {
-      'claiming-expenses': ['Fuel', 'Vehicle insurance', 'MOT & servicing', 'Parking fees', 'Tolls'],
-      'mileage-tracking': ['Client pickups', 'Package deliveries', 'Return journeys', 'Multi-drop routes'],
-      'vehicle-expenses': ['Fuel costs', 'Repairs', 'Road tax', 'Breakdown cover'],
+      'claiming-expenses': ['Uber/Deliveroo service fees', 'Phone mount & holder', 'Insulated delivery bag', 'Hi-vis vest', 'Phone data plan', 'Dashcam'],
+      'mileage-tracking': ['Multi-drop route', 'Return to depot', 'Between-platform trips', 'Uber pickup runs', 'Amazon Flex blocks'],
+      'vehicle-expenses': ['Fuel costs', 'MOT & servicing', 'Road tax', 'Breakdown cover', 'Car wash', 'Tyre replacement'],
       'vat-explained': ['Fuel VAT recovery', 'Vehicle purchase VAT'],
-      'ai-automation': ['Route optimization apps', 'Automated mileage logging', 'Digital receipt capture', 'Fuel price comparison tools', 'Job dispatch automation']
+      'understanding-profit': ['Platform earnings minus fees', 'Fuel costs', 'Vehicle running costs', 'Phone expenses'],
+      'tax-planning': ['Set aside 30% of weekly earnings', 'Track platform payouts', 'Quarterly mileage review'],
+      'ai-automation': ['Route optimization apps', 'Automated mileage logging', 'Digital receipt capture', 'Fuel price comparison tools']
     },
-    quickRefCards: ['Mileage vs Actual Costs Calculator', 'Fuel Receipt Log', 'Vehicle Expense Tracker']
+    quickRefCards: ['Platform Fee Deduction Guide', 'Driver Expense Checklist', 'Mileage vs Actual Costs Calculator']
   },
   other: {
     priorityLessons: ['mtd-basics', 'claiming-expenses', 'tax-planning', 'understanding-profit', 'ai-automation'],
