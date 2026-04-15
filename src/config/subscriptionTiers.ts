@@ -14,30 +14,31 @@ export interface TierConfig {
 export const SUBSCRIPTION_TIERS: Record<Exclude<SubscriptionTier, 'free'>, TierConfig> = {
   starter: {
     id: 'starter',
-    name: 'Starter',
+    name: 'Driver Essentials',
     price: 4.99,
     priceId: 'price_1SaNSz5d5AuxGTtPWCiPwJi2',
     productId: 'prod_TXSNVi9bp0CRfO',
-    description: 'Essential bookkeeping for new freelancers',
+    description: 'Track your miles, log platform earnings, know your tax bill',
     features: [
-      'Track income & expenses',
-      'Basic VAT calculations',
-      'Manual bank entry',
-      'Learning hub access',
+      'Mileage tracking with 45p/25p threshold',
+      'Income & expense logging',
+      'Platform fee tracking (Uber, Deliveroo, etc.)',
+      'Tax estimate & set-aside calculator',
+      'Learning hub with driver lessons',
       'Email support'
     ]
   },
   professional: {
     id: 'professional',
-    name: 'Professional',
+    name: 'Driver Pro',
     price: 14.99,
     priceId: 'price_1SaNTC5d5AuxGTtPS0UHJGOp',
     productId: 'prod_TXSN1pvc5sExfi',
-    description: 'Full-featured bookkeeping for established freelancers',
+    description: 'Auto-import bank transactions, snap receipts on the go',
     features: [
-      'Everything in Starter',
+      'Everything in Driver Essentials',
       'Bank sync via TrueLayer',
-      'Receipt OCR scanning',
+      'Receipt photo scanning',
       'AI bookkeeping assistant',
       'Invoice tracking',
       'Payment reminders',
@@ -47,17 +48,16 @@ export const SUBSCRIPTION_TIERS: Record<Exclude<SubscriptionTier, 'free'>, TierC
   },
   business: {
     id: 'business',
-    name: 'Business',
+    name: 'Fleet / Full Compliance',
     price: 29.99,
     priceId: 'price_1SaNTN5d5AuxGTtPam4qZji0',
     productId: 'prod_TXSOKSPIkSXWJK',
-    description: 'Complete tax automation for growing businesses',
+    description: 'Submit directly to HMRC, full MTD compliance',
     features: [
-      'Everything in Professional',
-      'HMRC MTD integration',
+      'Everything in Driver Pro',
+      'HMRC MTD auto-submission',
       'VAT auto-submission',
       'Cash flow forecasting',
-      'Mileage tracking',
       'Priority phone support'
     ]
   }
@@ -83,7 +83,7 @@ export const TIER_FEATURES: Record<string, SubscriptionTier[]> = {
   hmrcIntegration: ['business'],
   vatAutoSubmission: ['business'],
   cashFlowForecast: ['business'],
-  mileageTracking: ['business']
+  mileageTracking: ['starter', 'professional', 'business']
 };
 
 export const hasFeatureAccess = (tier: SubscriptionTier, feature: string): boolean => {

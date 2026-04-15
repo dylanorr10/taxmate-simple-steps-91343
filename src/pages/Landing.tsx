@@ -337,6 +337,51 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Why Not QuickBooks */}
+      <section className="py-16 px-4 bg-[hsl(200,16%,24%)]">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-10">
+            <p className="text-primary font-medium mb-2">Why Not QuickBooks?</p>
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Built for Drivers, Not Accountants
+            </h2>
+            <p className="text-white/70">
+              Generic accounting apps weren't designed for life on the road.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-destructive/5 border-destructive/20 p-6">
+              <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+                QuickBooks
+              </h3>
+              <ul className="space-y-2 text-white/60 text-sm">
+                <li>• Built for accountants, not drivers</li>
+                <li>• No mileage threshold tracking (45p → 25p)</li>
+                <li>• Doesn't know Uber from Deliveroo</li>
+                <li>• You pay for 50 features. You need 5.</li>
+                <li>• £12/month for complexity you don't want</li>
+              </ul>
+            </Card>
+            
+            <Card className="bg-primary/5 border-primary/20 p-6">
+              <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                Reelin
+              </h3>
+              <ul className="space-y-2 text-white/80 text-sm">
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Purpose-built for delivery drivers</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Tracks your 45p/25p mileage threshold automatically</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Knows your platform fees are deductible</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> Only the features you actually use</li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" /> From £4.99/month — less than half the price</li>
+              </ul>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-4 bg-gradient-to-b from-[hsl(200,16%,24%)] to-[hsl(200,16%,20%)]">
         <div className="container mx-auto max-w-3xl text-center">
