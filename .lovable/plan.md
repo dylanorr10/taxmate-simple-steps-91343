@@ -1,73 +1,57 @@
 
 
-# Niche Reelin for Gig Delivery Drivers
+# Competitive Repositioning: Beat QuickBooks for Drivers
 
-Target: Self-employed delivery/courier drivers — Uber, Deliveroo, Amazon Flex, Parcelforce, Evri, DPD, Just Eat, Stuart.
+## The Insight
+The Reddit user reveals exactly what drivers want: simple, focused on income/expenses/tax estimate, not overwhelmed by features. QuickBooks is "too much." Your advantage is being purpose-built for drivers.
 
-## What Needs to Change
+## Changes Needed
 
-### 1. Landing Page — Rewrite for drivers
-- Hero: "Built for Delivery Drivers. Track Miles. Claim Expenses. Stay HMRC-Ready."
-- Replace generic "business owner" language with driver-specific copy
-- Pain points section: mileage tracking headaches, missing fuel receipts, surprise tax bills, MTD confusion
-- Personal story: reframe around drivers you know / the driver problem
-- Curriculum section: show driver-relevant lessons only (mileage, fuel, vehicle costs, MTD)
-- Add platform logos (Uber, Deliveroo, Amazon Flex, Evri, etc.) as social proof / recognition
+### 1. Restructure Subscription Tiers for Drivers
+**File:** `src/config/subscriptionTiers.ts`
 
-### 2. Welcome Page — Remove generic profession picker
-- Replace multi-profession grid with driver sub-type selection: "Which platforms do you deliver for?" (Uber Eats, Deliveroo, Amazon Flex, Evri/Parcelforce, DPD/Yodel, Other)
-- This data feeds into personalised onboarding and examples
+Current problem: Mileage tracking is locked to Business tier (£29.99). For drivers, mileage is the core feature — it must be in the cheapest tier.
 
-### 3. Onboarding Flow — Driver-specific questions
-- Replace generic business types with driver-specific flow:
-  - Screen 2: "Which platforms?" (multi-select: Uber, Deliveroo, Amazon Flex, Evri, etc.)
-  - Screen 3: "Do you use your own vehicle?" + vehicle type (car, van, e-bike, motorbike)
-  - Keep income range + record-keeping screens (already relevant)
-- Auto-set `business_type = 'transport'` and `mileage` as priority nav item
+- **Starter (£4.99/mo)** — "Driver Essentials": Income & expense tracking, **mileage tracking**, tax estimate, learning hub, platform fee tracking
+- **Professional (£14.99/mo)** — "Driver Pro": Everything in Starter + bank sync, receipt scanning, AI assistant, invoice tracking
+- **Business (£29.99/mo)** — "Fleet / Full Compliance": Everything in Pro + HMRC MTD auto-submission, VAT submission, cash flow forecasting
 
-### 4. Business Type Config — Add driver-specific examples
-- Update `businessTypeConfig.ts` transport examples to be driver-specific:
-  - Expenses: "Uber service fees", "Phone mount", "Insulated delivery bag", "Hi-vis vest", "Phone data plan"
-  - Mileage: "Multi-drop route", "Return to depot", "Between-platform trips"
-- Add new quick ref cards: "Platform Fee Deduction Guide", "Driver Expense Checklist"
+Move `mileageTracking` from Business-only to all tiers in `TIER_FEATURES`.
 
-### 5. Learning Content — Prioritise driver lessons
-- Ensure mileage tracking, vehicle expenses, fuel VAT recovery, and MTD lessons exist and are prioritised
-- Add driver-specific examples within existing lessons (e.g., "If you drove 120 miles today across 15 Deliveroo drops...")
-- Consider a new lesson: "Tax Basics for Delivery Drivers" as the starter lesson
+### 2. Update Pricing Page Copy for Drivers
+**File:** `src/pages/Pricing.tsx`
 
-### 6. Navigation Defaults — Mileage front and centre
-- Update `getDefaultNavItems` for transport type to put Mileage as the second tab (already close, just confirm)
-- Dashboard should prominently show mileage stats and deduction progress
+- Rewrite tier descriptions with driver language:
+  - Starter: "Track your miles, log platform earnings, know your tax bill"
+  - Professional: "Auto-import bank transactions, snap receipts on the go"
+  - Business: "Submit directly to HMRC, full MTD compliance"
+- Add a comparison callout: "QuickBooks charges £12/mo and gives you features you'll never use. Reelin gives you exactly what drivers need, starting at £4.99."
 
-### 7. Dashboard — Driver-focused widgets
-- Highlight: miles this week, deduction earned, miles until rate drops (45p → 25p)
-- Show platform breakdown if we track which platform each trip was for
-- Quick-add trip button prominent at top
+### 3. Add Competitor Comparison Section to Landing Page
+**File:** `src/pages/Landing.tsx`
 
-### 8. Database — Add platform tracking
-- Add `delivery_platform` column to profiles table (or a new `driver_platforms` junction table)
-- Optionally add `platform` field to mileage_trips for per-platform tracking
-- Add `vehicle_type` column to profiles
+Add a "Why not QuickBooks?" section:
+- "Built for accountants, not drivers"
+- "No mileage threshold tracking (45p → 25p)"
+- "Doesn't know Uber from Deliveroo"  
+- "You'll pay for 50 features. You need 5."
 
-## Technical Changes Summary
+### 4. Update Feature Gating
+**File:** `src/config/subscriptionTiers.ts`
 
-| File/Area | Change |
-|-----------|--------|
-| `src/pages/Landing.tsx` | Full copy rewrite for drivers |
-| `src/pages/Welcome.tsx` | Platform picker instead of profession picker |
-| `src/pages/Onboarding.tsx` | Driver-specific screens (platforms, vehicle type) |
-| `src/data/businessTypeConfig.ts` | Expand transport config with driver examples |
-| `src/data/navigationConfig.ts` | Confirm transport defaults are optimal |
-| `src/data/learningContent.ts` | Add/update driver-relevant lessons and examples |
-| `src/pages/Dashboard.tsx` | Mileage-first layout for transport users |
-| Database migration | Add `vehicle_type`, `delivery_platforms` columns to profiles |
-| `mem://index.md` | Update core memory to reflect driver niche |
+```
+mileageTracking: ['starter', 'professional', 'business']  // was: ['business']
+```
 
-## Priority Order
-1. Landing page rewrite (this is what potential users see first)
-2. Welcome + Onboarding flow (first-run experience)
-3. Business type config + learning content (personalisation)
-4. Dashboard tweaks (daily usage)
-5. Database schema updates (platform tracking)
+This is critical — if a driver signs up and can't track miles on Starter, they'll leave immediately.
+
+## Priority
+1. Move mileage to Starter tier (feature gating fix)
+2. Rewrite tier descriptions for drivers
+3. Add competitor comparison to landing page
+
+## Technical Scope
+- 3 files modified: `subscriptionTiers.ts`, `Pricing.tsx`, `Landing.tsx`
+- No database changes
+- No new components needed
 
