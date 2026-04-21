@@ -33,8 +33,11 @@ import { HMRCCategoryPicker } from "@/components/HMRCCategoryPicker";
 import { BusinessUseSlider } from "@/components/BusinessUseSlider";
 import { Badge } from "@/components/ui/badge";
 import { useHMRCCategories, HMRCCategory } from "@/hooks/useHMRCCategories";
+import { useProfile } from "@/hooks/useProfile";
 
 const Log = () => {
+  const { profile } = useProfile();
+  const invoicingEnabled = !!profile?.invoicing_enabled;
   const [cashAmount, setCashAmount] = useState("");
   const [cashDescription, setCashDescription] = useState("");
   const [clientName, setClientName] = useState("");
