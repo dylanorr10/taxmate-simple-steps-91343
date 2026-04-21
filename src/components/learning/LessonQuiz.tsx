@@ -18,10 +18,12 @@ export const LessonQuiz = ({ quiz, onComplete, previousScore }: LessonQuizProps)
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
 
-  const question = quiz.questions[currentQuestion];
+  const questions = quiz?.questions ?? [];
+  const hasQuestions = questions.length > 0;
+  const question = questions[currentQuestion];
   const isCorrect = selectedAnswer === question?.correct_answer;
-  const isLastQuestion = currentQuestion === quiz.questions.length - 1;
-  const progress = ((currentQuestion + 1) / quiz.questions.length) * 100;
+  const isLastQuestion = currentQuestion === questions.length - 1;
+  const progress = hasQuestions ? ((currentQuestion + 1) / questions.length) * 100 : 0;
 
   const handleAnswerSelect = (index: number) => {
     if (showExplanation) return;
