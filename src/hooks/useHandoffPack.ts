@@ -1,39 +1,44 @@
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export interface HandoffStats {
-  transactions: number;
-  receipts: number;
-  healthScore: number;
-  sizeBytes: number;
-  edgeCases: number;
+export interface HandoffExport {
+  id: string;
+  period_label: string;
+  period_start: string | null;
+  period_end: string | null;
+  file_path: string;
+  file_size_bytes: number | null;
+  transaction_count: number | null;
+  receipt_count: number | null;
+  health_score: number | null;
+  expires_at: string;
+  sent_to_email: string | null;
+  sent_at: string | null;
+  status: string;
+  created_at: string;
 }
 
-export interface HandoffResult {
-  success: boolean;
+export interface GeneratePackParams {
+  periodLabel: string;
+  periodStart?: string; // ISO date
+  periodEnd?: string;
+}
+
+export interface GeneratePackResult {
   exportId: string;
-  downloadUrl: string;
+  signedUrl: string;
+  filePath: string;
   expiresAt: string;
-  filename: string;
-  stats: HandoffStats;
-  founderProfile: string;
+  stats: {
+    transactions: number;
+    receipts: number;
+    healthScore: number;
+  };
 }
 
-export interface HandoffPeriod {
-  label: string;
-  start?: string;
-  end?: string;
-}
-
-export function useHandoffPack() {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [lastResult, setLastResult] = useState<HandoffResult | null>(null);
-  const qc = useQueryClient();
-
-  const history = useQuery({
+export const useHandoffHistory = () => {
+  return useQuery({
     queryKey: ["handoff-exports"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -42,69 +47,52 @@ export function useHandoffPack() {
         .order("created_at", { ascending: false })
         .limit(10);
       if (error) throw error;
-      return data || [];
+      return (data ?? []) as HandoffExport[];
     },
   });
+};
 
-  async function generate(period: HandoffPeriod): Promise<HandoffResult | null> {
-    setIsGenerating(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-handoff-pack", {
-        body: {
-          periodStart: period.start,
-          periodEnd: period.end,
-          periodLabel: period.label,
-        },
-      });
+export const useGenerateHandoffPack = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: GeneratePackParams): Promise<GeneratePackResult> => {
+      const { data, error } = await supabase.functions.invoke(
+        "generate-handoff-pack",
+        { body: params },
+      );
       if (error) throw error;
-      if (!data?.success) throw new Error(data?.error || "Generation failed");
-      setLastResult(data);
+      if (!data?.signedUrl) throw new Error("No download URL returned");
+      return data as GeneratePackResult;
+    },
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["handoff-exports"] });
       toast.success("Handoff pack ready", {
-        description: `${data.stats.transactions} transactions • ${data.stats.receipts} receipts`,
+        description: "Your accountant bundle has been generated.",
       });
-      return data;
-    } catch (e: any) {
-      toast.error("Could not generate handoff pack", { description: e.message });
-      return null;
-    } finally {
-      setIsGenerating(false);
-    }
-  }
+    },
+    onError: (err: Error) => {
+      toast.error("Couldn't generate pack", { description: err.message });
+    },
+  });
+};
 
-  async function sendToAccountant(opts: {
-    exportId: string;
-    accountantEmail: string;
-    accountantName?: string;
-    message?: string;
-  }): Promise<boolean> {
-    setIsSending(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("send-handoff-to-accountant", {
-        body: opts,
-      });
+export const useSendHandoffToAccountant = () => {
+  return useMutation({
+    mutationFn: async (params: { exportId: string; email: string }) => {
+      const { data, error } = await supabase.functions.invoke(
+        "send-handoff-to-accountant",
+        { body: params },
+      );
       if (error) throw error;
-      if (!data?.success) throw new Error(data?.error || "Send failed");
-      qc.invalidateQueries({ queryKey: ["handoff-exports"] });
-      toast.success("Sent to your accountant", {
-        description: opts.accountantEmail,
+      return data;
+    },
+    onSuccess: (_, vars) => {
+      toast.success("Sent to accountant", {
+        description: `Download link emailed to ${vars.email}`,
       });
-      return true;
-    } catch (e: any) {
-      toast.error("Could not send email", { description: e.message });
-      return false;
-    } finally {
-      setIsSending(false);
-    }
-  }
-
-  return {
-    generate,
-    sendToAccountant,
-    isGenerating,
-    isSending,
-    lastResult,
-    history: history.data || [],
-    isLoadingHistory: history.isLoading,
-  };
-}
+    },
+    onError: (err: Error) => {
+      toast.error("Couldn't send email", { description: err.message });
+    },
+  });
+};

@@ -1,107 +1,127 @@
-// Standard UK Chart of Accounts (compatible with Xero / QuickBooks defaults).
-// Maps Reelin's HMRC category codes → standard CoA codes used by accountants.
+// UK Chart of Accounts mapping (Xero-compatible codes)
+// Maps internal HMRC category codes to standard UK CoA codes used by accountants.
 
 export interface CoAEntry {
   code: string;
   name: string;
-  type: "Revenue" | "Cost of Sales" | "Expense" | "Asset" | "Liability" | "Equity";
-  taxType: "Output VAT" | "Input VAT" | "No VAT";
+  type: "Revenue" | "Direct Costs" | "Expense" | "Asset" | "Liability";
 }
 
+// Static UK CoA — the canonical list shipped in 3-chart-of-accounts.csv
 export const UK_CHART_OF_ACCOUNTS: CoAEntry[] = [
   // Revenue
-  { code: "200", name: "Sales", type: "Revenue", taxType: "Output VAT" },
-  { code: "210", name: "Sales — Services", type: "Revenue", taxType: "Output VAT" },
-  { code: "220", name: "Sales — Products", type: "Revenue", taxType: "Output VAT" },
-  { code: "260", name: "Other Income", type: "Revenue", taxType: "No VAT" },
-
-  // Cost of Sales
-  { code: "310", name: "Cost of Goods Sold", type: "Cost of Sales", taxType: "Input VAT" },
-  { code: "320", name: "Subcontractor Costs", type: "Cost of Sales", taxType: "Input VAT" },
-
+  { code: "200", name: "Sales", type: "Revenue" },
+  { code: "260", name: "Other Revenue", type: "Revenue" },
+  // Direct Costs
+  { code: "310", name: "Cost of Goods Sold", type: "Direct Costs" },
   // Operating Expenses
-  { code: "400", name: "Advertising & Marketing", type: "Expense", taxType: "Input VAT" },
-  { code: "404", name: "Bank Fees", type: "Expense", taxType: "No VAT" },
-  { code: "408", name: "General Expenses", type: "Expense", taxType: "Input VAT" },
-  { code: "412", name: "Consulting & Professional Fees", type: "Expense", taxType: "Input VAT" },
-  { code: "416", name: "Depreciation", type: "Expense", taxType: "No VAT" },
-  { code: "420", name: "Entertainment", type: "Expense", taxType: "No VAT" },
-  { code: "424", name: "Postage, Freight & Courier", type: "Expense", taxType: "Input VAT" },
-  { code: "429", name: "General Office Expenses", type: "Expense", taxType: "Input VAT" },
-  { code: "433", name: "Insurance", type: "Expense", taxType: "No VAT" },
-  { code: "437", name: "Interest Expense", type: "Expense", taxType: "No VAT" },
-  { code: "441", name: "Legal Expenses", type: "Expense", taxType: "Input VAT" },
-  { code: "445", name: "Light, Power, Heating", type: "Expense", taxType: "Input VAT" },
-  { code: "449", name: "Motor Vehicle Expenses", type: "Expense", taxType: "Input VAT" },
-  { code: "453", name: "Office Expenses", type: "Expense", taxType: "Input VAT" },
-  { code: "461", name: "Printing & Stationery", type: "Expense", taxType: "Input VAT" },
-  { code: "469", name: "Rent", type: "Expense", taxType: "No VAT" },
-  { code: "473", name: "Repairs & Maintenance", type: "Expense", taxType: "Input VAT" },
-  { code: "477", name: "Wages & Salaries", type: "Expense", taxType: "No VAT" },
-  { code: "478", name: "Pension Costs", type: "Expense", taxType: "No VAT" },
-  { code: "485", name: "Subscriptions (Software)", type: "Expense", taxType: "Input VAT" },
-  { code: "489", name: "Telephone & Internet", type: "Expense", taxType: "Input VAT" },
-  { code: "493", name: "Travel — National", type: "Expense", taxType: "Input VAT" },
-  { code: "494", name: "Travel — International", type: "Expense", taxType: "No VAT" },
-  { code: "497", name: "Bank Service Charges", type: "Expense", taxType: "No VAT" },
-
-  // Special
-  { code: "999", name: "REVIEW NEEDED — Uncategorised", type: "Expense", taxType: "No VAT" },
+  { code: "400", name: "Advertising & Marketing", type: "Expense" },
+  { code: "404", name: "Bank Fees", type: "Expense" },
+  { code: "408", name: "General Expenses", type: "Expense" },
+  { code: "412", name: "Consulting & Accountancy", type: "Expense" },
+  { code: "420", name: "Entertainment", type: "Expense" },
+  { code: "425", name: "Freight & Courier", type: "Expense" },
+  { code: "429", name: "General Expenses", type: "Expense" },
+  { code: "433", name: "Insurance", type: "Expense" },
+  { code: "437", name: "Interest Expense", type: "Expense" },
+  { code: "441", name: "Legal Expenses", type: "Expense" },
+  { code: "445", name: "Light, Power, Heating", type: "Expense" },
+  { code: "449", name: "Motor Vehicle Expenses", type: "Expense" },
+  { code: "453", name: "Office Expenses", type: "Expense" },
+  { code: "461", name: "Postage, Freight & Courier", type: "Expense" },
+  { code: "463", name: "Printing & Stationery", type: "Expense" },
+  { code: "469", name: "Rent", type: "Expense" },
+  { code: "473", name: "Repairs & Maintenance", type: "Expense" },
+  { code: "477", name: "Wages & Salaries", type: "Expense" },
+  { code: "478", name: "Subcontractors", type: "Expense" },
+  { code: "485", name: "Software Subscriptions", type: "Expense" },
+  { code: "489", name: "Telephone & Internet", type: "Expense" },
+  { code: "493", name: "Travel - National", type: "Expense" },
+  { code: "494", name: "Travel - International", type: "Expense" },
+  { code: "497", name: "Bank Charges", type: "Expense" },
+  { code: "499", name: "Home Office", type: "Expense" },
+  // Review needed
+  { code: "999", name: "REVIEW NEEDED - Uncategorised", type: "Expense" },
 ];
 
-/**
- * Maps a Reelin HMRC category code to a UK CoA entry.
- * Falls back to 999 (REVIEW NEEDED) for unmapped/missing categories.
- */
+// Map HMRC category codes (from hmrc_categories.code) → CoA codes.
+// Unknown / null codes fall back to 999 for expenses, 260 for income.
+const HMRC_TO_COA: Record<string, string> = {
+  // Income
+  turnover: "200",
+  other_income: "260",
+  sales: "200",
+  // Common expense categories
+  cost_of_goods: "310",
+  goods_bought_for_resale: "310",
+  cost_of_sales: "310",
+  advertising: "400",
+  marketing: "400",
+  bank_charges: "404",
+  accountancy_fees: "412",
+  legal_fees: "441",
+  professional_fees: "412",
+  entertainment: "420",
+  insurance: "433",
+  interest: "437",
+  utilities: "445",
+  motor_expenses: "449",
+  vehicle: "449",
+  office_costs: "453",
+  office_supplies: "453",
+  postage: "461",
+  printing: "463",
+  rent: "469",
+  premises: "469",
+  repairs: "473",
+  wages: "477",
+  staff_costs: "477",
+  subcontractors: "478",
+  software: "485",
+  subscriptions: "485",
+  it_costs: "485",
+  phone: "489",
+  telephone: "489",
+  internet: "489",
+  travel: "493",
+  travel_uk: "493",
+  travel_overseas: "494",
+  home_office: "499",
+  use_of_home: "499",
+};
+
 export function mapHmrcToCoA(
   hmrcCode: string | null | undefined,
   type: "income" | "expense",
 ): CoAEntry {
   if (!hmrcCode) {
     return type === "income"
-      ? UK_CHART_OF_ACCOUNTS.find((c) => c.code === "200")!
-      : UK_CHART_OF_ACCOUNTS.find((c) => c.code === "999")!;
+      ? UK_CHART_OF_ACCOUNTS.find((e) => e.code === "200")!
+      : UK_CHART_OF_ACCOUNTS.find((e) => e.code === "999")!;
   }
-
-  const code = hmrcCode.toLowerCase();
-
-  // Income mappings
+  const normalised = hmrcCode.toLowerCase().replace(/[^a-z_]/g, "_");
+  const code = HMRC_TO_COA[normalised];
+  if (code) {
+    const entry = UK_CHART_OF_ACCOUNTS.find((e) => e.code === code);
+    if (entry) return entry;
+  }
+  // Heuristic fallbacks
   if (type === "income") {
-    if (code.includes("service")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "210")!;
-    if (code.includes("product") || code.includes("good")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "220")!;
-    if (code.includes("other")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "260")!;
-    return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "200")!;
+    return UK_CHART_OF_ACCOUNTS.find((e) => e.code === "260")!;
   }
-
-  // Expense mappings
-  if (code.includes("advert") || code.includes("market")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "400")!;
-  if (code.includes("bank") && code.includes("fee")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "404")!;
-  if (code.includes("subcontract")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "320")!;
-  if (code.includes("cost_of_goods") || code.includes("cogs")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "310")!;
-  if (code.includes("legal") || code.includes("professional")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "412")!;
-  if (code.includes("entertain")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "420")!;
-  if (code.includes("insurance")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "433")!;
-  if (code.includes("interest")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "437")!;
-  if (code.includes("rent")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "469")!;
-  if (code.includes("repair") || code.includes("maintenance")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "473")!;
-  if (code.includes("salary") || code.includes("wage")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "477")!;
-  if (code.includes("pension")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "478")!;
-  if (code.includes("subscription") || code.includes("software")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "485")!;
-  if (code.includes("phone") || code.includes("internet") || code.includes("telecom")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "489")!;
-  if (code.includes("travel")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "493")!;
-  if (code.includes("vehicle") || code.includes("motor") || code.includes("mileage")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "449")!;
-  if (code.includes("utility") || code.includes("electric") || code.includes("heat")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "445")!;
-  if (code.includes("office") || code.includes("home")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "453")!;
-  if (code.includes("print") || code.includes("stationery")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "461")!;
-  if (code.includes("postage") || code.includes("freight") || code.includes("courier")) return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "424")!;
-
-  return UK_CHART_OF_ACCOUNTS.find((c) => c.code === "408")!; // General Expenses
+  if (normalised.includes("software") || normalised.includes("subscription"))
+    return UK_CHART_OF_ACCOUNTS.find((e) => e.code === "485")!;
+  if (normalised.includes("travel"))
+    return UK_CHART_OF_ACCOUNTS.find((e) => e.code === "493")!;
+  if (normalised.includes("office"))
+    return UK_CHART_OF_ACCOUNTS.find((e) => e.code === "453")!;
+  return UK_CHART_OF_ACCOUNTS.find((e) => e.code === "408")!;
 }
 
-export function chartOfAccountsCSV(): string {
-  const headers = ["Code", "Name", "Type", "Tax Type"];
-  const rows = UK_CHART_OF_ACCOUNTS.map((c) => [c.code, c.name, c.type, c.taxType]);
-  return [headers, ...rows]
-    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-    .join("\n");
+export function chartOfAccountsCsv(): string {
+  const header = "Code,Name,Type";
+  const rows = UK_CHART_OF_ACCOUNTS.map(
+    (e) => `${e.code},"${e.name}",${e.type}`,
+  );
+  return [header, ...rows].join("\n");
 }

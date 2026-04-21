@@ -1,134 +1,106 @@
 
 
-# Accountant Handoff Package — "Holy sh*t this is clean"
+# Book Health Score — Your Killer Feature
 
-A one-click export bundle that turns 5–10 hours of accountant onboarding into 30–60 minutes. Generates a ZIP containing categorised transactions, a human-readable summary, a confidence report, and an auto-written founder profile.
+A live, weighted "accountant readiness" score (0–100) that turns bookkeeping into a dopamine loop. Replaces the existing MTD Gauge as the dashboard hero. Every fix the founder makes bumps the score immediately.
 
-## What gets generated (the bundle)
+## The Score Engine
 
-A single download: `reelin-handoff-{businessName}-{YYYY-MM-DD}.zip` containing:
+Single hook `useBookHealthScore()` that returns:
 
-```
-reelin-handoff/
-├── 1-START-HERE.pdf              ← Cover page + summary report
-├── 2-transactions.csv            ← Xero/QuickBooks-compatible
-├── 3-chart-of-accounts.csv       ← Standard UK CoA mapping
-├── 4-confidence-report.pdf       ← Book Health Score + flagged items
-├── 5-founder-profile.txt         ← Auto-generated business context
-├── 6-source-documents/           ← Receipts (PDFs/images from Storage)
-│   └── receipt-{date}-{desc}.{ext}
-└── README.txt                    ← What's in this bundle, how to use it
+```ts
+{
+  score: number;                  // 0–100 weighted total
+  breakdown: CategoryScore[];     // 6 categories with subscores
+  fixNow: ScoreIssue[];          // red — blocks accountant
+  improve: ScoreIssue[];         // amber — recommended
+  allGood: ScoreItem[];          // green — celebrate wins
+}
 ```
 
-## The four artefacts
+### Six weighted categories
 
-### 1. Clean transaction export (`2-transactions.csv`)
-Xero/QuickBooks-compatible columns:
+| Category | Weight | What it measures |
+|---|---:|---|
+| Transaction Coverage | 25% | % of income + expense rows with `hmrc_category_id` set; uncategorised items listed |
+| Accuracy Confidence | 20% | User-confirmed (`transaction_mappings.user_confirmed`) vs auto-categorised; rows flagged uncertain |
+| Compliance Signals | 20% | VAT threshold awareness (90% / 100% triggers), reasonable expense types, duplicate detection, sanity checks (e.g. expense > income red flag, missing business name/UTR) |
+| Record Completeness | 15% | % of expenses with `receipt_url`; missing descriptions on >£100 items |
+| Consistency | 10% | Same merchant/description mapped to same category across transactions |
+| Tax Readiness | 10% | Tax estimate fresh (<30 days), no missing tax periods, all past quarters submitted |
 
-```
-Date, Description, Reference, Amount, Currency, Account Code, Account Name,
-Tax Type, Tax Amount, Tracking Category, Contact, Notes, Receipt Link
-```
+Each category returns its own 0–100 subscore + the specific issues that pulled it down. Weighted sum = overall.
 
-- All income + expense rows merged, sorted by date
-- `Account Code` mapped from `hmrc_categories.code` → standard UK CoA codes (200=Sales, 310=Cost of Sales, 408=General Expenses, etc.)
-- `Tax Type` = "20% (VAT on Income)" / "20% (VAT on Expenses)" / "No VAT"
-- `Receipt Link` = relative path inside the ZIP for offline access
-- Uncategorised rows go to `Account Code: 999 - REVIEW NEEDED` so they're impossible to miss
-
-### 2. Standard chart of accounts (`3-chart-of-accounts.csv`)
-Static UK CoA file (Sales / Cost of Sales / Operating Expenses / Assets / Liabilities) with the Reelin → CoA code mapping included so the accountant can import it once into Xero/QB.
-
-### 3. Summary report (`1-START-HERE.pdf`)
-The accountant's first 5 minutes. Single 2–3 page PDF:
-
-- **Cover**: Business name, period covered, prepared on, total transactions, Book Health Score
-- **Revenue summary**: total in/out, by category, by month, top 5 clients
-- **Expense breakdown**: by HMRC category with totals + %
-- **Tax estimate history**: each tax period (status, income, expenses, estimated tax)
-- **VAT status**: registered? threshold position (£X of £90k), submission history
-- **Edge cases & notes**: auto-detected items needing accountant attention (e.g. "3 expenses >£500 with no receipt", "Stripe fees mapped to Bank Charges — please verify", "1 quarter unsubmitted")
-
-### 4. Confidence report (`4-confidence-report.pdf`)
-Reuses the existing `BookHealthScore` engine:
-- Overall score with the same 6-category breakdown shown in-app
-- % of transactions user-confirmed vs auto-categorised
-- Full list of 🔴 Fix-now and 🟡 Improve issues (so the accountant knows exactly what to double-check)
-- "All good" wins (so they trust the rest)
-
-### 5. Founder profile (`5-founder-profile.txt`)
-Auto-generated 1-paragraph summary using the existing Lovable AI Gateway (`google/gemini-2.5-flash`):
-
-> *"Sarah runs a SaaS business (solo founder, Ltd company). Primary revenue: Stripe subscriptions (~£4.2k/mo). Expense profile is software-heavy: OpenAI, AWS, Notion, Figma. No payroll. Home office claimed via simplified method (£312/yr). VAT-registered as of Aug 2025, currently 23% under threshold. Cash basis, calendar quarters."*
-
-Generated server-side from: profile + business_type + top expense categories + payroll status + VAT status + accounting basis. No PII beyond what the user's already entered.
-
-## How the user triggers it
-
-**Settings → Data Export & Retention** card already exists. Replace the two existing buttons (CSV / PDF) with three:
-
-1. **Quick CSV** (existing — kept for power users)
-2. **Summary PDF** (existing — kept)
-3. **🆕 Accountant Handoff Pack** — primary CTA, larger, with sparkle icon
-
-Plus a second entry point: **new "Hand off to accountant" button on the Tax page** so it surfaces where founders actually think about it.
-
-A modal before generation lets the user pick:
-- Period: This tax year / Last tax year / All time / Custom range
-- Optional: accountant's email to send a download link to (uses existing Resend integration via a new edge function)
-
-## Technical approach
+## Files
 
 | File | Change |
 |---|---|
-| `supabase/functions/generate-handoff-pack/index.ts` | NEW edge function — fetches all user data server-side, calls Lovable AI for founder profile, builds CSVs + PDFs + ZIP, uploads to a new private storage bucket, returns signed URL (24hr expiry) |
-| `supabase/functions/send-handoff-to-accountant/index.ts` | NEW — emails signed download link via Resend |
-| `supabase/migrations/...` | NEW — create private `handoff-packs` storage bucket with RLS (user can only read their own), add `handoff_exports` audit table (id, user_id, period, file_path, expires_at, sent_to_email, created_at) |
-| `src/components/AccountantHandoffCard.tsx` | NEW — replaces/augments DataExportCard's CTA, shows bundle preview, period selector, optional email field, generate button |
-| `src/components/AccountantHandoffPreview.tsx` | NEW — small modal showing "Bundle will include: 247 transactions, 18 receipts, score 87/100…" before the user clicks generate |
-| `src/hooks/useHandoffPack.ts` | NEW — invokes edge function, polls for completion, surfaces signed URL + toast |
-| `src/lib/chartOfAccounts.ts` | NEW — static UK CoA + mapping from `hmrc_categories.code` to CoA codes |
-| `src/pages/SettingsPage.tsx` | Mount new card above existing DataExportCard |
-| `src/pages/Tax.tsx` | Add "Hand off to accountant" button next to existing actions |
-| `src/integrations/supabase/types.ts` | Auto-regenerated for new table/bucket |
+| `src/lib/bookHealthScore.ts` | NEW — pure functions for each category, weighting, issue extraction. Fully unit-testable. |
+| `src/hooks/useBookHealthScore.ts` | NEW — pulls income, expenses, profile, tax periods, mappings; returns score + issues. Memoised. |
+| `src/components/BookHealthScoreCard.tsx` | NEW — hero card: big score, label ("78% accountant-ready"), trend vs last week, "View details" |
+| `src/components/BookHealthDetail.tsx` | NEW — expandable/dialog: 6 category bars + 3 grouped action lists (🔴 Fix now / 🟡 Improve / 🟢 All good). Each issue is a clickable deep link |
+| `src/pages/Dashboard.tsx` | Replace `MTDGauge` with `BookHealthScoreCard` as #2 widget (after Profit) |
+| `src/pages/Tax.tsx` | Add full `BookHealthDetail` panel here too |
+| `src/components/MTDGauge.tsx` | Keep file — repurposed inside detail view as the "Tax Readiness" sub-bar |
 
-### Why server-side?
-- Receipt files live in private Storage — fetching + zipping them in the browser is slow and leaks signed URLs
-- PDF generation (jsPDF works in Deno) is heavy
-- Lovable AI call for the founder profile must stay off the client
-- Lets us audit every export in `handoff_exports` (who exported what, when, where it was sent)
+No DB changes. All signals derive from existing tables (`income_transactions`, `expense_transactions`, `transaction_mappings`, `tax_periods`, `profiles`, `vat_submissions`).
 
-### Libraries used in the edge function
-- `jsPDF` (Deno-compatible) for the two PDFs
-- `JSZip` for the bundle
-- Native `csv` string building (no dependency)
-- `@supabase/supabase-js` admin client for service-role data access + Storage upload
-- Lovable AI (`LOVABLE_API_KEY`) for the founder profile — model `google/gemini-2.5-flash`
+## Issue → Action Deep Links (the dopamine loop)
 
-## Privacy & security
-- Bundle written to a **private** Storage bucket; URL is **signed and expires in 24 hours**
-- Email-to-accountant flow only sends the signed link, never raw data
-- `handoff_exports` table has RLS (user_id = auth.uid())
-- Rate limit: 5 generations per user per day (enforced in edge function)
-- Founder profile shown to the user for review **before** any send-to-accountant action
+Every issue in the list is a tappable row that jumps directly to the fix:
 
-## Other notes worth adding (your "maybe more notes")
+| Issue | Link target |
+|---|---|
+| "6 uncategorised transactions" | `/log?filter=uncategorised` |
+| "2 expenses missing receipts" | `/log?filter=no-receipt` |
+| "Confirm Stripe fees mapping" | opens inline confirm dialog on `/log` |
+| "VAT estimate stale" | `/tax` |
+| "Add business name" | `/settings#business` |
 
-A few high-leverage extras I'd bake in now since they're cheap once the pipeline exists:
+Side-effect: add `?filter=` query param support to `Log.tsx` (small addition).
 
-- **"Period close" lock** — when a handoff is generated for a tax period, mark it as `handoff_sent` so any later edits to those transactions trigger a warning ("You've already shared this period with your accountant — generate an amendment instead?"). Hooks into the existing amendments table.
-- **Accountant-facing landing page** — the signed URL opens a tiny page (`/accountant/{token}`) that shows the founder's name, the bundle contents, and a download button. Looks like a real handoff, not a raw S3 link.
-- **"What changed since last handoff"** — second handoff for the same period auto-generates a diff CSV (added/edited/deleted rows with timestamps). This is the killer reorder feature.
-- **Xero/QB direct push** — left for v2; signposted in the README ("Coming soon: one-click import to Xero")
+## UX Spec
 
-Out of scope for v1: direct Xero/QB API integration, accountant collaboration accounts, e-signature on the bundle.
+**Card (dashboard):**
+```
+┌──────────────────────────────────────┐
+│  📚 Book Health           ↗ +4 this │
+│                              week    │
+│        78                            │
+│      ─────  Accountant-ready         │
+│                                      │
+│  🔴 3 fixes   🟡 2 improvements      │
+│                                      │
+│         [ View details → ]           │
+└──────────────────────────────────────┘
+```
 
-## Priority order
-1. DB migration + storage bucket + `chartOfAccounts.ts` mapping
-2. Edge function: CSV + chart of accounts + ZIP (no PDFs yet) → end-to-end working download
-3. Add the two PDFs (summary + confidence report)
-4. Founder profile via Lovable AI
-5. UI card + Tax page button + period selector
-6. Email-to-accountant flow
-7. Period close lock + accountant landing page
+Color of the number: 0–49 destructive, 50–79 warning, 80–100 success.
+
+**Detail panel:**
+- Stacked progress bars per category with weight label
+- 3 collapsible sections (Fix now / Improve / All good) — Fix now expanded by default
+- Each issue: icon + one-line description + chevron → deep link
+- Empty "Fix now" section shows celebration: *"Your books are accountant-ready. Nice."*
+
+## Contextual Learning Hook (the third bullet)
+
+Don't ship a "Learn from here" button — instead, **inline learning prompts inside issues**. Each `ScoreIssue` can carry a `lessonId`. When present, the issue row shows a small "Why this matters" link that opens `<InlineLesson>` (already exists).
+
+Example: "Confirm Stripe fees" issue links to lesson `understanding-merchant-fees`. Founder learns in context, not by browsing the hub.
+
+## Out of Scope (Phase 2)
+
+- Persisting score history (would need a new `book_health_snapshots` table for week-over-week trend — for v1 we compute "last week" from cached localStorage)
+- AI-powered "likely misclassified" detection (heuristic only for v1: same merchant, different category)
+- Sharing score with accountant (export PDF) — v2
+
+## Priority
+
+1. `bookHealthScore.ts` pure scoring logic (the math has to be right)
+2. `useBookHealthScore` hook
+3. `BookHealthScoreCard` on Dashboard, replacing MTDGauge slot
+4. `BookHealthDetail` with deep-link issues
+5. `?filter=` support on Log page
+6. Inline lesson links on issues
 

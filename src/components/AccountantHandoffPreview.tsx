@@ -1,15 +1,30 @@
 import { useMemo, useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, Loader2, Download, Mail, CheckCircle2, FileText } from "lucide-react";
-import { useHandoffPack, type HandoffResult } from "@/hooks/useHandoffPack";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Sparkles, Loader2, FileText, Receipt, Activity, ExternalLink, Mail } from "lucide-react";
 import { useIncomeTransactions, useExpenseTransactions } from "@/hooks/useTransactions";
 import { useBookHealthScore } from "@/hooks/useBookHealthScore";
+import {
+  useGenerateHandoffPack,
+  useSendHandoffToAccountant,
+  type GeneratePackResult,
+} from "@/hooks/useHandoffPack";
 
 interface Props {
   open: boolean;
@@ -18,239 +33,207 @@ interface Props {
 
 type PeriodKey = "this-tax-year" | "last-tax-year" | "all-time";
 
-function getTaxYearBounds(yearOffset = 0): { start: string; end: string; label: string } {
-  // UK tax year: 6 April → 5 April
-  const now = new Date();
-  const currentYearStart = new Date(now.getFullYear(), 3, 6); // Apr 6
-  let yStart = currentYearStart;
-  if (now < currentYearStart) yStart = new Date(now.getFullYear() - 1, 3, 6);
-  yStart = new Date(yStart.getFullYear() - yearOffset, 3, 6);
-  const yEnd = new Date(yStart.getFullYear() + 1, 3, 5);
-  const label = `Tax Year ${yStart.getFullYear()}/${String(yStart.getFullYear() + 1).slice(2)}`;
-  return { start: yStart.toISOString().slice(0, 10), end: yEnd.toISOString().slice(0, 10), label };
+function ukTaxYearRange(offset: 0 | -1) {
+  // UK tax year: 6 Apr → 5 Apr
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = today.getMonth(); // 0-indexed
+  const d = today.getDate();
+  const beforeApril6 = m < 3 || (m === 3 && d < 6);
+  const startYear = beforeApril6 ? y - 1 + offset : y + offset;
+  const start = new Date(startYear, 3, 6); // 6 Apr
+  const end = new Date(startYear + 1, 3, 5); // 5 Apr next year
+  const iso = (dt: Date) => dt.toISOString().slice(0, 10);
+  return {
+    label: `Tax year ${startYear}/${(startYear + 1).toString().slice(2)}`,
+    start: iso(start),
+    end: iso(end),
+  };
 }
 
-export function AccountantHandoffPreview({ open, onOpenChange }: Props) {
-  const [period, setPeriod] = useState<PeriodKey>("this-tax-year");
+const AccountantHandoffPreview = ({ open, onOpenChange }: Props) => {
+  const [periodKey, setPeriodKey] = useState<PeriodKey>("this-tax-year");
   const [accountantEmail, setAccountantEmail] = useState("");
-  const [accountantName, setAccountantName] = useState("");
-  const [message, setMessage] = useState("");
-  const [result, setResult] = useState<HandoffResult | null>(null);
+  const [generated, setGenerated] = useState<GeneratePackResult | null>(null);
 
-  const { generate, sendToAccountant, isGenerating, isSending } = useHandoffPack();
-  const { transactions: income } = useIncomeTransactions();
-  const { transactions: expenses } = useExpenseTransactions();
+  const { transactions: income = [] } = useIncomeTransactions();
+  const { transactions: expenses = [] } = useExpenseTransactions();
   const { score } = useBookHealthScore();
 
-  const periodBounds = useMemo(() => {
-    if (period === "this-tax-year") return getTaxYearBounds(0);
-    if (period === "last-tax-year") return getTaxYearBounds(1);
-    return { start: undefined, end: undefined, label: "All time" };
-  }, [period]);
+  const generate = useGenerateHandoffPack();
+  const sendEmail = useSendHandoffToAccountant();
 
-  const preview = useMemo(() => {
-    const within = (d: string) =>
-      (!periodBounds.start || d >= periodBounds.start) &&
-      (!periodBounds.end || d <= periodBounds.end);
-    const i = (income || []).filter((t) => within(t.transaction_date));
-    const e = (expenses || []).filter((t) => within(t.transaction_date));
-    return {
-      total: i.length + e.length,
-      receipts: e.filter((t: any) => t.receipt_url).length,
+  const period = useMemo(() => {
+    if (periodKey === "this-tax-year") return ukTaxYearRange(0);
+    if (periodKey === "last-tax-year") return ukTaxYearRange(-1);
+    return { label: "All time", start: undefined as string | undefined, end: undefined as string | undefined };
+  }, [periodKey]);
+
+  const stats = useMemo(() => {
+    const inRange = (date: string) => {
+      if (!period.start || !period.end) return true;
+      return date >= period.start && date <= period.end;
     };
-  }, [income, expenses, periodBounds]);
+    const incomeInRange = income.filter((t) => inRange(t.transaction_date));
+    const expensesInRange = expenses.filter((t) => inRange(t.transaction_date));
+    const receipts = expensesInRange.filter((e) => !!e.receipt_url).length;
+    return {
+      transactions: incomeInRange.length + expensesInRange.length,
+      receipts,
+    };
+  }, [income, expenses, period]);
 
-  async function handleGenerate() {
-    const r = await generate({
-      label: periodBounds.label,
-      start: periodBounds.start,
-      end: periodBounds.end,
+  const handleGenerate = async () => {
+    const result = await generate.mutateAsync({
+      periodLabel: period.label,
+      periodStart: period.start,
+      periodEnd: period.end,
     });
-    if (r) setResult(r);
-  }
+    setGenerated(result);
+  };
 
-  async function handleSend() {
-    if (!result) return;
-    const ok = await sendToAccountant({
-      exportId: result.exportId,
-      accountantEmail,
-      accountantName: accountantName || undefined,
-      message: message || undefined,
+  const handleSendEmail = async () => {
+    if (!generated || !accountantEmail) return;
+    await sendEmail.mutateAsync({
+      exportId: generated.exportId,
+      email: accountantEmail,
     });
-    if (ok) {
+  };
+
+  const handleClose = (next: boolean) => {
+    if (!next) {
+      setGenerated(null);
       setAccountantEmail("");
-      setAccountantName("");
-      setMessage("");
     }
-  }
-
-  function reset() {
-    setResult(null);
-    setAccountantEmail("");
-    setAccountantName("");
-    setMessage("");
-  }
+    onOpenChange(next);
+  };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        onOpenChange(o);
-        if (!o) reset();
-      }}
-    >
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             Accountant Handoff Pack
           </DialogTitle>
           <DialogDescription>
-            {result
-              ? "Your bundle is ready. Download or send it directly to your accountant."
-              : "A clean, accountant-ready bundle in one click."}
+            A clean ZIP your accountant can import in minutes.
           </DialogDescription>
         </DialogHeader>
 
-        {!result ? (
-          <div className="space-y-5">
+        {!generated ? (
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Period</Label>
-              <RadioGroup value={period} onValueChange={(v) => setPeriod(v as PeriodKey)}>
-                <div className="flex items-center space-x-2 p-3 border border-border rounded-lg">
-                  <RadioGroupItem value="this-tax-year" id="this" />
-                  <Label htmlFor="this" className="flex-1 cursor-pointer text-sm">
-                    This tax year ({getTaxYearBounds(0).label})
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 border border-border rounded-lg">
-                  <RadioGroupItem value="last-tax-year" id="last" />
-                  <Label htmlFor="last" className="flex-1 cursor-pointer text-sm">
-                    Last tax year ({getTaxYearBounds(1).label})
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 border border-border rounded-lg">
-                  <RadioGroupItem value="all-time" id="all" />
-                  <Label htmlFor="all" className="flex-1 cursor-pointer text-sm">
-                    All time
-                  </Label>
-                </div>
-              </RadioGroup>
+              <Label>Period</Label>
+              <Select value={periodKey} onValueChange={(v) => setPeriodKey(v as PeriodKey)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="this-tax-year">This tax year</SelectItem>
+                  <SelectItem value="last-tax-year">Last tax year</SelectItem>
+                  <SelectItem value="all-time">All time</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="bg-muted/40 rounded-lg p-4 space-y-2">
-              <div className="text-xs font-medium text-muted-foreground uppercase">Bundle preview</div>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <div className="text-2xl font-bold">{preview.total}</div>
-                  <div className="text-xs text-muted-foreground">Transactions</div>
+            <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Bundle preview
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="flex flex-col items-center text-center">
+                  <FileText className="w-5 h-5 text-primary mb-1" />
+                  <p className="text-lg font-semibold">{stats.transactions}</p>
+                  <p className="text-xs text-muted-foreground">transactions</p>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold">{preview.receipts}</div>
-                  <div className="text-xs text-muted-foreground">Receipts</div>
+                <div className="flex flex-col items-center text-center">
+                  <Receipt className="w-5 h-5 text-success mb-1" />
+                  <p className="text-lg font-semibold">{stats.receipts}</p>
+                  <p className="text-xs text-muted-foreground">receipts</p>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold">{score}</div>
-                  <div className="text-xs text-muted-foreground">Health score</div>
+                <div className="flex flex-col items-center text-center">
+                  <Activity className="w-5 h-5 text-warning mb-1" />
+                  <p className="text-lg font-semibold">{score}</p>
+                  <p className="text-xs text-muted-foreground">health</p>
                 </div>
               </div>
-            </div>
-
-            <div className="text-xs text-muted-foreground space-y-1">
-              <div className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> Summary PDF + confidence report</div>
-              <div className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> Xero/QuickBooks-ready CSV</div>
-              <div className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> Receipts bundled into one folder</div>
-              <div className="flex items-center gap-1.5"><FileText className="w-3 h-3" /> AI-generated founder profile</div>
-            </div>
-
-            <Button onClick={handleGenerate} disabled={isGenerating} size="lg" className="w-full">
-              {isGenerating ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Building bundle…</>
-              ) : (
-                <><Sparkles className="w-4 h-4" /> Generate pack</>
-              )}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-5">
-            <div className="bg-success/10 border border-success/20 rounded-lg p-4 space-y-2">
-              <div className="flex items-center gap-2 text-success">
-                <CheckCircle2 className="w-5 h-5" />
-                <span className="font-semibold">Bundle ready</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-center pt-2">
-                <div>
-                  <div className="text-lg font-bold">{result.stats.transactions}</div>
-                  <div className="text-xs text-muted-foreground">Transactions</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold">{result.stats.receipts}</div>
-                  <div className="text-xs text-muted-foreground">Receipts</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold">{result.stats.healthScore}</div>
-                  <div className="text-xs text-muted-foreground">Score</div>
-                </div>
-              </div>
-            </div>
-
-            <Button asChild size="lg" className="w-full">
-              <a href={result.downloadUrl} download={result.filename}>
-                <Download className="w-4 h-4" /> Download ZIP
-              </a>
-            </Button>
-
-            <div className="space-y-2 border-t border-border pt-4">
-              <div className="text-xs font-medium text-muted-foreground uppercase">Founder profile preview</div>
-              <p className="text-sm text-muted-foreground italic bg-muted/30 p-3 rounded-md">
-                {result.founderProfile}
+              <p className="text-xs text-muted-foreground">
+                Includes summary PDF, transactions CSV (Xero/QB ready), chart of accounts,
+                confidence report, founder profile and source receipts.
               </p>
             </div>
-
-            <div className="space-y-3 border-t border-border pt-4">
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium">Send directly to your accountant</span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  placeholder="accountant@firm.co.uk"
-                  type="email"
-                  value={accountantEmail}
-                  onChange={(e) => setAccountantEmail(e.target.value)}
-                />
-                <Input
-                  placeholder="Name (optional)"
-                  value={accountantName}
-                  onChange={(e) => setAccountantName(e.target.value)}
-                />
-              </div>
-              <Textarea
-                placeholder="Optional message…"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={2}
-              />
-              <Button
-                onClick={handleSend}
-                disabled={isSending || !accountantEmail}
-                variant="outline"
-                className="w-full"
-              >
-                {isSending ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                ) : (
-                  <><Mail className="w-4 h-4" /> Email handoff link</>
-                )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-success/30 bg-success/5 p-4 space-y-2">
+              <p className="font-medium text-success">Pack ready</p>
+              <p className="text-sm text-muted-foreground">
+                Link expires {new Date(generated.expiresAt).toLocaleString()}
+              </p>
+              <Button asChild size="sm" className="mt-2">
+                <a href={generated.signedUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Download ZIP
+                </a>
               </Button>
             </div>
 
-            <p className="text-xs text-muted-foreground text-center">
-              Download link expires in 24 hours. You can re-generate any time.
-            </p>
+            <div className="space-y-2">
+              <Label htmlFor="accountant-email">Email to accountant (optional)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="accountant-email"
+                  type="email"
+                  placeholder="accountant@example.com"
+                  value={accountantEmail}
+                  onChange={(e) => setAccountantEmail(e.target.value)}
+                />
+                <Button
+                  onClick={handleSendEmail}
+                  disabled={!accountantEmail || sendEmail.isPending}
+                  variant="outline"
+                >
+                  {sendEmail.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Mail className="w-4 h-4 mr-1" /> Send
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
         )}
+
+        <DialogFooter>
+          {!generated ? (
+            <>
+              <Button variant="ghost" onClick={() => handleClose(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleGenerate} disabled={generate.isPending}>
+                {generate.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Generating…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Generate pack
+                  </>
+                )}
+              </Button>
+            </>
+          ) : (
+            <Button onClick={() => handleClose(false)}>Done</Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default AccountantHandoffPreview;
