@@ -170,6 +170,7 @@ const Tax = () => {
         <div className="px-4 lg:px-8 py-6 space-y-6">
           {/* Book Health Score — accountant-readiness at a glance */}
           <BookHealthScoreCard />
+          <AccountantHandoffCard />
 
           {/* Tabs for Quarterly vs VAT */}
           <Tabs defaultValue="quarterly" className="w-full">

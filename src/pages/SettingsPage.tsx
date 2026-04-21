@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { SUBSCRIPTION_TIERS } from "@/config/subscriptionTiers";
 import { SimplifiedExpensesSettings } from "@/components/SimplifiedExpensesSettings";
 import DataExportCard from "@/components/DataExportCard";
+import AccountantHandoffCard from "@/components/AccountantHandoffCard";
 import { PayrollSettingsToggle } from "@/components/payroll/PayrollSettingsToggle";
 import { OptionalModulesCard } from "@/components/OptionalModulesCard";
 
