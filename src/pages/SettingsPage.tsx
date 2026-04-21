@@ -499,6 +499,15 @@ const SettingsPage = () => {
           </Card>
         </div>
 
+        {/* Accountant Handoff Pack (hero export) */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Download className="w-5 h-5" />
+            Hand off to your accountant
+          </h2>
+          <AccountantHandoffCard />
+        </div>
+
         {/* Data Export & Retention (Phase 8) */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
