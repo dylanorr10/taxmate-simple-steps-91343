@@ -886,4 +886,323 @@ Most AI tools have:
 
 Start with one tool, master it, then expand. The goal is more time for what matters - growing your business and serving clients.`,
   },
+
+  // ============= FOUNDER FINANCE 101 =============
+  {
+    id: 'founder-sole-trader-vs-ltd',
+    title: 'Sole Trader vs Ltd — When to Switch',
+    category: 'Founder Finance',
+    difficulty: 'beginner',
+    duration: '5 min',
+    icon: '🏢',
+    content: `The single biggest finance decision a UK founder makes early on.
+
+**The rule of thumb:**
+- Profit under £30k → Sole trader is usually fine
+- Profit £30k–£50k → Run the numbers, often Ltd wins
+- Profit over £50k → Ltd almost always saves you tax
+
+**Sole trader pros:** Free to register, no Companies House filings, simple tax return.
+**Sole trader cons:** You ARE the business. Personal liability. Pay tax on every penny of profit at Income Tax rates.
+
+**Ltd pros:** Limited personal liability. Pay yourself via low salary + dividends (lower combined tax). More credible to enterprise customers.
+**Ltd cons:** Annual accounts at Companies House. Confirmation statement. Corporation tax return. Personal self-assessment too.
+
+**The tax saving (rough):** A founder making £60k profit can save £3k–£6k/year by being Ltd vs sole trader.
+
+**When NOT to rush to Ltd:**
+- Pre-revenue or under £20k profit
+- You want maximum simplicity for year one
+- You haven't validated the business yet
+
+Reelin tracks both structures. When your profit crosses £30k, we'll prompt you.`,
+  },
+  {
+    id: 'founder-what-you-can-claim',
+    title: 'What Digital Founders Can Claim',
+    category: 'Founder Finance',
+    difficulty: 'beginner',
+    duration: '4 min',
+    icon: '🧾',
+    content: `If it's "wholly and exclusively" for the business, it's claimable. Here's what counts for a modern founder:
+
+**Software & infrastructure (100% claimable):**
+- OpenAI / Anthropic / Replicate API credits
+- Vercel, Supabase, AWS, Cloudflare, Railway
+- Cursor, GitHub Copilot, Linear, Notion, Figma
+- Domain registration, Google Workspace, Stripe fees
+
+**Hardware:**
+- Laptop and monitor (capital allowance)
+- Headphones, webcam, mic for client calls
+
+**Services:**
+- Contractor invoices (designers, devs, copywriters)
+- Accountant fees, bookkeeping software
+- Legal fees for contracts
+
+**Marketing:**
+- Google / Meta / Reddit / X ads
+- SEO tools, email platforms
+- Conference tickets
+
+**Home office:** Either £6/week flat rate (no proof needed) or actual % of bills based on room use.
+
+**The grey area:** Phone and internet must be apportioned (e.g., 70% business). Coffee meetings with potential customers — claim. Personal Netflix — don't claim.
+
+**Always keep:** Receipt or invoice (digital is fine), date, what it was for. Reelin stores these for the 5-year HMRC requirement.`,
+  },
+  {
+    id: 'founder-vat-threshold',
+    title: 'The £90k VAT Threshold',
+    category: 'Founder Finance',
+    difficulty: 'intermediate',
+    duration: '4 min',
+    icon: '⚠️',
+    content: `If your rolling 12-month turnover hits £90,000, you must register for VAT within 30 days. This is the single most-missed rule by fast-growing founders.
+
+**It's "rolling 12 months" — not your tax year.** Check every month.
+
+**Why it matters for AI/SaaS:**
+- B2C customers HATE seeing prices go up by 20% overnight
+- B2B customers don't care (they reclaim it)
+- One viral month can push you over before you notice
+
+**Your three options:**
+1. **Standard VAT:** Charge 20%, reclaim 20% on business expenses
+2. **Flat Rate Scheme:** Charge 20%, pay HMRC a fixed % (often simpler for software)
+3. **Voluntary registration before £90k:** Useful if you sell B2B and want to reclaim input VAT
+
+**EU/US customers:** Different rules apply. Digital services to EU consumers have their own VAT rules (look up "OSS / IOSS").
+
+**Reelin tracks your rolling 12-month turnover and warns you at 80%.** Don't get caught out.`,
+  },
+  {
+    id: 'founder-stripe-foreign-income',
+    title: 'Stripe, Lemon Squeezy & Foreign Income',
+    category: 'Founder Finance',
+    difficulty: 'intermediate',
+    duration: '4 min',
+    icon: '💳',
+    content: `HMRC taxes you on what you earned, not what landed in your bank.
+
+**Stripe basics:**
+- Your income = gross sales (before Stripe's 1.4–2.9% fee)
+- The fee is a deductible business expense
+- Refunds reduce your income in the period you refunded
+
+**Foreign currency:**
+- Convert to GBP using the rate on the date of the transaction (or HMRC's monthly average)
+- Don't wait until withdrawal — that's not the taxable event
+
+**Lemon Squeezy / Paddle (Merchant of Record):**
+- They handle VAT for you on EU/US sales
+- You record the NET amount they pay you as income
+- This is genuinely simpler than Stripe for international SaaS
+
+**App Store / Stripe Connect / marketplaces:**
+- Apple takes 30%, you record gross sale + Apple fee as expense (or net, but be consistent)
+- Always check HMRC's specific guidance for your platform
+
+**Common mistake:** Recording only the Stripe payout. You'll under-report income and over-claim losses. Reelin pulls the gross amount automatically.`,
+  },
+  {
+    id: 'founder-paying-yourself',
+    title: 'Paying Yourself: Salary vs Dividends vs Drawings',
+    category: 'Founder Finance',
+    difficulty: 'intermediate',
+    duration: '5 min',
+    icon: '💷',
+    content: `How you pay yourself depends on your business structure.
+
+**Sole trader: Drawings**
+- You don't "pay yourself" — you just take money out
+- All profit is taxed as personal income whether you take it or leave it
+- No payroll, no PAYE, no fuss
+- Pay Income Tax + Class 2 + Class 4 NI on full profit
+
+**Ltd company: Salary + Dividends (the sweet spot)**
+- Pay yourself a director's salary up to the NI threshold (~£12,570/yr) — tax-free, deductible for Corporation Tax
+- Take the rest as dividends — no NI, lower tax rates
+- Combined effective rate is meaningfully lower than pure salary
+
+**Why this matters:** A Ltd founder taking £50k can pay ~£3k less tax than a sole trader making the same.
+
+**Pension trick (Ltd):** Employer pension contributions reduce Corporation Tax AND don't count toward your personal allowance. Massive long-term win.
+
+**Don't:** Pay yourself dividends if your company doesn't have distributable profits. HMRC reclassifies them as illegal loans. Get an accountant for year-end.`,
+  },
+  {
+    id: 'founder-rd-tax-credits',
+    title: 'R&D Tax Credits for AI/Software Founders',
+    category: 'Founder Finance',
+    difficulty: 'advanced',
+    duration: '6 min',
+    icon: '🧪',
+    content: `If you're building AI or genuinely novel software, you may qualify for R&D Tax Credits. This is one of the most underused benefits available to UK tech founders.
+
+**What qualifies:**
+- Solving a technical uncertainty (not just building a CRUD app)
+- Developing novel algorithms, ML models, or system architecture
+- Work that a "competent professional" couldn't do off the shelf
+
+**What doesn't:**
+- Standard web development
+- Building a website with React
+- Integrating existing APIs
+
+**What you can claim:**
+- Salary costs of staff doing R&D
+- Subcontractor costs (capped)
+- Software, cloud compute (yes — your AWS bill for model training counts)
+- Consumables used in R&D
+
+**The cash:**
+- Profitable Ltd: Reduces Corporation Tax bill by ~20% of qualifying costs
+- Loss-making Ltd: Cash payment from HMRC (~10–15% of qualifying spend)
+
+**Big change (April 2024):** Merged scheme replaced SME and RDEC for most claims. Rules tightened. Get a specialist.
+
+**Don't:** DIY this for the first claim. A good R&D specialist takes 15–20% of the credit and gets you 5x more than you'd claim alone. Worth every penny.`,
+  },
+  {
+    id: 'founder-companies-house',
+    title: 'Companies House Basics',
+    category: 'Founder Finance',
+    difficulty: 'beginner',
+    duration: '3 min',
+    icon: '🏛️',
+    content: `If you went Ltd, Companies House is your second master (after HMRC). Miss a deadline and you get fined automatically.
+
+**The three things you must file:**
+
+**1. Confirmation statement** (annually, ~£34)
+- Confirms your company details haven't changed
+- Due on your "confirmation date" (usually the anniversary of incorporation)
+- 14-day grace period, then fines
+
+**2. Annual accounts** (annually, free)
+- Due 9 months after your accounting reference date
+- "Micro-entity" or "small company" formats are usually fine for solo founders
+- Late filing penalties: £150 → £750 → £1,500 → £7,500
+
+**3. Corporation Tax return (CT600)** — filed with HMRC, not Companies House
+- Due 12 months after year-end
+- Tax payable 9 months + 1 day after year-end (yes, before the return is due)
+
+**What you DON'T need to do:**
+- File monthly anything
+- Submit invoices to Companies House
+- Hire an accountant for filings (but you probably should)
+
+**Reelin keeps your numbers in shape so when these deadlines hit, you (or your accountant) can file in an hour.**`,
+  },
+  {
+    id: 'founder-when-to-hire-accountant',
+    title: 'When to Hire an Accountant (and What to Hand Them)',
+    category: 'Founder Finance',
+    difficulty: 'beginner',
+    duration: '4 min',
+    icon: '🤝',
+    content: `You don't need an accountant from day one. You DO need one before any of these moments:
+
+**Hire one when:**
+- You incorporate as Ltd (year-end accounts get complex fast)
+- Profit hits ~£40k (the tax savings pay for them)
+- You hire your first employee (PAYE is a minefield)
+- You raise investment (SEIS/EIS paperwork)
+- You hit £90k turnover (VAT registration)
+- You're claiming R&D credits
+
+**What a good UK accountant costs:**
+- Sole trader self-assessment: £200–£500/yr
+- Ltd company year-end + CT600: £600–£1,500/yr
+- Monthly bookkeeping + payroll: £100–£300/mo
+- R&D claim: 15–25% of credit (success fee)
+
+**What to hand them (Reelin gives you this):**
+1. Categorised income and expense ledger
+2. Bank statements (PDF, full year)
+3. Receipts for any expense over £100
+4. Mileage log if you claim it
+5. List of capital purchases (laptop, etc.)
+6. Last year's accounts if switching accountants
+
+**Red flags in an accountant:**
+- They want everything on paper
+- They don't use software (Xero, QuickBooks, FreeAgent)
+- They take >2 weeks to reply
+- They can't explain something in plain English
+
+**Soon, Reelin will help you find a vetted accountant who specialises in tech founders. One click, all your data handed over cleanly.**`,
+  },
+  {
+    id: 'founder-saving-for-tax',
+    title: 'Saving for Tax with Lumpy Revenue',
+    category: 'Founder Finance',
+    difficulty: 'beginner',
+    duration: '3 min',
+    icon: '🏦',
+    content: `Founder revenue is lumpy. One viral month can land £30k. The next month: £400. Your tax bill doesn't care.
+
+**The rule:**
+- Sole trader: set aside 30% of every payment received
+- Ltd: set aside 19% (Corporation Tax) on profit, plus your personal tax separately
+
+**The mechanics:**
+1. Open a separate savings account (Wise, Starling, Monzo Pots all work)
+2. Every time money lands, immediately transfer the % out
+3. Treat it as not yours. Because it isn't.
+4. Pay HMRC from this account when bills land
+
+**Why "every payment" not "monthly"?**
+- January self-assessment hits when you're broke
+- Payments on account double the bill in your second year
+- VAT bills land quarterly with no warning if you don't track them
+
+**Founder-specific traps:**
+- Stripe payouts feel like income — they're gross, fees haven't come out yet
+- A £10k client invoice ≠ £10k available cash (set aside £3k for tax day one)
+- Don't spend the VAT you've collected. It's HMRC's money sitting in your account.
+
+**Reelin shows you a live "tax to set aside" number on your dashboard. Look at it weekly.**`,
+  },
+  {
+    id: 'founder-mtd-itsa-2026',
+    title: 'MTD ITSA April 2026 — What Founders Must Do',
+    category: 'Founder Finance',
+    difficulty: 'intermediate',
+    duration: '4 min',
+    icon: '📅',
+    content: `Making Tax Digital for Income Tax Self Assessment (MTD ITSA) starts April 2026. If you're a sole trader, this affects you.
+
+**Who's in from April 2026:**
+- Sole traders and landlords with gross income over £50,000
+
+**Who's in from April 2027:**
+- Sole traders and landlords with gross income £30,000–£50,000
+
+**Who's in from April 2028:**
+- £20,000–£30,000
+
+**What changes:**
+- No more one annual self-assessment in January
+- Instead: 4 quarterly submissions + 1 final declaration
+- Records must be digital (paper notebooks no longer compliant)
+- Must use HMRC-approved software (like Reelin)
+
+**What stays the same:**
+- Your tax bill amount and deadline (Jan 31)
+- What you can claim
+- Self-employed NICs
+
+**For Ltd founders:** MTD ITSA doesn't affect your Ltd, but if you take dividends or have side income, your personal tax return must comply.
+
+**The risk if you ignore it:**
+- Penalties (initially light, then escalating)
+- Scrambling at year-end without digital records
+- Paying an accountant 3x more to clean up
+
+**Reelin is being built MTD-ready from day one. Start now and the 2026 transition is a non-event.**`,
+  },
 ];
