@@ -34,9 +34,12 @@ import { BusinessUseSlider } from "@/components/BusinessUseSlider";
 import { Badge } from "@/components/ui/badge";
 import { useHMRCCategories, HMRCCategory } from "@/hooks/useHMRCCategories";
 import { useProfile } from "@/hooks/useProfile";
+import { useSearchParams, Link } from "react-router-dom";
 
 const Log = () => {
   const { profile } = useProfile();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeFilter = searchParams.get("filter");
   const invoicingEnabled = !!profile?.invoicing_enabled;
   const [cashAmount, setCashAmount] = useState("");
   const [cashDescription, setCashDescription] = useState("");
@@ -239,6 +242,20 @@ const Log = () => {
             Review bank transactions or add manual entries
           </p>
         </div>
+
+        {activeFilter && (
+          <Card className="p-4 border-l-4 border-l-primary bg-primary/5 flex items-center justify-between">
+            <div className="text-sm">
+              <span className="font-semibold">Filtered: </span>
+              {activeFilter === "uncategorised" && "showing items without an HMRC category"}
+              {activeFilter === "no-receipt" && "showing expenses without a receipt"}
+              {!["uncategorised", "no-receipt"].includes(activeFilter) && activeFilter}
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setSearchParams({})}>
+              <X className="w-4 h-4 mr-1" /> Clear
+            </Button>
+          </Card>
+        )}
 
         {/* Cash Flow Forecast */}
         <CashFlowForecast />

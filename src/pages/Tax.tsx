@@ -35,6 +35,7 @@ import { useTaxAdjustments } from "@/hooks/useTaxAdjustments";
 import { formatCurrency } from "@/utils/transactionHelpers";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { BookHealthScoreCard } from "@/components/BookHealthScoreCard";
 
 const Tax = () => {
   const navigate = useNavigate();
@@ -166,6 +167,9 @@ const Tax = () => {
         </div>
 
         <div className="px-4 lg:px-8 py-6 space-y-6">
+          {/* Book Health Score — accountant-readiness at a glance */}
+          <BookHealthScoreCard />
+
           {/* Tabs for Quarterly vs VAT */}
           <Tabs defaultValue="quarterly" className="w-full">
             <TabsList className="grid w-full grid-cols-2">

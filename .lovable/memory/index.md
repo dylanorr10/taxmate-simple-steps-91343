@@ -1,22 +1,20 @@
 # Memory: index.md
-Updated: today
+Updated: just now
 
 # Project Memory
 
 ## Core
-- Niched for UK solo founders (SaaS/AI/indie/agency/creator/ecommerce). Pivoted from delivery drivers Apr 2026.
-- Value prop: "Your first finance hire. For founders who'd rather build than bookkeep."
-- Three pillars: know what to claim, know what you owe, hand off to vetted accountant when ready.
-- Default business_type for new signups: `solo_founder`. Default nav: dashboard/log/learn/tax (no mileage).
-- Education-first: 10-lesson "Founder Finance 101" is the core hook (sole trader vs Ltd, VAT threshold, R&D credits, etc.)
+- **Book Health Score is the killer feature (Apr 2026)**: Live 0–100 weighted "accountant readiness" score. 6 categories (coverage 25%, accuracy 20%, compliance 20%, records 15%, consistency 10%, tax 10%). Replaces MTD Gauge as Dashboard hero. Logic in `src/lib/bookHealthScore.ts`, hook `useBookHealthScore`, UI in `BookHealthScoreCard` + `BookHealthDetail`. Issues are deep-linkable (`/log?filter=uncategorised`, etc.) with optional `lessonId` for inline contextual learning.
+- **Stripped to essentials (Apr 2026)**: Core nav = Dashboard / Money / Learn / Tax. Mileage, Invoicing, and Payroll are **opt-in** via Settings → Optional Modules. Flags: `profiles.mileage_enabled`, `profiles.invoicing_enabled`, `payroll_settings.enabled`. Existing users with data auto-enabled on migration.
+- Niched for UK solo founders. Default `business_type` for new signups: `solo_founder`.
 - Progressive Web App (PWA) optimized for mobile and desktop.
+- Support both UK sole traders and limited companies.
+- Education-first: Learning Hub is primary focus; financial features secondary.
 - TrueLayer uses sandbox (`reelin-959c67`) for MVP.
+- Landing page is primary entry point. Waitlist tracks `utm_source=linkedin`.
 - LAUNCH_MODE is disabled (false) to allow external trials.
-- Driver code preserved as a preset (transport business_type) but deprioritised in defaults/copy.
-- Long-term: sell as one-time fee bundle to founders + accountant referral fees (not yet built).
 
 ## Memories
-- [Founder Pivot](mem://positioning/founder-pivot) — Full Apr 2026 repositioning notes, files changed, what's still TODO
 - [Stripe Subscriptions](mem://monetization/stripe-subscription-tiers-implemented) — Tier pricing (Starter/Pro/Business) and edge function logic
 - [Lifecycle Tiers](mem://monetization/lifecycle-based-subscription-tiers) — Feature access based on VAT status and business maturity
 - [Global Architecture](mem://technical/global-expansion-architecture) — Modular country-specific tax structure (e.g., src/modules/uk/)
