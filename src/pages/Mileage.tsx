@@ -34,7 +34,7 @@ const PURPOSE_PRESETS = [
 
 const Mileage = () => {
   const navigate = useNavigate();
-  const { profile, updateProfile, isUpdating } = useProfile();
+  const { profile, updateProfile, isUpdating: isUpdatingProfile } = useProfile();
   const {
     trips,
     isLoading,
