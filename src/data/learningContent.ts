@@ -1205,4 +1205,144 @@ Reelin tracks both structures. When your profit crosses £30k, we'll prompt you.
 
 **Reelin is being built MTD-ready from day one. Start now and the 2026 transition is a non-event.**`,
   },
+  {
+    id: 'founder-paying-yourself-ltd',
+    title: "Paying Yourself: Salary vs Dividends (Ltd)",
+    category: 'founder',
+    difficulty: 'intermediate',
+    duration: '6 min',
+    icon: '👑',
+    content: `# Paying Yourself From a Ltd Company (2025-26)
+
+Once you've gone Ltd, you stop "drawing" money. Every pound out has to be classified — and the mix you choose changes your tax bill by thousands.
+
+## The two main options
+
+**Salary** — taxed via PAYE, deductible business expense, builds NI record for state pension.
+**Dividends** — paid from post-tax profit, lower rates, no NI, doesn't count toward state pension.
+
+## The optimal split for most solo founders
+
+Take a director's salary of **£12,570/year (£1,047.50/month)** — exactly the personal allowance.
+
+- £0 income tax
+- £0 employee NI (under the £12,570 threshold)
+- £0 employer NI (under the £5,000 secondary threshold from April 2025)
+- Counts as a qualifying year for state pension
+- Reduces corporation tax (it's a deductible expense)
+
+Then top up with **dividends** as profit allows.
+
+## Dividend rates 2025-26
+
+- First £500 — tax-free (dividend allowance)
+- Basic rate: 8.75%
+- Higher rate: 33.75%
+- Additional rate: 39.35%
+
+## Real example
+
+You're a solo SaaS founder with £60k profit:
+- Salary: £12,570 (£0 tax)
+- Dividends: £37,700 to stay in basic rate band
+- Dividend tax: ~£3,255
+- Corp tax saved on salary: ~£2,389
+- **Total personal tax: ~£3,255 vs ~£12,000 if all salary**
+
+## When this changes
+
+- If you have other income (PAYE job, rentals) — reduces dividend room
+- If your spouse is a shareholder — split dividends to use both allowances
+- If profit is under £20k — sometimes simpler to just take salary
+
+## Set it up in Reelin
+
+Open the Payroll module → "You" tab → set your monthly director salary. Reelin auto-creates the expense entries and warns when dividends push you into a higher band.`,
+    quiz: [
+      {
+        id: 'q1',
+        question: "What's the optimal director's salary for 2025-26 to minimise tax?",
+        options: ["£0 — just take dividends", "£12,570 (personal allowance)", "£25,000", "£50,270 (basic rate cap)"],
+        correctAnswer: 1,
+        explanation: "£12,570 matches the personal allowance — no income tax, no NI, but still counts toward state pension and reduces corporation tax."
+      },
+      {
+        id: 'q2',
+        question: "What's the basic-rate dividend tax rate for 2025-26?",
+        options: ["0%", "7.5%", "8.75%", "20%"],
+        correctAnswer: 2,
+        explanation: "Basic-rate dividend tax is 8.75% (above the £500 dividend allowance)."
+      }
+    ]
+  },
+  {
+    id: 'founder-first-hire',
+    title: "Your First Hire: Contractor vs Employee",
+    category: 'founder',
+    difficulty: 'intermediate',
+    duration: '7 min',
+    icon: '🤝',
+    content: `# Your First Hire — and What It Really Costs
+
+Hiring is the moment most founders realise payroll is a real thing. Here's how to decide between contractor and employee, what each really costs, and how to stay out of HMRC trouble.
+
+## Contractor
+
+- Invoices you, handles their own tax
+- No PAYE, no employer NI, no pension obligation
+- Flexible — easy to scale up/down
+- **But:** if HMRC decides they're "really" an employee (IR35), you owe back PAYE + NI + penalties
+
+## Employee
+
+- You run PAYE (tax + NI)
+- Employer NI: 15% above £5,000/year (2025-26)
+- Auto-enrolment pension: minimum 3% employer contribution
+- Employment rights: notice, holiday pay, sick pay, redundancy
+
+## The hidden cost
+
+For a £40,000 employee, your true monthly cost is roughly:
+- Gross salary: £3,333
+- Employer NI: ~£440
+- Pension (3%): ~£90
+- **Total: ~£3,860/month**
+
+That's ~16% on top of salary before you even count holiday cover or tools.
+
+## IR35 in 30 seconds
+
+A contractor is "inside IR35" (treated as an employee for tax) if you:
+- Tell them how, when and where to work
+- Won't accept a substitute
+- Provide their kit
+- Have ongoing mutual obligation
+
+**Outside IR35** = genuine B2B. **Inside IR35** = you should have hired them as an employee.
+
+Use Reelin's IR35 checker (Payroll → Contractors) for a quick read.
+
+## What Reelin does and doesn't do
+
+✅ Calculates monthly PAYE, NI, pension
+✅ Tracks contractor payments + IR35 status
+✅ Exports for your accountant or payroll provider
+❌ Does NOT submit RTI to HMRC — use FreeAgent, Xero Payroll, or hand to an accountant for the live submission`,
+    quiz: [
+      {
+        id: 'q1',
+        question: "Roughly what % on top of salary does an employee cost (employer NI + pension, 2025-26)?",
+        options: ["~5%", "~15-16%", "~25%", "~40%"],
+        correctAnswer: 1,
+        explanation: "Employer NI (15% above £5k) plus 3% pension auto-enrolment adds roughly 16% to a typical £30-50k salary."
+      },
+      {
+        id: 'q2',
+        question: "A contractor uses your laptop, sits at your office every day, and can't send a substitute. They're likely:",
+        options: ["Outside IR35", "Inside IR35 (effectively employed)", "Self-employed and fine", "Exempt from IR35"],
+        correctAnswer: 1,
+        explanation: "Control + no substitution + your equipment are classic inside-IR35 indicators. You'd owe back PAYE/NI if HMRC reviewed."
+      }
+    ]
+  },
 ];

@@ -63,6 +63,14 @@ export const availableNavItems: NavItem[] = [
     icon: 'BookText', 
     description: 'Tax dictionary', 
     recommendedFor: ['beginner'] 
+  },
+  {
+    id: 'payroll',
+    path: '/payroll',
+    label: 'Payroll',
+    icon: 'Banknote',
+    description: 'Director salary, contractors, employees',
+    recommendedFor: ['solo_founder']
   }
 ];
 
