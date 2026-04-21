@@ -60,9 +60,17 @@ export const LessonQuiz = ({ quiz, onComplete, previousScore }: LessonQuizProps)
     setIsComplete(false);
   };
 
+  if (!hasQuestions) {
+    return (
+      <Card className="p-6 text-center text-muted-foreground">
+        No quiz questions available for this lesson yet.
+      </Card>
+    );
+  }
+
   if (isComplete) {
-    const finalScore = Math.round(((isCorrect ? correctAnswers + 1 : correctAnswers) / quiz.questions.length) * 100);
-    const passed = finalScore >= quiz.passing_score;
+    const finalScore = Math.round(((isCorrect ? correctAnswers + 1 : correctAnswers) / questions.length) * 100);
+    const passed = finalScore >= (quiz?.passing_score ?? 70);
 
     return (
       <Card className={cn(
@@ -75,11 +83,11 @@ export const LessonQuiz = ({ quiz, onComplete, previousScore }: LessonQuizProps)
         <p className="text-lg text-muted-foreground">
           {passed 
             ? "Congratulations! You passed! 🎉"
-            : `You need ${quiz.passing_score}% to pass. Keep learning!`
+            : `You need ${quiz?.passing_score ?? 70}% to pass. Keep learning!`
           }
         </p>
         <p className="text-sm text-muted-foreground">
-          You got {isCorrect ? correctAnswers + 1 : correctAnswers} out of {quiz.questions.length} questions correct
+          You got {isCorrect ? correctAnswers + 1 : correctAnswers} out of {questions.length} questions correct
         </p>
         {!passed && (
           <Button onClick={handleRetake} variant="outline" className="gap-2">
