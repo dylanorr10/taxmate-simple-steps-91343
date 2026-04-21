@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, CheckCircle, Sparkles, Car, Bike } from "lucide-react";
+import { ChevronRight, CheckCircle, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,8 @@ const Onboarding = () => {
     name: "",
     email: "",
     password: "",
-    vehicleType: "",
+    businessStructure: "", // sole_trader | ltd | not_sure
+    revenueSource: "",     // stripe | lemon_squeezy | invoices | pre_revenue
     incomeEstimate: "",
     recordKeeping: "",
   });
@@ -49,16 +50,16 @@ const Onboarding = () => {
         experience_level = 'intermediate';
       }
 
-      // Retrieve selected platforms from Welcome page
-      const storedPlatforms = sessionStorage.getItem("selectedPlatforms");
-      const deliveryPlatforms = storedPlatforms ? JSON.parse(storedPlatforms) : [];
+      // Retrieve founder types from Welcome page
+      const storedTypes = sessionStorage.getItem("founderTypes");
+      const founderTypes = storedTypes ? JSON.parse(storedTypes) : [];
 
-      const defaultNavItems = getDefaultNavItems('transport', experience_level);
+      const defaultNavItems = getDefaultNavItems('solo_founder', experience_level);
 
       await supabase.from('profiles').update({
-        business_type: 'transport',
-        vehicle_type: formData.vehicleType,
-        delivery_platforms: deliveryPlatforms,
+        business_type: 'solo_founder',
+        // Reuse existing column to store founder sub-types (no schema change)
+        delivery_platforms: founderTypes,
         vat_registered,
         experience_level,
         nav_items: defaultNavItems,
@@ -66,11 +67,11 @@ const Onboarding = () => {
         demo_mode: false
       }).eq('id', user.id);
 
-      sessionStorage.removeItem("selectedPlatforms");
+      sessionStorage.removeItem("founderTypes");
 
       toast({
-        title: "Welcome aboard! 🚗",
-        description: "Your driver account is ready. Start by logging your first trip."
+        title: "Welcome aboard! 🚀",
+        description: "Your founder account is ready. Start by logging your first transaction."
       });
 
       navigate("/dashboard");
@@ -97,10 +98,10 @@ const Onboarding = () => {
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-3">
-            Welcome to Reelin 🚗
+            Welcome to Reelin 🚀
           </h1>
           <p className="text-lg text-muted-foreground mb-8">
-            Tax tracking built for delivery drivers
+            Your first finance hire — built for founders
           </p>
         </div>
 
@@ -108,9 +109,9 @@ const Onboarding = () => {
           <div className="flex items-start space-x-3 bg-primary/5 p-4 rounded-xl border border-primary/10">
             <CheckCircle className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-foreground">Track Every Mile</p>
+              <p className="font-semibold text-foreground">Know what to claim</p>
               <p className="text-sm text-muted-foreground">
-                Log trips in seconds and see your tax deduction grow at 45p/mile
+                OpenAI bills, hosting, contractors — we'll show you what counts
               </p>
             </div>
           </div>
@@ -118,9 +119,9 @@ const Onboarding = () => {
           <div className="flex items-start space-x-3 bg-accent/5 p-4 rounded-xl border border-accent/10">
             <CheckCircle className="w-6 h-6 text-accent flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-foreground">Snap Fuel Receipts</p>
+              <p className="font-semibold text-foreground">Know what you owe</p>
               <p className="text-sm text-muted-foreground">
-                Photograph receipts at the pump — never lose a fuel claim again
+                Tax to set aside, VAT threshold, when to go Ltd — all in plain English
               </p>
             </div>
           </div>
@@ -128,9 +129,9 @@ const Onboarding = () => {
           <div className="flex items-start space-x-3 bg-secondary/5 p-4 rounded-xl border border-secondary/10">
             <CheckCircle className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-foreground">MTD Ready by 2026</p>
+              <p className="font-semibold text-foreground">Hand off to an accountant when ready</p>
               <p className="text-sm text-muted-foreground">
-                Stay compliant with Making Tax Digital — we handle the digital records
+                Clean records, organised — your future accountant will thank you
               </p>
             </div>
           </div>
@@ -235,13 +236,19 @@ const Onboarding = () => {
     </div>
   );
 
-  // Screen 2: Vehicle Type
-  const VehicleTypeScreen = () => {
-    const vehicleTypes = [
-      { id: "car", label: "Car", icon: "🚗", description: "Sedan, hatchback, SUV" },
-      { id: "van", label: "Van", icon: "🚐", description: "Transit, Sprinter, Berlingo" },
-      { id: "motorbike", label: "Motorbike", icon: "🏍️", description: "Motorcycle or scooter" },
-      { id: "ebike", label: "E-Bike / Bicycle", icon: "🚲", description: "Electric or pedal bike" },
+  // Screen 2: Founder structure + revenue source
+  const FounderStructureScreen = () => {
+    const structures = [
+      { id: "sole_trader", label: "Sole trader", icon: "👤", description: "Just me, registered with HMRC" },
+      { id: "ltd", label: "Limited company (Ltd)", icon: "🏢", description: "Companies House registered" },
+      { id: "not_sure", label: "Not sure yet / pre-registration", icon: "🤔", description: "We'll teach you the difference" },
+    ];
+
+    const sources = [
+      { id: "stripe", label: "Stripe", icon: "💳" },
+      { id: "lemon_squeezy", label: "Lemon Squeezy / Paddle", icon: "🍋" },
+      { id: "invoices", label: "Direct invoices", icon: "📄" },
+      { id: "pre_revenue", label: "Pre-revenue", icon: "🛠️" },
     ];
 
     return (
@@ -249,31 +256,32 @@ const Onboarding = () => {
         <div className="flex-1 px-6 pt-6 overflow-y-auto">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              What do you deliver in?
+              How are you set up?
             </h2>
             <p className="text-muted-foreground">
-              This affects how we calculate your mileage deductions
+              We'll tailor your dashboard and lessons to match
             </p>
           </div>
 
-          <div className="space-y-3">
-            {vehicleTypes.map((type) => (
+          <div className="space-y-3 mb-6">
+            <p className="text-sm font-semibold text-foreground">Business structure</p>
+            {structures.map((s) => (
               <button
-                key={type.id}
-                onClick={() => updateFormData("vehicleType", type.id)}
+                key={s.id}
+                onClick={() => updateFormData("businessStructure", s.id)}
                 className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                  formData.vehicleType === type.id
+                  formData.businessStructure === s.id
                     ? "border-accent bg-accent/5 shadow-md"
                     : "border-border hover:border-accent/50 bg-card"
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="text-3xl">{type.icon}</div>
+                  <div className="text-3xl">{s.icon}</div>
                   <div className="flex-1">
-                    <p className="font-semibold text-foreground">{type.label}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{type.description}</p>
+                    <p className="font-semibold text-foreground">{s.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
                   </div>
-                  {formData.vehicleType === type.id && (
+                  {formData.businessStructure === s.id && (
                     <CheckCircle className="w-6 h-6 text-accent" />
                   )}
                 </div>
@@ -281,19 +289,23 @@ const Onboarding = () => {
             ))}
           </div>
 
-          <div className="bg-accent/5 border border-accent/10 rounded-xl p-4 mt-6">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-lg">💡</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground mb-1">
-                  Mileage rates
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Cars & vans: 45p/mile (first 10,000), then 25p/mile. Motorcycles: 24p/mile. Bicycles: 20p/mile.
-                </p>
-              </div>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-foreground">Where does revenue come from?</p>
+            <div className="grid grid-cols-2 gap-2">
+              {sources.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => updateFormData("revenueSource", s.id)}
+                  className={`p-3 rounded-xl border-2 transition-all text-left ${
+                    formData.revenueSource === s.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50 bg-card"
+                  }`}
+                >
+                  <div className="text-2xl mb-1">{s.icon}</div>
+                  <p className="text-sm font-medium text-foreground">{s.label}</p>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -308,7 +320,7 @@ const Onboarding = () => {
             </button>
             <button
               onClick={handleNext}
-              disabled={!formData.vehicleType}
+              disabled={!formData.businessStructure || !formData.revenueSource}
               className="flex-1 bg-gradient-to-r from-primary to-accent text-white font-semibold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               <span>Continue</span>
@@ -439,10 +451,10 @@ const Onboarding = () => {
             <CheckCircle className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-3">
-            You're all set, {formData.name?.split(" ")[0] || "driver"}! 🚗
+            You're all set, {formData.name?.split(" ")[0] || "founder"}! 🚀
           </h1>
           <p className="text-lg text-muted-foreground">
-            Your driver account is ready to go
+            Your founder account is ready to go
           </p>
         </div>
 
@@ -456,9 +468,9 @@ const Onboarding = () => {
                 <span className="text-accent font-bold">1</span>
               </div>
               <div>
-                <p className="font-semibold text-foreground">Log your first trip</p>
+                <p className="font-semibold text-foreground">Log your first transaction</p>
                 <p className="text-sm text-muted-foreground">
-                  Takes 5 seconds — start building your mileage deduction
+                  Stripe payout, OpenAI bill, contractor invoice — start your record
                 </p>
               </div>
             </div>
@@ -468,9 +480,9 @@ const Onboarding = () => {
                 <span className="text-accent font-bold">2</span>
               </div>
               <div>
-                <p className="font-semibold text-foreground">Snap a fuel receipt</p>
+                <p className="font-semibold text-foreground">Read "Sole trader vs Ltd"</p>
                 <p className="text-sm text-muted-foreground">
-                  Next time you fill up, photograph the receipt
+                  The single most important decision for a new founder
                 </p>
               </div>
             </div>
@@ -480,9 +492,9 @@ const Onboarding = () => {
                 <span className="text-accent font-bold">3</span>
               </div>
               <div>
-                <p className="font-semibold text-foreground">Learn the basics</p>
+                <p className="font-semibold text-foreground">Watch your VAT threshold</p>
                 <p className="text-sm text-muted-foreground">
-                  5-minute lessons on what you can claim as a delivery driver
+                  We'll warn you before you hit £90k turnover
                 </p>
               </div>
             </div>
@@ -519,7 +531,7 @@ const Onboarding = () => {
   const screens = [
     <WelcomeScreen key="welcome" />,
     <BasicInfoScreen key="basic" />,
-    <VehicleTypeScreen key="vehicle" />,
+    <FounderStructureScreen key="structure" />,
     <IncomeRecordsScreen key="income" />,
     <SuccessScreen key="success" />,
   ];

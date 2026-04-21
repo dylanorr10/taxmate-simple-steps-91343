@@ -38,6 +38,8 @@ import { ExpenseAlert } from "@/components/ExpenseAlert";
 import MTDGauge from "@/components/MTDGauge";
 import { MtdComplianceChecklist } from "@/components/MtdComplianceChecklist";
 import MileageStatsCard from "@/components/MileageStatsCard";
+import { VATThresholdCard } from "@/components/VATThresholdCard";
+import { ShouldYouGoLtdPrompt } from "@/components/ShouldYouGoLtdPrompt";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -257,14 +259,23 @@ const Dashboard = () => {
 
               {/* Sidebar Column */}
               <div className="space-y-6">
-                {/* Mileage Stats - Driver-focused */}
-                <div className="animate-fade-in" style={{ animationDelay: "25ms" }}>
-                  <MileageStatsCard
-                    totalMiles={Math.round((mileageTrips || []).filter(t => t.trip_type === 'business').reduce((sum, t) => sum + Number(t.distance_miles), 0))}
-                    totalDeduction={Math.round((mileageTrips || []).filter(t => t.trip_type === 'business').reduce((sum, t) => sum + Number(t.calculated_deduction), 0))}
-                  />
+                {/* Should you go Ltd? — only renders when profit > £30k annualised */}
+                <ShouldYouGoLtdPrompt annualProfit={profit * 12} />
+
+                {/* VAT Threshold Tracker — founder-critical */}
+                <div className="animate-fade-in" style={{ animationDelay: "10ms" }}>
+                  <VATThresholdCard />
                 </div>
 
+                {/* Mileage Stats — only show if user has any mileage trips */}
+                {(mileageTrips || []).filter(t => t.trip_type === 'business').length > 0 && (
+                  <div className="animate-fade-in" style={{ animationDelay: "25ms" }}>
+                    <MileageStatsCard
+                      totalMiles={Math.round((mileageTrips || []).filter(t => t.trip_type === 'business').reduce((sum, t) => sum + Number(t.distance_miles), 0))}
+                      totalDeduction={Math.round((mileageTrips || []).filter(t => t.trip_type === 'business').reduce((sum, t) => sum + Number(t.calculated_deduction), 0))}
+                    />
+                  </div>
+                )}
                 {/* Invoice Tracker - Overdue Payments */}
                 <div className="animate-fade-in" style={{ animationDelay: "50ms" }}>
                   <InvoiceTracker />

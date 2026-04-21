@@ -70,15 +70,15 @@ const Pricing = () => {
         {/* Hero */}
         <div className="text-center mb-12 md:mb-16">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            Simple pricing for drivers
+            Simple pricing for founders
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4">
-            Mileage tracking from day one. All plans include a 14-day free trial.
+            Founder Finance 101 included on every plan. 14-day free trial.
           </p>
           <div className="bg-primary/10 border border-primary/20 rounded-xl px-6 py-3 inline-block">
             <p className="text-sm text-muted-foreground">
-              QuickBooks charges £12/mo for features you'll never use.{' '}
-              <span className="text-primary font-semibold">Reelin gives drivers exactly what they need, from £4.99.</span>
+              Xero charges £15/mo and assumes you know accounting.{' '}
+              <span className="text-primary font-semibold">Reelin teaches you as you go, from £4.99.</span>
             </p>
           </div>
         </div>
