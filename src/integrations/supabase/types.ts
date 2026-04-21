@@ -300,6 +300,71 @@ export type Database = {
           },
         ]
       }
+      handoff_exports: {
+        Row: {
+          created_at: string
+          expires_at: string
+          file_path: string
+          file_size_bytes: number | null
+          health_score: number | null
+          id: string
+          period_end: string | null
+          period_label: string
+          period_start: string | null
+          receipt_count: number | null
+          sent_at: string | null
+          sent_to_email: string | null
+          status: string
+          transaction_count: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          file_path: string
+          file_size_bytes?: number | null
+          health_score?: number | null
+          id?: string
+          period_end?: string | null
+          period_label: string
+          period_start?: string | null
+          receipt_count?: number | null
+          sent_at?: string | null
+          sent_to_email?: string | null
+          status?: string
+          transaction_count?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          file_path?: string
+          file_size_bytes?: number | null
+          health_score?: number | null
+          id?: string
+          period_end?: string | null
+          period_label?: string
+          period_start?: string | null
+          receipt_count?: number | null
+          sent_at?: string | null
+          sent_to_email?: string | null
+          status?: string
+          transaction_count?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "handoff_exports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hmrc_categories: {
         Row: {
           code: string
@@ -1024,6 +1089,7 @@ export type Database = {
           created_at: string
           deadline_date: string
           end_date: string
+          handoff_sent_at: string | null
           id: string
           period_key: string
           quarter_number: number
@@ -1040,6 +1106,7 @@ export type Database = {
           created_at?: string
           deadline_date: string
           end_date: string
+          handoff_sent_at?: string | null
           id?: string
           period_key: string
           quarter_number: number
@@ -1056,6 +1123,7 @@ export type Database = {
           created_at?: string
           deadline_date?: string
           end_date?: string
+          handoff_sent_at?: string | null
           id?: string
           period_key?: string
           quarter_number?: number
