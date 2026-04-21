@@ -36,6 +36,7 @@ import { formatCurrency } from "@/utils/transactionHelpers";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { BookHealthScoreCard } from "@/components/BookHealthScoreCard";
+import AccountantHandoffCard from "@/components/AccountantHandoffCard";
 
 const Tax = () => {
   const navigate = useNavigate();

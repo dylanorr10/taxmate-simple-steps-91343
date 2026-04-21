@@ -21,6 +21,7 @@ import { format } from "date-fns";
 import { SUBSCRIPTION_TIERS } from "@/config/subscriptionTiers";
 import { SimplifiedExpensesSettings } from "@/components/SimplifiedExpensesSettings";
 import DataExportCard from "@/components/DataExportCard";
+import AccountantHandoffCard from "@/components/AccountantHandoffCard";
 import { PayrollSettingsToggle } from "@/components/payroll/PayrollSettingsToggle";
 import { OptionalModulesCard } from "@/components/OptionalModulesCard";
 
@@ -504,7 +505,10 @@ const SettingsPage = () => {
             <Download className="w-5 h-5" />
             Data Export & Retention
           </h2>
-          <DataExportCard />
+          <div className="space-y-4">
+            <AccountantHandoffCard />
+            <DataExportCard />
+          </div>
         </div>
 
         {/* Navigation Preferences */}
