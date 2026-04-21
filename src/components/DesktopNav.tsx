@@ -1,19 +1,22 @@
 import { Link, useLocation } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
-import { availableNavItems, getDefaultNavItems } from '@/data/navigationConfig';
+import { availableNavItems } from '@/data/navigationConfig';
+import { usePayrollSettings } from '@/hooks/usePayroll';
 import { cn } from '@/lib/utils';
 
 const DesktopNav = () => {
   const location = useLocation();
   const { profile } = useProfile();
+  const { enabled: payrollEnabled } = usePayrollSettings();
 
-  // Get user's custom nav items or smart defaults
-  const userNavItemIds = profile?.nav_items || 
-    getDefaultNavItems(profile?.business_type || undefined, profile?.experience_level || undefined);
-  
-  // Map to actual nav item configs - show all available items on desktop
-  const navItems = availableNavItems;
+  // Filter optional modules out of desktop nav unless explicitly enabled
+  const navItems = availableNavItems.filter((item) => {
+    if (item.id === 'mileage') return !!profile?.mileage_enabled;
+    if (item.id === 'payroll') return payrollEnabled;
+    if (item.id === 'settings') return false; // Settings rendered separately on the right
+    return true;
+  });
 
   return (
     <nav className="hidden lg:flex fixed top-0 left-0 right-0 bg-card/95 backdrop-blur-md border-b border-border z-50 shadow-sm">

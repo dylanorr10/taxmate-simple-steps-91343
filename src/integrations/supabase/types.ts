@@ -905,6 +905,8 @@ export type Database = {
           experience_level: string | null
           home_office_method: string | null
           id: string
+          invoicing_enabled: boolean
+          mileage_enabled: boolean
           mileage_method: string | null
           nav_items: Json | null
           profile_complete: boolean | null
@@ -924,6 +926,8 @@ export type Database = {
           experience_level?: string | null
           home_office_method?: string | null
           id: string
+          invoicing_enabled?: boolean
+          mileage_enabled?: boolean
           mileage_method?: string | null
           nav_items?: Json | null
           profile_complete?: boolean | null
@@ -943,6 +947,8 @@ export type Database = {
           experience_level?: string | null
           home_office_method?: string | null
           id?: string
+          invoicing_enabled?: boolean
+          mileage_enabled?: boolean
           mileage_method?: string | null
           nav_items?: Json | null
           profile_complete?: boolean | null

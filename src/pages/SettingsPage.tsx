@@ -22,6 +22,7 @@ import { SUBSCRIPTION_TIERS } from "@/config/subscriptionTiers";
 import { SimplifiedExpensesSettings } from "@/components/SimplifiedExpensesSettings";
 import DataExportCard from "@/components/DataExportCard";
 import { PayrollSettingsToggle } from "@/components/payroll/PayrollSettingsToggle";
+import { OptionalModulesCard } from "@/components/OptionalModulesCard";
 
 const SettingsPage = () => {
   const location = useLocation();
@@ -676,8 +677,14 @@ const SettingsPage = () => {
           </div>
         </div>
 
-        {/* Payroll Module */}
-        <PayrollSettingsToggle />
+        {/* Optional Modules — payroll, invoicing, mileage all in one place */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            Optional Modules
+          </h2>
+          <OptionalModulesCard />
+        </div>
 
         {/* Account Settings */}
         <div className="mb-6">

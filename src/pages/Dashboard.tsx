@@ -267,8 +267,8 @@ const Dashboard = () => {
                   <VATThresholdCard />
                 </div>
 
-                {/* Mileage Stats — only show if user has any mileage trips */}
-                {(mileageTrips || []).filter(t => t.trip_type === 'business').length > 0 && (
+                {/* Mileage Stats — only show if mileage module enabled AND has trips */}
+                {profile?.mileage_enabled && (mileageTrips || []).filter(t => t.trip_type === 'business').length > 0 && (
                   <div className="animate-fade-in" style={{ animationDelay: "25ms" }}>
                     <MileageStatsCard
                       totalMiles={Math.round((mileageTrips || []).filter(t => t.trip_type === 'business').reduce((sum, t) => sum + Number(t.distance_miles), 0))}
@@ -276,30 +276,16 @@ const Dashboard = () => {
                     />
                   </div>
                 )}
-                {/* Invoice Tracker - Overdue Payments */}
-                <div className="animate-fade-in" style={{ animationDelay: "50ms" }}>
-                  <InvoiceTracker />
-                </div>
+                {/* Invoice Tracker - only when invoicing module enabled */}
+                {profile?.invoicing_enabled && (
+                  <div className="animate-fade-in" style={{ animationDelay: "50ms" }}>
+                    <InvoiceTracker />
+                  </div>
+                )}
 
-                {/* MTD Compliance Gauge */}
+                {/* MTD Compliance Gauge — kept as quick at-a-glance score; full checklist lives on Tax page */}
                 <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
                   <MTDGauge score={mtdReadiness} />
-                </div>
-
-                {/* MTD Compliance Checklist */}
-                <div className="animate-fade-in" style={{ animationDelay: "150ms" }}>
-                  <MtdComplianceChecklist
-                    hasBusinessName={!!profile?.business_name}
-                    hasVATNumber={!!profile?.vat_number}
-                    hasHMRCConnection={isConnected}
-                    allHaveHMRCCategories={complianceFactors.allHaveHMRCCategories}
-                    noUncategorizedExpenses={complianceFactors.noUncategorizedExpenses}
-                    hasMileageTrips={complianceFactors.hasMileageTrips}
-                    allQuartersSubmittedOnTime={complianceFactors.allQuartersSubmittedOnTime}
-                    hasYearEndAdjustments={complianceFactors.hasYearEndAdjustments}
-                    hasIncomeTransactions={complianceFactors.hasIncomeTransactions}
-                    hasExpenseTransactions={complianceFactors.hasExpenseTransactions}
-                  />
                 </div>
 
                 {/* Recent Activity */}

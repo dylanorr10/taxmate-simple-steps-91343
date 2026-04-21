@@ -74,21 +74,16 @@ export const availableNavItems: NavItem[] = [
   }
 ];
 
-export const getDefaultNavItems = (businessType?: string, experienceLevel?: string): string[] => {
-  // Solo founders: log + learn + tax (no mileage)
-  if (businessType === 'solo_founder') {
-    return ['dashboard', 'log', 'learn', 'tax'];
-  }
-  // Transport/delivery drivers: mileage is second tab
-  if (businessType === 'transport' || businessType === 'delivery_driver') {
-    return ['dashboard', 'mileage', 'log', 'learn'];
-  }
-  if (businessType === 'creative' || businessType === 'content_creator') {
-    return ['dashboard', 'log', 'tax', 'learn'];
-  }
+// Optional modules — only shown in nav when user explicitly enables them
+export const OPTIONAL_NAV_IDS = ['mileage', 'payroll'] as const;
+// Note: invoicing isn't a separate nav item (it's a tab inside Money/Log),
+// but the same opt-in flag (`profiles.invoicing_enabled`) controls it.
+
+export const getDefaultNavItems = (_businessType?: string, experienceLevel?: string): string[] => {
+  // Stripped to essentials: Dashboard / Money / Learn / Tax for everyone.
+  // Mileage / Payroll / Invoicing are opt-in via Settings → Optional Modules.
   if (experienceLevel === 'beginner') {
     return ['dashboard', 'log', 'learn', 'glossary'];
   }
-  // Default for founder-first product
   return ['dashboard', 'log', 'learn', 'tax'];
 };

@@ -33,8 +33,11 @@ import { HMRCCategoryPicker } from "@/components/HMRCCategoryPicker";
 import { BusinessUseSlider } from "@/components/BusinessUseSlider";
 import { Badge } from "@/components/ui/badge";
 import { useHMRCCategories, HMRCCategory } from "@/hooks/useHMRCCategories";
+import { useProfile } from "@/hooks/useProfile";
 
 const Log = () => {
+  const { profile } = useProfile();
+  const invoicingEnabled = !!profile?.invoicing_enabled;
   const [cashAmount, setCashAmount] = useState("");
   const [cashDescription, setCashDescription] = useState("");
   const [clientName, setClientName] = useState("");
@@ -241,10 +244,10 @@ const Log = () => {
         <CashFlowForecast />
 
         <Tabs defaultValue="bank" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className={`grid w-full ${invoicingEnabled ? 'grid-cols-3' : 'grid-cols-2'}`}>
             <TabsTrigger value="bank">Bank</TabsTrigger>
             <TabsTrigger value="manual">Manual</TabsTrigger>
-            <TabsTrigger value="invoices">Invoices</TabsTrigger>
+            {invoicingEnabled && <TabsTrigger value="invoices">Invoices</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="bank" className="space-y-4 mt-4">
@@ -797,9 +800,11 @@ const Log = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="invoices" className="space-y-4 mt-4">
-            <InvoiceTracker />
-          </TabsContent>
+          {invoicingEnabled && (
+            <TabsContent value="invoices" className="space-y-4 mt-4">
+              <InvoiceTracker />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
 
