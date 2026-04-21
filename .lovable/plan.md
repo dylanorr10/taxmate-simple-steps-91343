@@ -1,89 +1,103 @@
 
 
-# Pivot Reelin to Founder-First (Step One)
+# Payroll Module (Optional, Founder-Focused)
 
-Strip the driver framing. Reposition the entire app as **"The Finance Co-Pilot for First-Time Founders"** — covers sole trader → Ltd transition, Stripe revenue, SaaS expenses, VAT threshold, and hands off to a vetted accountant when they're ready.
+Add payroll as an **optional module** founders can enable when they hire their first person (themselves on PAYE, a contractor, or first employee). Off by default — surfaces when relevant, never clutters the app for pre-revenue solo founders.
 
-## What Changes
+## The Founder Reality
 
-### 1. Brand + Copy Layer
-- **`src/pages/Landing.tsx`** — Rewrite hero, pain points, comparison, social proof for founders. Replace "delivery driver" hero/QuickBooks section with:
-  - Hero: "Your first finance hire. For founders who'd rather build than bookkeep."
-  - Pains: "Sole trader or Ltd?", "Can I claim my OpenAI bill?", "When do I register for VAT?", "What do I owe HMRC?"
-  - Comparison: "Xero assumes you know accounting. You don't. That's the point."
-- **`src/pages/Auth.tsx`, `src/pages/Pricing.tsx`** — Swap driver copy for founder copy.
+Three payroll moments hit founders in order:
+1. **Going Ltd & paying themselves** — director's salary at the £12,570 threshold + dividends (most common first need)
+2. **Paying a contractor** — IR35 check, invoice tracking, no PAYE needed
+3. **First employee** — full PAYE, NI, pension auto-enrolment, RTI to HMRC
 
-### 2. Onboarding Flow
-- **`src/pages/Welcome.tsx`** — Replace 7 delivery platforms with founder categories:
-  - Building a SaaS / AI product
-  - Agency / consultancy
-  - Content / creator business
-  - Ecommerce / DTC
-  - Freelance services
-  - Other digital business
-- **`src/pages/Onboarding.tsx`** — Add founder branch:
-  - "Sole trader or Ltd?" (with "not sure" → routes to lesson)
-  - "Where does revenue come from?" (Stripe / Lemon Squeezy / Invoices / Pre-revenue)
-  - "Monthly recurring costs?" (API credits, hosting, tools)
+We cover #1 and #2 properly. For #3 we **track and educate**, then hand off to a real payroll provider (Gusto-style integration or accountant) — building full HMRC RTI submission is a 6-month project on its own.
 
-### 3. Business Type Config
-- **`src/data/businessTypeConfig.ts`** — Add `digital_business` / `solo_founder` type with founder expense examples (OpenAI, Anthropic, Vercel, Supabase, Cursor, GitHub, Figma, domains, Stripe fees, contractor invoices, ads).
-- Make `solo_founder` the default for new signups.
+## What Gets Built
 
-### 4. Learning Hub: Founder Finance 101
-- **`src/data/learningContent.ts`** — Add 10-lesson founder path:
-  1. Sole trader vs Ltd — when to switch (£30-50k profit rule)
-  2. What digital founders can claim (SaaS, APIs, home office)
-  3. The £90k VAT threshold — why it matters for AI startups
-  4. Stripe, Lemon Squeezy & foreign income — how HMRC sees it
-  5. Paying yourself: salary vs dividends vs drawings
-  6. R&D tax credits for AI/software
-  7. Companies House basics (confirmation statement, deadlines)
-  8. When to hire an accountant + what to hand them
-  9. Saving for tax with lumpy revenue
-  10. MTD ITSA April 2026 for solo founders
+### 1. New "Payroll" section (opt-in)
+- Hidden by default. Surfaces via:
+  - Settings → "Enable Payroll module"
+  - Auto-prompt on Dashboard when user marks themselves as Ltd in onboarding
+  - CTA inside the "Paying yourself: salary vs dividends" lesson
 
-### 5. Dashboard
-- **`src/pages/Dashboard.tsx`** — Founder-tuned widgets:
-  - "Profit this month" front and centre (replaces mileage hero)
-  - "Tax to set aside" (already exists, surface higher)
-  - **NEW** `src/components/VATThresholdCard.tsx` — rolling 12-month turnover vs £90k with progress bar
-  - **NEW** "Should you go Ltd?" prompt component that appears when profit > £30k, links to lesson
+### 2. Three payroll types
 
-### 6. Navigation Defaults
-- **`src/data/navigationConfig.ts`** — Founder default: `dashboard / log / learn / tax` (drop mileage from default tabs).
+**a) Director's salary (you, paying yourself)**
+- Set monthly salary (default £1,047.50/mo = £12,570/yr tax-free threshold)
+- Auto-creates monthly expense entries tagged "Director's salary"
+- Shows tax/NI implications inline ("At this level: £0 income tax, £0 employee NI, £0 employer NI")
+- Companion dividend tracker (record dividend payments separately, shows tax band warnings)
 
-### 7. Memory Update
-- Update `mem://index.md` Core to reflect founder pivot (replace driver-niche line).
-- New memory file: `mem://positioning/founder-pivot` documenting the new ICP and copy direction.
+**b) Contractor payments**
+- Add contractor (name, email, UTR optional, IR35 status flag)
+- Log payments → auto-creates expense entry tagged to that contractor
+- Year-end summary per contractor (CSV export for accountant)
+- IR35 helper: 5-question checker linking to lesson
 
-## What I Won't Touch (Yet)
-- No DB schema changes (existing `business_type` field handles new type)
-- No Stripe/pricing changes
-- No accountant handoff flow yet (that's Step Two)
-- Driver code stays in place but is deprioritised in copy/defaults — can be revived as a preset later if you sell to a driver-focused buyer
+**c) Employees (lightweight tracker + handoff)**
+- Add employee with salary, start date, NI category
+- Monthly run: shows gross / estimated PAYE / employee NI / employer NI / pension (using HMRC 2025-26 rates)
+- **Does NOT submit RTI to HMRC.** Big banner: "For real PAYE submission, connect a payroll provider or your accountant"
+- Export monthly run as PDF/CSV for whoever processes it
+
+### 3. Dashboard integration
+- New widget (only when payroll enabled): "Payroll this month — £X gross across N people"
+- Employer NI added to "Tax to set aside" calculation
+- Director salary auto-flows into existing expense totals
+
+### 4. Two new founder lessons
+Append to `learningContent.ts`:
+- `founder-paying-yourself-ltd` — director salary vs dividends, optimal split for 2025-26
+- `founder-first-hire` — contractor vs employee, IR35, what payroll really costs
+
+### 5. Honest scoping
+- **No HMRC PAYE RTI submission** — explicitly out of scope, signposted to FreeAgent/Xero Payroll/accountant
+- **No pension auto-enrolment provider integration** — we calculate the contribution, user processes via NEST/Smart Pension separately
+- **No P60/P45 generation** — listed as "v2"
+
+## Database Changes
+
+Three new tables:
+
+| Table | Purpose |
+|---|---|
+| `payroll_settings` | per-user: enabled flag, employer reference, PAYE scheme ref (optional) |
+| `payroll_people` | directors / contractors / employees — type, name, salary, NI category, IR35 status |
+| `payroll_runs` | monthly run per person: gross, tax, NI, pension, net, status |
+
+All with standard RLS (auth.uid() = user_id). `payroll_runs` auto-syncs into `expense_transactions` so existing P&L, tax estimates, and exports just work.
 
 ## Files Touched
 
 | File | Change |
 |---|---|
-| `src/pages/Landing.tsx` | Founder hero, pains, comparison rewrite |
-| `src/pages/Welcome.tsx` | Founder category picker |
-| `src/pages/Onboarding.tsx` | Add Ltd/sole-trader + revenue source branch |
-| `src/pages/Auth.tsx` | Founder copy |
-| `src/pages/Pricing.tsx` | Founder copy on tiers |
-| `src/pages/Dashboard.tsx` | Surface VAT threshold + Ltd prompt |
-| `src/data/businessTypeConfig.ts` | Add `solo_founder` type |
-| `src/data/learningContent.ts` | Add 10 founder lessons |
-| `src/data/navigationConfig.ts` | Founder default nav |
-| `src/components/VATThresholdCard.tsx` | NEW |
-| `src/components/ShouldYouGoLtdPrompt.tsx` | NEW |
-| `mem://index.md` + `mem://positioning/founder-pivot` | Memory update |
+| `supabase/migrations/...` | NEW — 3 tables + RLS |
+| `src/pages/Payroll.tsx` | NEW — main page with 3 tabs (You / Contractors / Employees) |
+| `src/components/payroll/DirectorSalaryCard.tsx` | NEW |
+| `src/components/payroll/ContractorList.tsx` | NEW |
+| `src/components/payroll/EmployeePayrollRun.tsx` | NEW |
+| `src/components/payroll/IR35Checker.tsx` | NEW |
+| `src/hooks/usePayroll.ts` | NEW — CRUD + monthly calculations |
+| `src/lib/payrollCalculations.ts` | NEW — UK 2025-26 PAYE/NI/pension math |
+| `src/data/navigationConfig.ts` | Add `payroll` nav item (recommendedFor: solo_founder, only shown when enabled) |
+| `src/pages/SettingsPage.tsx` | Add "Enable Payroll" toggle |
+| `src/pages/Dashboard.tsx` | Conditional payroll widget + auto-prompt for Ltd users |
+| `src/data/learningContent.ts` | 2 new lessons |
+| `src/App.tsx` | Add `/payroll` route |
 
 ## Priority Order
-1. Landing page + Welcome (what new visitors see)
-2. Business type config + Onboarding branch
-3. Founder learning path (the actual value)
-4. Dashboard widgets (VAT threshold, Ltd prompt)
-5. Memory update
+1. DB migration + `payrollCalculations.ts` (the math has to be right)
+2. Director salary flow (covers 80% of founder need)
+3. Contractor tracker + IR35 checker
+4. Employee run calculator + handoff banner
+5. Dashboard widget + settings toggle
+6. Two lessons
+
+## Out of Scope (Documented as "v2")
+- HMRC RTI submission
+- P60/P45 generation
+- Pension provider API integration
+- Multi-currency payroll
+- Historic payroll backfill
 
