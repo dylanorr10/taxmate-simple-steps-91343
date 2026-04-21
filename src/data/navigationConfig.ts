@@ -67,6 +67,10 @@ export const availableNavItems: NavItem[] = [
 ];
 
 export const getDefaultNavItems = (businessType?: string, experienceLevel?: string): string[] => {
+  // Solo founders: log + learn + tax (no mileage)
+  if (businessType === 'solo_founder') {
+    return ['dashboard', 'log', 'learn', 'tax'];
+  }
   // Transport/delivery drivers: mileage is second tab
   if (businessType === 'transport' || businessType === 'delivery_driver') {
     return ['dashboard', 'mileage', 'log', 'learn'];
@@ -77,6 +81,6 @@ export const getDefaultNavItems = (businessType?: string, experienceLevel?: stri
   if (experienceLevel === 'beginner') {
     return ['dashboard', 'log', 'learn', 'glossary'];
   }
-  // Default for everyone else
-  return ['dashboard', 'log', 'mileage', 'learn'];
+  // Default for founder-first product
+  return ['dashboard', 'log', 'learn', 'tax'];
 };

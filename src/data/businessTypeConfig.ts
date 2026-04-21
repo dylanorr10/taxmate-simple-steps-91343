@@ -1,4 +1,4 @@
-export type BusinessType = 'trades' | 'creative' | 'professional' | 'health' | 'transport' | 'other';
+export type BusinessType = 'solo_founder' | 'trades' | 'creative' | 'professional' | 'health' | 'transport' | 'other';
 
 export interface BusinessTypeConfig {
   priorityLessons: string[];
@@ -8,6 +8,53 @@ export interface BusinessTypeConfig {
 }
 
 export const businessTypeConfig: Record<BusinessType, BusinessTypeConfig> = {
+  solo_founder: {
+    priorityLessons: [
+      'founder-sole-trader-vs-ltd',
+      'founder-what-you-can-claim',
+      'founder-vat-threshold',
+      'founder-stripe-foreign-income',
+      'founder-paying-yourself',
+      'founder-rd-tax-credits',
+      'founder-companies-house',
+      'founder-when-to-hire-accountant',
+      'founder-saving-for-tax',
+      'founder-mtd-itsa-2026',
+    ],
+    hiddenLessons: ['cis-basics', 'mileage-tracking', 'vehicle-expenses'],
+    customExamples: {
+      'founder-what-you-can-claim': [
+        'OpenAI / Anthropic API credits',
+        'Vercel / Supabase / AWS hosting',
+        'Cursor / GitHub Copilot subscriptions',
+        'Figma / Notion / Linear',
+        'Domain + Google Workspace',
+        'Stripe / Lemon Squeezy fees',
+        'Contractor invoices (designers, devs)',
+        'Ads (Google, Meta, Reddit, X)',
+        'Co-working day passes',
+        'Laptop + monitor',
+        'Online courses & books',
+      ],
+      'understanding-profit': [
+        'Stripe / Lemon Squeezy revenue',
+        'API + hosting costs',
+        'Contractor spend',
+        'Software subscriptions',
+      ],
+      'tax-planning': [
+        'Set aside 30% of profit for tax',
+        'Quarterly Stripe payout review',
+        'Pension contributions (Ltd)',
+        'Dividend timing',
+      ],
+    },
+    quickRefCards: [
+      'Sole Trader vs Ltd Decision Guide',
+      'Founder Expense Checklist',
+      'VAT Threshold Tracker',
+    ],
+  },
   trades: {
     priorityLessons: ['claiming-expenses', 'vat-explained', 'cis-basics', 'mileage-tracking'],
     hiddenLessons: ['digital-services-tax', 'copyright-basics'],
@@ -91,6 +138,7 @@ export const getExamples = (lessonId: string, businessType: BusinessType): strin
 
 export const getBusinessTypeLabel = (businessType: BusinessType): string => {
   const labels: Record<BusinessType, string> = {
+    solo_founder: 'Solo Founder / Digital Business',
     trades: 'Trades & Manual Work',
     creative: 'Creative & Tech',
     professional: 'Professional Services',
