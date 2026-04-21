@@ -236,13 +236,19 @@ const Onboarding = () => {
     </div>
   );
 
-  // Screen 2: Vehicle Type
-  const VehicleTypeScreen = () => {
-    const vehicleTypes = [
-      { id: "car", label: "Car", icon: "🚗", description: "Sedan, hatchback, SUV" },
-      { id: "van", label: "Van", icon: "🚐", description: "Transit, Sprinter, Berlingo" },
-      { id: "motorbike", label: "Motorbike", icon: "🏍️", description: "Motorcycle or scooter" },
-      { id: "ebike", label: "E-Bike / Bicycle", icon: "🚲", description: "Electric or pedal bike" },
+  // Screen 2: Founder structure + revenue source
+  const FounderStructureScreen = () => {
+    const structures = [
+      { id: "sole_trader", label: "Sole trader", icon: "👤", description: "Just me, registered with HMRC" },
+      { id: "ltd", label: "Limited company (Ltd)", icon: "🏢", description: "Companies House registered" },
+      { id: "not_sure", label: "Not sure yet / pre-registration", icon: "🤔", description: "We'll teach you the difference" },
+    ];
+
+    const sources = [
+      { id: "stripe", label: "Stripe", icon: "💳" },
+      { id: "lemon_squeezy", label: "Lemon Squeezy / Paddle", icon: "🍋" },
+      { id: "invoices", label: "Direct invoices", icon: "📄" },
+      { id: "pre_revenue", label: "Pre-revenue", icon: "🛠️" },
     ];
 
     return (
@@ -250,31 +256,32 @@ const Onboarding = () => {
         <div className="flex-1 px-6 pt-6 overflow-y-auto">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-foreground mb-2">
-              What do you deliver in?
+              How are you set up?
             </h2>
             <p className="text-muted-foreground">
-              This affects how we calculate your mileage deductions
+              We'll tailor your dashboard and lessons to match
             </p>
           </div>
 
-          <div className="space-y-3">
-            {vehicleTypes.map((type) => (
+          <div className="space-y-3 mb-6">
+            <p className="text-sm font-semibold text-foreground">Business structure</p>
+            {structures.map((s) => (
               <button
-                key={type.id}
-                onClick={() => updateFormData("vehicleType", type.id)}
+                key={s.id}
+                onClick={() => updateFormData("businessStructure", s.id)}
                 className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
-                  formData.vehicleType === type.id
+                  formData.businessStructure === s.id
                     ? "border-accent bg-accent/5 shadow-md"
                     : "border-border hover:border-accent/50 bg-card"
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="text-3xl">{type.icon}</div>
+                  <div className="text-3xl">{s.icon}</div>
                   <div className="flex-1">
-                    <p className="font-semibold text-foreground">{type.label}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{type.description}</p>
+                    <p className="font-semibold text-foreground">{s.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
                   </div>
-                  {formData.vehicleType === type.id && (
+                  {formData.businessStructure === s.id && (
                     <CheckCircle className="w-6 h-6 text-accent" />
                   )}
                 </div>
@@ -282,19 +289,23 @@ const Onboarding = () => {
             ))}
           </div>
 
-          <div className="bg-accent/5 border border-accent/10 rounded-xl p-4 mt-6">
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-lg">💡</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground mb-1">
-                  Mileage rates
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Cars & vans: 45p/mile (first 10,000), then 25p/mile. Motorcycles: 24p/mile. Bicycles: 20p/mile.
-                </p>
-              </div>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-foreground">Where does revenue come from?</p>
+            <div className="grid grid-cols-2 gap-2">
+              {sources.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => updateFormData("revenueSource", s.id)}
+                  className={`p-3 rounded-xl border-2 transition-all text-left ${
+                    formData.revenueSource === s.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50 bg-card"
+                  }`}
+                >
+                  <div className="text-2xl mb-1">{s.icon}</div>
+                  <p className="text-sm font-medium text-foreground">{s.label}</p>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -309,7 +320,7 @@ const Onboarding = () => {
             </button>
             <button
               onClick={handleNext}
-              disabled={!formData.vehicleType}
+              disabled={!formData.businessStructure || !formData.revenueSource}
               className="flex-1 bg-gradient-to-r from-primary to-accent text-white font-semibold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               <span>Continue</span>
