@@ -41,8 +41,8 @@ export const LessonQuiz = ({ quiz, onComplete, previousScore }: LessonQuizProps)
   const handleNextQuestion = () => {
     if (isLastQuestion) {
       const finalCorrect = isCorrect ? correctAnswers + 1 : correctAnswers;
-      const scorePercent = Math.round((finalCorrect / quiz.questions.length) * 100);
-      const passed = scorePercent >= quiz.passing_score;
+      const scorePercent = Math.round((finalCorrect / questions.length) * 100);
+      const passed = scorePercent >= (quiz?.passing_score ?? 70);
       setIsComplete(true);
       onComplete(scorePercent, passed);
     } else {
