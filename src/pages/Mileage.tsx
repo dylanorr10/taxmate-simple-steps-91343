@@ -279,6 +279,42 @@ const Mileage = () => {
     );
   }
 
+  // Mileage is an opt-in module
+  if (profile && !profile.mileage_enabled) {
+    return (
+      <div className="min-h-screen bg-background pb-24">
+        <div className="bg-card border-b sticky top-0 z-10">
+          <div className="max-w-2xl mx-auto px-6 py-4 flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-semibold text-foreground">Mileage</h1>
+          </div>
+        </div>
+        <div className="max-w-2xl mx-auto px-6 py-12">
+          <Card>
+            <CardContent className="p-6 space-y-4 text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <Car className="h-6 w-6 text-primary" />
+              </div>
+              <h2 className="text-lg font-semibold text-foreground">Mileage tracking is off</h2>
+              <p className="text-sm text-muted-foreground">
+                Reelin's core is money in, money out, and tax. Turn on mileage tracking when you need to claim business trips.
+              </p>
+              <Button
+                onClick={() => updateProfile({ mileage_enabled: true })}
+                disabled={isUpdatingProfile}
+              >
+                Enable mileage tracking
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
