@@ -129,14 +129,33 @@ const LessonPage = () => {
     toast.success(progress?.bookmarked ? "Removed from bookmarks" : "Added to bookmarks");
   };
 
+  const announceCompletionTime = () => {
+    if (completionAnnouncedRef.current || !lesson || startTimeRef.current === null) return;
+    completionAnnouncedRef.current = true;
+    const elapsedSec = Math.max(1, Math.round((Date.now() - startTimeRef.current) / 1000));
+    const estimatedSec = (lesson.duration || 0) * 60;
+    const mins = Math.floor(elapsedSec / 60);
+    const secs = elapsedSec % 60;
+    const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+
+    let message = `Finished in just ${timeStr}!`;
+    if (estimatedSec > 0 && elapsedSec < estimatedSec) {
+      const savedMin = Math.max(1, Math.round((estimatedSec - elapsedSec) / 60));
+      message = `🚀 Smashed it in ${timeStr} — ${savedMin} min faster than expected!`;
+    } else if (estimatedSec > 0) {
+      message = `✅ Lesson complete in ${timeStr}. Nicely done.`;
+    }
+    toast.success(message, { duration: 6000 });
+  };
+
   const handleQuizComplete = (score: number, passed: boolean) => {
     if (!id) return;
     recordQuizAttempt.mutate({ lessonId: id, score });
     setQuizCompleted(true);
-    
+
     if (passed) {
       completeLesson.mutate({ lessonId: id, quizScore: score });
-      toast.success("Lesson completed! 🎉");
+      announceCompletionTime();
     }
   };
 
