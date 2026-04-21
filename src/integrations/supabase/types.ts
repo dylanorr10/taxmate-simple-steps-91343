@@ -689,6 +689,155 @@ export type Database = {
           },
         ]
       }
+      payroll_people: {
+        Row: {
+          active: boolean
+          annual_salary: number
+          created_at: string
+          email: string | null
+          id: string
+          ir35_status: string | null
+          monthly_salary: number
+          name: string
+          ni_category: string | null
+          notes: string | null
+          person_type: string
+          start_date: string | null
+          updated_at: string
+          user_id: string
+          utr: string | null
+        }
+        Insert: {
+          active?: boolean
+          annual_salary?: number
+          created_at?: string
+          email?: string | null
+          id?: string
+          ir35_status?: string | null
+          monthly_salary?: number
+          name: string
+          ni_category?: string | null
+          notes?: string | null
+          person_type: string
+          start_date?: string | null
+          updated_at?: string
+          user_id: string
+          utr?: string | null
+        }
+        Update: {
+          active?: boolean
+          annual_salary?: number
+          created_at?: string
+          email?: string | null
+          id?: string
+          ir35_status?: string | null
+          monthly_salary?: number
+          name?: string
+          ni_category?: string | null
+          notes?: string | null
+          person_type?: string
+          start_date?: string | null
+          updated_at?: string
+          user_id?: string
+          utr?: string | null
+        }
+        Relationships: []
+      }
+      payroll_runs: {
+        Row: {
+          created_at: string
+          employee_ni: number
+          employer_ni: number
+          expense_transaction_id: string | null
+          gross: number
+          id: string
+          income_tax: number
+          net_pay: number
+          notes: string | null
+          pay_month: string
+          pension_contribution: number
+          person_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          employee_ni?: number
+          employer_ni?: number
+          expense_transaction_id?: string | null
+          gross?: number
+          id?: string
+          income_tax?: number
+          net_pay?: number
+          notes?: string | null
+          pay_month: string
+          pension_contribution?: number
+          person_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          employee_ni?: number
+          employer_ni?: number
+          expense_transaction_id?: string | null
+          gross?: number
+          id?: string
+          income_tax?: number
+          net_pay?: number
+          notes?: string | null
+          pay_month?: string
+          pension_contribution?: number
+          person_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_runs_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_settings: {
+        Row: {
+          auto_create_expenses: boolean
+          created_at: string
+          employer_reference: string | null
+          enabled: boolean
+          id: string
+          paye_scheme_reference: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_create_expenses?: boolean
+          created_at?: string
+          employer_reference?: string | null
+          enabled?: boolean
+          id?: string
+          paye_scheme_reference?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_create_expenses?: boolean
+          created_at?: string
+          employer_reference?: string | null
+          enabled?: boolean
+          id?: string
+          paye_scheme_reference?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       period_amendments: {
         Row: {
           amendment_type: string
