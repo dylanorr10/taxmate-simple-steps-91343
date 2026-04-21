@@ -20,6 +20,7 @@ import { Switch } from '@/components/ui/switch';
 import BottomNav from '@/components/BottomNav';
 import { useMileageTrips, calculateDeduction, MileageTrip } from '@/hooks/useMileageTrips';
 import { HomeOfficeCalculator } from '@/components/HomeOfficeCalculator';
+import { useProfile } from '@/hooks/useProfile';
 import { toast } from 'sonner';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
@@ -33,6 +34,7 @@ const PURPOSE_PRESETS = [
 
 const Mileage = () => {
   const navigate = useNavigate();
+  const { profile, updateProfile, isUpdating } = useProfile();
   const {
     trips,
     isLoading,
