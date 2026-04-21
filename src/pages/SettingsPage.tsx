@@ -658,7 +658,11 @@ const SettingsPage = () => {
               <Button variant="outline" className="w-full">
                 Get Help Now
               </Button>
-            </Card>
+          </Card>
+        </div>
+
+        {/* Payroll Module */}
+        <PayrollSettingsToggle />
 
             <Card className="p-4 bg-primary/10 border-primary/20">
               <div className="flex items-center gap-3 mb-3">
