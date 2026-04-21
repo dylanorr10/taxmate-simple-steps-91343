@@ -23,6 +23,7 @@ import Auth from "./pages/Auth";
 import Chat from "./pages/Chat";
 import Install from "./pages/Install";
 import Pricing from "./pages/Pricing";
+import Payroll from "./pages/Payroll";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { FloatingChatButton } from "@/components/FloatingChatButton";
 
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/glossary" element={<ProtectedRoute><Glossary /></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+            <Route path="/payroll" element={<ProtectedRoute><Payroll /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
