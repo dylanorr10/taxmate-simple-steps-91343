@@ -57,11 +57,18 @@ const LessonPage = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
+  const startTimeRef = useRef<number | null>(null);
+  const completionAnnouncedRef = useRef(false);
 
-  // Start lesson tracking
+  // Start lesson tracking + invisible timer
   useEffect(() => {
-    if (id && lesson && !progress) {
-      startLesson.mutate(id);
+    if (id && lesson) {
+      if (startTimeRef.current === null) {
+        startTimeRef.current = Date.now();
+      }
+      if (!progress) {
+        startLesson.mutate(id);
+      }
     }
   }, [id, lesson, progress]);
 
