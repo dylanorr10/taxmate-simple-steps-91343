@@ -2,17 +2,27 @@ import { Link, useLocation } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import { useProfile } from '@/hooks/useProfile';
 import { availableNavItems, getDefaultNavItems } from '@/data/navigationConfig';
+import { usePayrollSettings } from '@/hooks/usePayroll';
 
 const BottomNav = () => {
   const location = useLocation();
   const { profile } = useProfile();
+  const { enabled: payrollEnabled } = usePayrollSettings();
 
   // Get user's custom nav items or smart defaults
   const userNavItemIds = profile?.nav_items || 
     getDefaultNavItems(profile?.business_type || undefined, profile?.experience_level || undefined);
   
+  // Filter out optional modules unless explicitly enabled
+  const isAllowed = (id: string) => {
+    if (id === 'mileage') return !!profile?.mileage_enabled;
+    if (id === 'payroll') return payrollEnabled;
+    return true;
+  };
+
   // Map to actual nav item configs
   const navItems = userNavItemIds
+    .filter(isAllowed)
     .map(id => availableNavItems.find(item => item.id === id))
     .filter(Boolean)
     .slice(0, 4); // Enforce max 4 items

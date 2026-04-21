@@ -16,6 +16,8 @@ export interface Profile {
   accounting_basis: string | null;
   mileage_method: string | null;
   home_office_method: string | null;
+  invoicing_enabled: boolean | null;
+  mileage_enabled: boolean | null;
   created_at: string;
   updated_at: string;
 }
