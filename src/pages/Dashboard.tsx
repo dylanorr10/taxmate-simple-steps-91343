@@ -35,7 +35,7 @@ import { QuickAddFab } from "@/components/QuickAddFab";
 import { ExpandableSection } from "@/components/ExpandableSection";
 import { InvoiceTracker } from "@/components/InvoiceTracker";
 import { ExpenseAlert } from "@/components/ExpenseAlert";
-import MTDGauge from "@/components/MTDGauge";
+import { BookHealthScoreCard } from "@/components/BookHealthScoreCard";
 import { MtdComplianceChecklist } from "@/components/MtdComplianceChecklist";
 import MileageStatsCard from "@/components/MileageStatsCard";
 import { VATThresholdCard } from "@/components/VATThresholdCard";
@@ -283,9 +283,9 @@ const Dashboard = () => {
                   </div>
                 )}
 
-                {/* MTD Compliance Gauge — kept as quick at-a-glance score; full checklist lives on Tax page */}
+                {/* Book Health Score — the killer feature */}
                 <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-                  <MTDGauge score={mtdReadiness} />
+                  <BookHealthScoreCard />
                 </div>
 
                 {/* Recent Activity */}
