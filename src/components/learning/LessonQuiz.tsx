@@ -104,7 +104,7 @@ export const LessonQuiz = ({ quiz, onComplete, previousScore }: LessonQuizProps)
       {/* Progress bar */}
       <div>
         <div className="flex justify-between text-sm text-muted-foreground mb-2">
-          <span>Question {currentQuestion + 1} of {quiz.questions.length}</span>
+          <span>Question {currentQuestion + 1} of {questions.length}</span>
           <span>{correctAnswers} correct</span>
         </div>
         <div className="h-2 bg-muted rounded-full overflow-hidden">
